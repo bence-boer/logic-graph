@@ -18,11 +18,34 @@
     let width = $state(0);
     let height = $state(0);
     let simulation: Simulation<LogicNode, D3Link> | null = null;
+    let hovered_node_id = $state<string | null>(null);
 
     // Reactive references to store data
     let nodes = $derived(graph_store.nodes);
     let connections = $derived(graph_store.connections);
     let links = $derived(convert_connections_to_d3_links(connections));
+
+    // Get connected node IDs for highlighting
+    function get_connected_node_ids(node_id: string): Set<string> {
+        const connected = new Set<string>();
+        connections.forEach((conn) => {
+            if (conn.sources.includes(node_id)) {
+                conn.targets.forEach((target) => connected.add(target));
+            }
+            if (conn.targets.includes(node_id)) {
+                conn.sources.forEach((source) => connected.add(source));
+            }
+        });
+        return connected;
+    }
+
+    // Check if a link is connected to the hovered node
+    function is_link_connected_to_hovered(link: D3Link): boolean {
+        if (!hovered_node_id) return false;
+        const source_id = (link.source as LogicNode).id;
+        const target_id = (link.target as LogicNode).id;
+        return source_id === hovered_node_id || target_id === hovered_node_id;
+    }
 
     onMount(() => {
         // Load sample data for testing
@@ -115,7 +138,46 @@
                 d.connection.type === ConnectionType.CONTRADICTION
                     ? `url(#${get_arrow_marker_id(d.connection.type)}-start)`
                     : null
-            );
+            )
+            .attr('cursor', 'pointer')
+            .on('click', (event, d) => {
+                event.stopPropagation();
+                selection_store.select_connection(d.connection.id);
+            })
+            .on('mouseover', function (event, d) {
+                d3.select(this)
+                    .attr('stroke-width', 4)
+                    .style('filter', 'drop-shadow(0 0 4px currentColor)');
+            })
+            .on('mouseout', function (event, d) {
+                const is_selected = selection_store.is_selected(d.connection.id);
+                d3.select(this)
+                    .attr('stroke-width', is_selected ? 3 : 2)
+                    .style('filter', is_selected ? 'drop-shadow(0 0 6px currentColor)' : 'none');
+            });
+
+        // Update merged link selection
+        link_selection
+            .merge(link_enter)
+            .attr('stroke-width', (d) => {
+                const is_selected = selection_store.is_selected(d.connection.id);
+                const is_connected = is_link_connected_to_hovered(d);
+                if (is_selected) return 3;
+                if (is_connected) return 3;
+                return 2;
+            })
+            .style('filter', (d) => {
+                const is_selected = selection_store.is_selected(d.connection.id);
+                const is_connected = is_link_connected_to_hovered(d);
+                if (is_selected) return 'drop-shadow(0 0 6px currentColor)';
+                if (is_connected) return 'drop-shadow(0 0 4px currentColor)';
+                return 'none';
+            })
+            .style('opacity', (d) => {
+                if (!hovered_node_id) return 0.8;
+                const is_connected = is_link_connected_to_hovered(d);
+                return is_connected ? 1 : 0.3;
+            });
 
         // Update nodes
         const node_selection = container
@@ -144,15 +206,63 @@
                 event.stopPropagation();
                 selection_store.select_node(d.id);
             })
-            .on('mouseover', function () {
-                d3.select(this).attr('fill', 'var(--node-hover)');
+            .on('mouseover', function (event, d) {
+                hovered_node_id = d.id;
+                d3.select(this)
+                    .attr('r', 10)
+                    .attr('stroke-width', 3)
+                    .style('filter', 'drop-shadow(0 0 8px var(--accent-primary))');
+                render_graph(); // Re-render to update link highlighting
             })
             .on('mouseout', function (event, d) {
+                hovered_node_id = null;
                 const is_selected = selection_store.is_selected(d.id);
-                d3.select(this).attr(
-                    'fill',
-                    is_selected ? 'var(--node-selected)' : 'var(--node-default)'
-                );
+                const is_pinned = d.fx !== null && d.fx !== undefined;
+                d3.select(this)
+                    .attr('r', is_selected ? 10 : 8)
+                    .attr('stroke-width', is_pinned ? 3 : 2)
+                    .style(
+                        'filter',
+                        is_selected ? 'drop-shadow(0 0 8px var(--accent-primary))' : 'none'
+                    );
+                render_graph(); // Re-render to update link highlighting
+            });
+
+        // Add title (tooltip) for nodes
+        node_enter
+            .append('title')
+            .text((d) => `${d.name}${d.description ? '\n' + d.description : ''}`);
+
+        // Update merged selections
+        node_selection
+            .merge(node_enter)
+            .attr('fill', (d) => {
+                if (selection_store.is_selected(d.id)) return 'var(--node-selected)';
+                if (hovered_node_id && get_connected_node_ids(hovered_node_id).has(d.id)) {
+                    return 'var(--node-hover)';
+                }
+                return 'var(--node-default)';
+            })
+            .attr('r', (d) => (selection_store.is_selected(d.id) ? 10 : 8))
+            .attr('stroke', (d) => {
+                const is_pinned = d.fx !== null && d.fx !== undefined;
+                if (is_pinned) return 'var(--accent-tertiary)';
+                return 'var(--border-default)';
+            })
+            .attr('stroke-width', (d) => {
+                const is_pinned = d.fx !== null && d.fx !== undefined;
+                return is_pinned ? 3 : 2;
+            })
+            .style('filter', (d) => {
+                if (selection_store.is_selected(d.id))
+                    return 'drop-shadow(0 0 8px var(--accent-primary))';
+                return 'none';
+            })
+            .style('opacity', (d) => {
+                if (!hovered_node_id) return 1;
+                if (d.id === hovered_node_id) return 1;
+                if (get_connected_node_ids(hovered_node_id).has(d.id)) return 1;
+                return 0.3;
             });
 
         // Add labels
@@ -174,12 +284,20 @@
             .attr('pointer-events', 'none')
             .text((d) => d.name);
 
-        // Update merged selections
-        node_selection
-            .merge(node_enter)
-            .attr('fill', (d) =>
-                selection_store.is_selected(d.id) ? 'var(--node-selected)' : 'var(--node-default)'
-            );
+        // Update label opacity based on hover state
+        label_selection
+            .merge(label_enter)
+            .style('opacity', (d) => {
+                if (!hovered_node_id) return 1;
+                if (d.id === hovered_node_id) return 1;
+                if (get_connected_node_ids(hovered_node_id).has(d.id)) return 1;
+                return 0.3;
+            })
+            .style('font-weight', (d) => {
+                if (selection_store.is_selected(d.id)) return 'bold';
+                if (d.id === hovered_node_id) return 'bold';
+                return 'normal';
+            });
     }
 
     function tick_handler() {
@@ -284,10 +402,26 @@
 
     :global(.link) {
         opacity: 0.8;
+        transition:
+            stroke-width 0.2s ease,
+            opacity 0.2s ease;
     }
 
     :global(.link:hover) {
         opacity: 1;
-        stroke-width: 3px;
+    }
+
+    :global(.node-label) {
+        transition:
+            opacity 0.2s ease,
+            font-weight 0.2s ease;
+        user-select: none;
+    }
+
+    :global(circle) {
+        transition:
+            r 0.2s ease,
+            stroke-width 0.2s ease,
+            opacity 0.2s ease;
     }
 </style>

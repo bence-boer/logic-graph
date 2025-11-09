@@ -11,6 +11,13 @@
     } from '$lib/utils/export';
     import { validate_graph } from '$lib/utils/validation';
     import { ConnectionType } from '$lib/types/graph';
+    import HelpModal from '$lib/components/ui/HelpModal.svelte';
+
+    interface Props {
+        show_help?: boolean;
+    }
+
+    let { show_help = $bindable(false) }: Props = $props();
 
     async function handle_import() {
         const graph = await trigger_import_dialog();
@@ -189,7 +196,18 @@
             <span class="label">Delete</span>
         </button>
     </div>
+
+    <div class="toolbar-divider"></div>
+
+    <div class="toolbar-section">
+        <button class="toolbar-btn" onclick={() => (show_help = true)} title="Help (?)">
+            <span class="icon">❓</span>
+            <span class="label">Help</span>
+        </button>
+    </div>
 </div>
+
+<HelpModal bind:is_open={show_help} onclose={() => (show_help = false)} />
 
 <style>
     .toolbar {
