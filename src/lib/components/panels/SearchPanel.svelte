@@ -6,6 +6,7 @@
     } from '$lib/stores/search.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
     import type { LogicNode, LogicConnection } from '$lib/types/graph';
     import { search_graph } from '$lib/utils/search';
     import { SearchInput, SearchFilters, SearchResults } from './SearchPanel';
@@ -46,13 +47,34 @@
     function handle_select_connection(conn: LogicConnection) {
         selection_store.select_connection(conn.id);
     }
+
+    function close_panel() {
+        ui_store.toggle_search_panel();
+    }
 </script>
 
+<!-- Mobile backdrop overlay -->
+<button
+    class="fixed inset-0 z-890 hidden bg-black/50 backdrop-blur-sm max-md:block"
+    onclick={close_panel}
+    aria-label="Close search panel"
+></button>
+
 <div
-    class="fixed top-20 right-4 z-900 flex max-h-[calc(100vh-100px)] w-80 animate-[slide-in_0.3s_ease] flex-col rounded-xl border border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-lg) backdrop-blur-md"
+    class="fixed top-20 right-4 z-900 flex max-h-[calc(100vh-100px)] w-80 animate-[slide-in_0.3s_ease] flex-col rounded-xl border border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-lg) backdrop-blur-md max-md:left-1/2 max-md:top-1/2 max-md:right-auto max-md:h-[90vh] max-md:max-h-[600px] max-md:w-[90vw] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2"
 >
     <div class="border-b border-(--border-default) p-6">
-        <h3 class="m-0 text-base font-semibold text-(--text-primary)">Search & Filter</h3>
+        <div class="flex items-center justify-between">
+            <h3 class="m-0 text-base font-semibold text-(--text-primary)">Search & Filter</h3>
+            <!-- Mobile close button -->
+            <button
+                class="hidden h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-(--bg-secondary) text-(--text-primary) transition-all duration-200 hover:bg-(--border-hover) max-md:flex"
+                onclick={close_panel}
+                aria-label="Close search panel"
+            >
+                ✕
+            </button>
+        </div>
     </div>
 
     <div
@@ -80,26 +102,3 @@
         />
     </div>
 </div>
-
-<style>
-    @keyframes slide-in {
-        from {
-            opacity: 0;
-            transform: translateX(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        div:first-child {
-            width: 100%;
-            max-width: 320px;
-            right: 50%;
-            transform: translateX(50%);
-        }
-    }
-</style>

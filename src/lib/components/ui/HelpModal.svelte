@@ -24,7 +24,7 @@
 
 {#if is_open}
     <div
-        class="fixed top-0 right-0 bottom-0 left-0 z-1000 flex animate-[fade-in_0.2s_ease] items-center justify-center bg-black/70 backdrop-blur-sm"
+        class="fixed top-0 right-0 bottom-0 left-0 z-1000 flex animate-[fade-in_0.2s_ease] items-center justify-center bg-black/70 backdrop-blur-sm p-4"
         onclick={handle_backdrop_click}
         onkeydown={(e) => e.key === 'Escape' && handle_close()}
         role="dialog"
@@ -33,7 +33,7 @@
         tabindex="-1"
     >
         <div
-            class="flex max-h-[80vh] w-[90%] max-w-[600px] animate-[slide-up_0.3s_ease] flex-col rounded-xl border border-neutral-700 bg-neutral-800/80 shadow-[0_10px_15px_rgba(0,0,0,0.5)]"
+            class="flex max-h-[80vh] w-[90%] max-w-[600px] animate-[slide-up_0.3s_ease] flex-col rounded-xl border border-neutral-700 bg-neutral-800/80 shadow-[0_10px_15px_rgba(0,0,0,0.5)] max-md:max-h-[90vh] max-md:w-full"
         >
             <div class="flex items-center justify-between border-b border-neutral-700 p-6">
                 <h2 id="help-modal-title" class="m-0 text-xl font-semibold text-white">

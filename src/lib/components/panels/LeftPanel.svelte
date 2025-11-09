@@ -1,8 +1,6 @@
 <script lang="ts">
     import { ui_store } from '$lib/stores/ui.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
-    import { toast_store } from '$lib/stores/toast.svelte';
-    import { Database, Trash2 } from '@lucide/svelte';
 
     let is_open = $derived(ui_store.left_panel_open);
     let show_labels = $derived(ui_store.show_labels);
@@ -22,32 +20,24 @@
     function toggle_descriptions() {
         ui_store.show_descriptions = !ui_store.show_descriptions;
     }
-
-    function handle_load_sample() {
-        graph_store.load_sample_data();
-        toast_store.success('Sample graph loaded: "Socrates is mortal" syllogism');
-    }
-
-    function handle_clear() {
-        const node_count = graph_store.nodes.length;
-        const connection_count = graph_store.connections.length;
-
-        if (confirm('Clear the entire graph? This will delete all statements and connections.')) {
-            graph_store.clear();
-            toast_store.info(
-                `Graph cleared (${node_count} statements, ${connection_count} connections removed)`
-            );
-        }
-    }
 </script>
 
+{#if is_open}
+    <!-- Mobile backdrop overlay -->
+    <button
+        class="fixed inset-0 z-890 hidden bg-black/50 backdrop-blur-sm max-md:block"
+        onclick={toggle_panel}
+        aria-label="Close panel"
+    ></button>
+{/if}
+
 <div
-    class="fixed top-0 bottom-0 left-0 z-900 flex w-80 border border-l-0 border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-sm) backdrop-blur-md transition-transform duration-300 ease-in-out {is_open
-        ? 'translate-x-0'
-        : '-translate-x-80'}"
+    class="fixed top-0 bottom-0 left-0 z-900 flex w-80 border border-l-0 border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-sm) backdrop-blur-md transition-transform duration-300 ease-in-out max-md:left-1/2 max-md:top-1/2 max-md:h-[90vh] max-md:max-h-[600px] max-md:w-[90vw] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:rounded-xl max-md:border {is_open
+        ? 'translate-x-0 max-md:scale-100 max-md:opacity-100'
+        : '-translate-x-80 max-md:pointer-events-none max-md:scale-95 max-md:opacity-0'}"
 >
     <button
-        class="absolute top-1/2 -right-6 flex h-20 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-tr-lg rounded-br-lg border border-l-0 border-(--border-default) bg-(--bg-elevated) text-sm text-(--text-primary) backdrop-blur-md transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary)"
+        class="absolute top-1/2 -right-6 flex h-20 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-tr-lg rounded-br-lg border border-l-0 border-(--border-default) bg-(--bg-elevated) text-sm text-(--text-primary) backdrop-blur-md transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) max-md:hidden"
         onclick={toggle_panel}
         aria-label="Toggle left panel"
     >
@@ -55,8 +45,17 @@
     </button>
 
     {#if is_open}
+        <!-- Mobile close button -->
+        <button
+            class="absolute top-4 right-4 z-10 hidden h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-(--bg-secondary) text-(--text-primary) transition-all duration-200 hover:bg-(--border-hover) max-md:flex"
+            onclick={toggle_panel}
+            aria-label="Close panel"
+        >
+            ✕
+        </button>
+
         <div
-            class="flex flex-1 flex-col gap-4 overflow-y-auto p-3 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:bg-(--border-default) [&::-webkit-scrollbar-thumb:hover]:bg-(--border-hover) [&::-webkit-scrollbar-track]:bg-transparent"
+            class="flex flex-1 flex-col gap-4 overflow-y-auto p-3 max-md:p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:bg-(--border-default) [&::-webkit-scrollbar-thumb:hover]:bg-(--border-hover) [&::-webkit-scrollbar-track]:bg-transparent"
         >
             <div class="flex flex-col gap-3">
                 <h2 class="m-0 text-base font-semibold text-(--text-primary)">Graph Info</h2>
@@ -114,48 +113,6 @@
                 </div>
             </div>
 
-            <div class="h-px bg-(--border-default)"></div>
-
-            <div class="flex flex-col gap-3">
-                <h2 class="m-0 text-base font-semibold text-(--text-primary)">Quick Actions</h2>
-                <div class="flex gap-1">
-                    <button
-                        class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
-                        onclick={handle_load_sample}
-                        title="Load Sample Data"
-                        aria-label="Load Sample Data"
-                    >
-                        <Database size={18} />
-                    </button>
-                    <button
-                        class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--accent-secondary) transition-all duration-200 hover:border-(--accent-secondary) hover:bg-[rgba(239,68,68,0.1)] active:scale-98"
-                        onclick={handle_clear}
-                        title="Clear Graph"
-                        aria-label="Clear Graph"
-                    >
-                        <Trash2 size={18} />
-                    </button>
-                </div>
-            </div>
         </div>
     {/if}
 </div>
-
-<style>
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        div:first-child {
-            width: 100%;
-            max-width: 320px;
-            bottom: 80px;
-        }
-
-        button:first-of-type {
-            top: auto;
-            bottom: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 6px;
-        }
-    }
-</style>

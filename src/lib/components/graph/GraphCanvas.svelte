@@ -30,6 +30,7 @@
     let height = $state(0);
     let simulation: Simulation<LogicNode, D3Link> | null = null;
     let hovered_node_id = $state<string | null>(null);
+    let zoom_behavior: d3.ZoomBehavior<SVGSVGElement, unknown> | null = null;
 
     // Store mutable copies for D3 simulation
     let simulation_nodes: LogicNode[] = [];
@@ -121,7 +122,7 @@
         svg_zoom_container = svg.select<SVGGElement>('g.zoom-container');
 
         // Create zoom behavior
-        const zoom_behavior = d3
+        zoom_behavior = d3
             .zoom<SVGSVGElement, unknown>()
             .scaleExtent([0.1, 4])
             .on('zoom', (event) => {
@@ -183,6 +184,20 @@
         update_link_positions(svg_zoom_container);
         update_node_positions(svg_zoom_container);
         update_label_positions(svg_zoom_container);
+    }
+
+    /**
+     * Recenter and reset zoom to fit all nodes in view
+     */
+    export function recenter_view() {
+        if (!svg_container || !zoom_behavior || !svg_zoom_container) return;
+
+        const svg = d3.select(svg_container);
+        
+        // Reset to identity transform (no zoom, no pan)
+        svg.transition()
+            .duration(750)
+            .call(zoom_behavior.transform, d3.zoomIdentity);
     }
 
     // React to data changes

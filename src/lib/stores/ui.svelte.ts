@@ -6,8 +6,17 @@
 import type { RightPanelMode } from '$lib/types/graph';
 import { RightPanelModeType } from '$lib/types/graph';
 
+/**
+ * Check if the current viewport is mobile size
+ */
+function is_mobile(): boolean {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth <= 768;
+}
+
 function create_ui_store() {
-    let _left_panel_open = $state(true);
+    // Close left panel by default on mobile
+    let _left_panel_open = $state(!is_mobile());
     let _right_panel_mode = $state<RightPanelMode>({ type: RightPanelModeType.CLOSED });
     let _show_labels = $state(true);
     let _show_descriptions = $state(false);
