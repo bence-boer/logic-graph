@@ -240,4 +240,21 @@
     .panel-content::-webkit-scrollbar-thumb:hover {
         background: var(--border-hover);
     }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .left-panel {
+            width: 100%;
+            max-width: 320px;
+            bottom: 80px;
+        }
+
+        .toggle-btn {
+            top: auto;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 6px;
+        }
+    }
 </style>

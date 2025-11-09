@@ -461,4 +461,13 @@
     .panel-content::-webkit-scrollbar-thumb:hover {
         background: var(--border-hover);
     }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .right-panel {
+            width: 100%;
+            max-width: 320px;
+            bottom: 80px;
+        }
+    }
 </style>

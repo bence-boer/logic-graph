@@ -1,6 +1,8 @@
 <script lang="ts">
     import Button from './Button.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
+    import { loading_store } from '$lib/stores/loading.svelte';
+    import { toast_store } from '$lib/stores/toast.svelte';
     import {
         download_graph_as_json,
         download_as_svg,
@@ -33,6 +35,8 @@
 
     async function handle_export() {
         is_exporting = true;
+        loading_store.start(`Exporting as ${export_format.toUpperCase()}...`);
+
         try {
             const graph = graph_store.get_graph();
 
@@ -54,15 +58,17 @@
                     break;
             }
 
+            toast_store.success(`Exported as ${export_format.toUpperCase()}`);
             handle_close();
         } catch (error) {
             console.error('Export failed:', error);
-            alert(`Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            const error_message = error instanceof Error ? error.message : 'Unknown error';
+            toast_store.error(`Export failed: ${error_message}`);
         } finally {
             is_exporting = false;
+            loading_store.stop();
         }
     }
-
     const format_descriptions: Record<string, string> = {
         json: 'Export graph data structure for re-importing',
         svg: 'Vector graphics with embedded styles',
@@ -360,5 +366,21 @@
 
     .modal-body::-webkit-scrollbar-thumb:hover {
         background: var(--border-hover);
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 95%;
+            max-height: 90vh;
+        }
+
+        .info-list li {
+            font-size: 0.75rem;
+        }
+
+        .form-help {
+            font-size: 0.7rem;
+        }
     }
 </style>

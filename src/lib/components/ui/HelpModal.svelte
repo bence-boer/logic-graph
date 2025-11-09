@@ -206,4 +206,25 @@
     .modal-body::-webkit-scrollbar-thumb:hover {
         background: var(--border-hover);
     }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .modal-content {
+            width: 95%;
+            max-height: 90vh;
+        }
+
+        .shortcut-row {
+            grid-template-columns: 140px 1fr;
+            gap: var(--spacing-sm);
+        }
+
+        .shortcut-keys {
+            font-size: 0.75rem;
+        }
+
+        .shortcut-description {
+            font-size: 0.75rem;
+        }
+    }
 </style>
