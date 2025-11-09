@@ -69,7 +69,10 @@
 
         if (node.fx !== null && node.fx !== undefined) {
             // Unpin
-            graph_store.update_node(node.id, { fx: null, fy: null });
+            graph_store.update_node(node.id, { 
+                fx: null, 
+                fy: null
+            });
             toast_store.info('Node unpinned');
         } else {
             // Pin at current position

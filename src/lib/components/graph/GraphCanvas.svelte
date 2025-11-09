@@ -21,6 +21,10 @@
     let simulation: Simulation<LogicNode, D3Link> | null = null;
     let hovered_node_id = $state<string | null>(null);
 
+    // Store mutable copies for D3 simulation
+    let simulation_nodes: LogicNode[] = [];
+    let simulation_links: D3Link[] = [];
+
     // Reactive references to store data
     let nodes = $derived(graph_store.nodes);
     let connections = $derived(graph_store.connections);
@@ -89,16 +93,20 @@
 
         svg.call(zoom_behavior);
 
+        // Create initial mutable copies for simulation
+        simulation_nodes = nodes.map(n => ({...n}));
+        simulation_links = links.map(l => ({...l}));
+
         // Initialize force simulation
         simulation = d3
-            .forceSimulation<LogicNode>(nodes)
+            .forceSimulation<LogicNode>(simulation_nodes)
             .force('charge', d3.forceManyBody<LogicNode>().strength(-300))
             .force('center', d3.forceCenter(width / 2, height / 2))
             .force('collision', d3.forceCollide<LogicNode>().radius(40))
             .force(
                 'link',
                 d3
-                    .forceLink<LogicNode, D3Link>(links)
+                    .forceLink<LogicNode, D3Link>(simulation_links)
                     .id((d) => d.id)
                     .distance(150)
                     .strength(0.7)
@@ -119,7 +127,7 @@
         const link_selection = container
             .select<SVGGElement>('g.links')
             .selectAll<SVGLineElement, D3Link>('line')
-            .data(links, (d) => `${(d.source as LogicNode).id}-${(d.target as LogicNode).id}`);
+            .data(simulation_links, (d) => `${(d.source as LogicNode).id}-${(d.target as LogicNode).id}`);
 
         link_selection.exit().remove();
 
@@ -184,7 +192,7 @@
         const node_selection = container
             .select<SVGGElement>('g.nodes')
             .selectAll<SVGCircleElement, LogicNode>('circle')
-            .data(nodes, (d) => d.id);
+            .data(simulation_nodes, (d) => d.id);
 
         node_selection.exit().remove();
 
@@ -270,7 +278,7 @@
         const label_selection = container
             .select<SVGGElement>('g.labels')
             .selectAll<SVGTextElement, LogicNode>('text')
-            .data(nodes, (d) => d.id);
+            .data(simulation_nodes, (d) => d.id);
 
         label_selection.exit().remove();
 
@@ -347,18 +355,53 @@
         d: LogicNode
     ) {
         if (!event.active && simulation) simulation.alphaTarget(0);
-        // Keep node pinned after drag
-        // To unpin, set d.fx = null and d.fy = null
+        // Keep node pinned after drag and sync to store
+        graph_store.update_node(d.id, {
+            x: d.x,
+            y: d.y,
+            fx: d.fx,
+            fy: d.fy
+        });
     }
 
     // React to data changes
     $effect(() => {
         // When nodes or links change, update the simulation and re-render
         if (simulation) {
-            simulation.nodes(nodes);
+            // Sync store data to simulation arrays
+            // Update existing nodes and add new ones
+            const node_map = new Map(simulation_nodes.map(n => [n.id, n]));
+            
+            // Update or add nodes from store
+            nodes.forEach(store_node => {
+                const sim_node = node_map.get(store_node.id);
+                if (sim_node) {
+                    // Update existing node properties (preserve D3 properties)
+                    Object.assign(sim_node, {
+                        name: store_node.name,
+                        description: store_node.description,
+                        fx: store_node.fx,
+                        fy: store_node.fy
+                    });
+                } else {
+                    // Add new node
+                    simulation_nodes.push({...store_node});
+                }
+            });
+            
+            // Remove deleted nodes
+            simulation_nodes = simulation_nodes.filter(sim_node => 
+                nodes.some(store_node => store_node.id === sim_node.id)
+            );
+            
+            // Update links
+            simulation_links = links.map(l => ({...l}));
+            
+            // Update simulation with new data
+            simulation.nodes(simulation_nodes);
             const link_force = simulation.force<d3.ForceLink<LogicNode, D3Link>>('link');
             if (link_force) {
-                link_force.links(links);
+                link_force.links(simulation_links);
             }
             simulation.alpha(0.3).restart();
             render_graph();
