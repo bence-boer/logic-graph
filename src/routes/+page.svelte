@@ -1,2 +1,16 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+    import GraphCanvas from '$lib/components/graph/GraphCanvas.svelte';
+</script>
+
+<div class="app-container">
+    <GraphCanvas />
+</div>
+
+<style>
+    .app-container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+    }
+</style>

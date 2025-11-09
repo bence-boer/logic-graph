@@ -1,0 +1,44 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "All humans are mortal",
+      "description": "Universal statement about human mortality"
+    },
+    {
+      "id": "2",
+      "name": "Socrates is human",
+      "description": "Particular statement about Socrates"
+    },
+    {
+      "id": "3",
+      "name": "Socrates is mortal",
+      "description": "Logical conclusion from premises"
+    },
+    {
+      "id": "4",
+      "name": "Socrates is immortal",
+      "description": "Contradicts the conclusion"
+    }
+  ],
+  "connections": [
+    {
+      "id": "c1",
+      "type": "implication",
+      "sources": ["1", "2"],
+      "targets": ["3"]
+    },
+    {
+      "id": "c2",
+      "type": "contradiction",
+      "sources": ["3"],
+      "targets": ["4"]
+    }
+  ],
+  "metadata": {
+    "name": "Sample Logic Graph",
+    "description": "Example demonstrating syllogistic reasoning",
+    "created": "2025-11-09T00:00:00.000Z",
+    "modified": "2025-11-09T00:00:00.000Z"
+  }
+}

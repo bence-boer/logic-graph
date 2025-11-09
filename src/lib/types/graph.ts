@@ -1,0 +1,104 @@
+/**
+ * Type definitions for the Logic Graph application
+ */
+
+/**
+ * Represents a single node in the logic graph
+ */
+export interface LogicNode {
+    /** Unique identifier for the node */
+    id: string;
+    /** Display name of the node (rendered in the UI) */
+    name: string;
+    /** Detailed description of the node (rendered in the UI) */
+    description: string;
+    /** X position (managed by D3 force simulation) */
+    x?: number;
+    /** Y position (managed by D3 force simulation) */
+    y?: number;
+    /** X velocity (managed by D3 force simulation) */
+    vx?: number;
+    /** Y velocity (managed by D3 force simulation) */
+    vy?: number;
+    /** Fixed X position for pinning nodes */
+    fx?: number | null;
+    /** Fixed Y position for pinning nodes */
+    fy?: number | null;
+    /** Node index (assigned by D3) */
+    index?: number;
+}
+
+/**
+ * Type of connection between nodes
+ */
+export enum ConnectionType {
+    IMPLICATION = 'implication',
+    CONTRADICTION = 'contradiction'
+}
+
+/**
+ * Represents a connection (edge) between nodes in the logic graph
+ */
+export interface LogicConnection {
+    /** Unique identifier for the connection */
+    id: string;
+    /** Type of logical relationship */
+    type: ConnectionType;
+    /** Array of source node IDs (supports multiple sources) */
+    sources: string[];
+    /** Array of target node IDs (supports multiple targets) */
+    targets: string[];
+}
+
+/**
+ * D3-compatible link format for the force simulation
+ * This expands connections into individual source-target pairs
+ */
+export interface D3Link {
+    /** Source node or node ID */
+    source: string | LogicNode;
+    /** Target node or node ID */
+    target: string | LogicNode;
+    /** Reference to the original connection */
+    connection: LogicConnection;
+    /** Index assigned by D3 */
+    index?: number;
+}
+
+/**
+ * Metadata for the graph
+ */
+export interface GraphMetadata {
+    /** Name of the graph */
+    name?: string;
+    /** Description of the graph */
+    description?: string;
+    /** Creation timestamp */
+    created?: string;
+    /** Last modified timestamp */
+    modified?: string;
+}
+
+/**
+ * Complete logic graph structure
+ */
+export interface LogicGraph {
+    /** Array of nodes in the graph */
+    nodes: LogicNode[];
+    /** Array of connections between nodes */
+    connections: LogicConnection[];
+    /** Optional metadata about the graph */
+    metadata?: GraphMetadata;
+}
+
+/**
+ * Selection state types
+ */
+export type SelectionType = 'node' | 'connection' | null;
+
+export interface Selection {
+    /** Type of selected item */
+    type: SelectionType;
+    /** ID of selected item */
+    id: string | null;
+}

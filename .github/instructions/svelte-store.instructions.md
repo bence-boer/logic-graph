@@ -43,7 +43,7 @@ Access store data with `store_name.data`
 ```ts
 // Example: counter_store.svelte.ts
 export const counter_store = (() => {
-let _state = $state(0);
+    let _state = $state(0);
 
     return {
         get data() {
@@ -53,12 +53,11 @@ let _state = $state(0);
             _state = value;
         }
     };
-
 })();
 
 // Example: Generic typed store
 export function create_store<T>(initial_value: T) {
-let _state = $state(initial_value);
+    let _state = $state(initial_value);
 
     return {
         get data() {
@@ -68,14 +67,13 @@ let _state = $state(initial_value);
             _state = value;
         }
     };
-
 }
 
 // Example: Composite store with multiple fields
 export const user_store = (() => {
-let _name = $state('');
-let _age = $state(0);
-let _email = $state('');
+    let _name = $state('');
+    let _age = $state(0);
+    let _email = $state('');
 
     return {
         name: {

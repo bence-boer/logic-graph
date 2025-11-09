@@ -1,1 +1,76 @@
 @import 'tailwindcss';
+
+/* Design System Variables - Figma-inspired Dark Theme */
+:root {
+    /* Background colors */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2a2a2a;
+    --bg-elevated: rgba(42, 42, 42, 0.8);
+
+    /* Text colors */
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-tertiary: #666666;
+
+    /* Accent colors */
+    --accent-primary: #7c3aed; /* Purple for implications */
+    --accent-secondary: #ef4444; /* Red for contradictions */
+    --accent-tertiary: #10b981; /* Green for success states */
+
+    /* Border colors */
+    --border-default: #3a3a3a;
+    --border-hover: #4a4a4a;
+
+    /* Graph element colors */
+    --node-default: #4a5568;
+    --node-selected: var(--accent-primary);
+    --node-hover: #5a6578;
+
+    --link-implication: var(--accent-primary);
+    --link-contradiction: var(--accent-secondary);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+    /* Blur */
+    --blur-sm: 8px;
+    --blur-md: 12px;
+    --blur-lg: 16px;
+
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+}
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family:
+        'Inter',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        Roboto,
+        sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+/* Ensure full viewport usage */
+html,
+body,
+#app {
+    width: 100%;
+    height: 100%;
+}
