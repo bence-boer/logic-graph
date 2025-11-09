@@ -2,23 +2,23 @@
   "nodes": [
     {
       "id": "550e8400-e29b-41d4-a716-446655440001",
-      "name": "All humans are mortal",
-      "description": "Universal statement about human mortality"
+      "statement": "All humans are mortal",
+      "details": "Universal statement about human mortality"
     },
     {
       "id": "550e8400-e29b-41d4-a716-446655440002",
-      "name": "Socrates is human",
-      "description": "Particular statement about Socrates"
+      "statement": "Socrates is human",
+      "details": "Particular statement about Socrates"
     },
     {
       "id": "550e8400-e29b-41d4-a716-446655440003",
-      "name": "Socrates is mortal",
-      "description": "Logical conclusion from premises"
+      "statement": "Socrates is mortal",
+      "details": "Logical conclusion from premises"
     },
     {
       "id": "550e8400-e29b-41d4-a716-446655440004",
-      "name": "Socrates is immortal",
-      "description": "Contradicts the conclusion"
+      "statement": "Socrates is immortal",
+      "details": "Contradicts the conclusion"
     }
   ],
   "connections": [
@@ -36,8 +36,8 @@
     }
   ],
   "metadata": {
-    "name": "Sample Logic Graph",
-    "description": "Example demonstrating syllogistic reasoning",
+    "statement": "Sample Logic Graph",
+    "details": "Example demonstrating syllogistic reasoning",
     "created": "2025-11-09T00:00:00.000Z",
     "modified": "2025-11-09T00:00:00.000Z"
   }

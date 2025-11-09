@@ -60,7 +60,7 @@ export function export_to_svg(svg_element?: SVGSVGElement): string {
             opacity: 0.8;
         }
         .link-implication {
-            stroke: #7c3aed;
+            stroke: #eda312;
         }
         .link-contradiction {
             stroke: #ef4444;

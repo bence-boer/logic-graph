@@ -15,8 +15,8 @@
         onclose?.();
     }
 
-    function handle_backdrop_click(e: MouseEvent) {
-        if (e.target === e.currentTarget) {
+    function handle_backdrop_click(event: MouseEvent) {
+        if (event.target === event.currentTarget) {
             handle_close();
         }
     }
@@ -24,9 +24,9 @@
 
 {#if is_open}
     <div
-        class="fixed top-0 right-0 bottom-0 left-0 z-1000 flex animate-[fade-in_0.2s_ease] items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+        class="fixed top-0 right-0 bottom-0 left-0 z-1000 flex animate-[fade-in_0.2s_ease] items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
         onclick={handle_backdrop_click}
-        onkeydown={(e) => e.key === 'Escape' && handle_close()}
+        onkeydown={(event) => event.key === 'Escape' && handle_close()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="help-modal-title"
@@ -56,7 +56,7 @@
                             class="grid grid-cols-[180px_1fr] items-center gap-6 rounded-md bg-neutral-800 px-4 py-2"
                         >
                             <div
-                                class="rounded border border-neutral-700 bg-neutral-900 px-2 py-1.5 text-center font-['Monaco','Courier_New',monospace] text-sm font-semibold text-purple-600"
+                                class="rounded border border-neutral-700 bg-neutral-900 px-2 py-1.5 text-center font-['Monaco','Courier_New',monospace] text-sm font-semibold text-accent-600"
                             >
                                 {get_shortcut_display(shortcut)}
                             </div>

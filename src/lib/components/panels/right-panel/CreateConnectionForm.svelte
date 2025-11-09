@@ -19,8 +19,8 @@
     let node_options = $derived(
         graph_store.nodes.map((node) => ({
             value: node.id,
-            label: node.name,
-            description: node.description
+            label: node.statement,
+            description: node.details
         }))
     );
 
@@ -61,10 +61,10 @@
             });
 
             const source_names = source_ids
-                .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+                .map((id) => graph_store.nodes.find((n) => n.id === id)?.statement || 'Unknown')
                 .join(', ');
             const target_names = target_ids
-                .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+                .map((id) => graph_store.nodes.find((n) => n.id === id)?.statement || 'Unknown')
                 .join(', ');
             const connection_type_label =
                 connection_type === ConnectionType.IMPLICATION ? 'Implication' : 'Contradiction';

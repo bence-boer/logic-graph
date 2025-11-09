@@ -30,7 +30,7 @@ export interface SimulationConfig {
  */
 export const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
     charge_strength: -300,
-    link_distance: 150,
+    link_distance: 225,
     collision_radius: 40,
     center_force: [0, 0],
     link_strength: 0.7
@@ -160,7 +160,7 @@ export function sync_simulation_nodes(
     simulation_nodes: LogicNode[],
     store_nodes: LogicNode[]
 ): LogicNode[] {
-    const node_map = new Map(simulation_nodes.map((n) => [n.id, n]));
+    const node_map = new Map(simulation_nodes.map((node) => [node.id, node]));
 
     // Update existing nodes and add new ones
     store_nodes.forEach((store_node) => {
@@ -168,8 +168,8 @@ export function sync_simulation_nodes(
         if (sim_node) {
             // Update existing node properties (preserve D3 properties)
             Object.assign(sim_node, {
-                name: store_node.name,
-                description: store_node.description,
+                statement: store_node.statement,
+                details: store_node.details,
                 fx: store_node.fx,
                 fy: store_node.fy
             });

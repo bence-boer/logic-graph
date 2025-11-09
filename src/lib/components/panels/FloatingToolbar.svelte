@@ -1,12 +1,13 @@
 <script lang="ts">
     import type GraphCanvas from '$lib/components/graph/GraphCanvas.svelte';
+    import type { LogicGraph } from '$lib/types/graph';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
     import { toast_store } from '$lib/stores/toast.svelte';
-    import { trigger_import_dialog } from '$lib/utils/import';
     import { validate_graph } from '$lib/utils/validation';
     import HelpModal from '$lib/components/ui/HelpModal.svelte';
     import ExportModal from '$lib/components/ui/ExportModal.svelte';
+    import ImportModal from '$lib/components/ui/ImportModal.svelte';
     import { FileActions, EditActions, UtilityActions } from './FloatingToolbar';
 
     interface Props {
@@ -16,30 +17,26 @@
 
     let { show_help = $bindable(false), graph_canvas }: Props = $props();
     let show_export = $state(false);
+    let show_import = $state(false);
 
-    async function handle_import() {
-        const graph = await trigger_import_dialog();
-        if (graph) {
-            const validation = validate_graph(graph);
-            if (validation.valid) {
-                graph_store.load_graph(graph);
-                const node_count = graph.nodes?.length || 0;
-                const connection_count = graph.connections?.length || 0;
-                toast_store.success(
-                    `Graph imported: ${node_count} statements, ${connection_count} connections`
-                );
-            } else {
-                const error_summary = validation.errors
-                    .slice(0, 3)
-                    .map((e) => e.message)
-                    .join('; ');
-                toast_store.error(
-                    `Invalid graph: ${error_summary}${validation.errors.length > 3 ? '...' : ''}`
-                );
-                alert(
-                    `Invalid graph:\n${validation.errors.map((e) => `- ${e.message}`).join('\n')}`
-                );
-            }
+    function handle_import(graph: LogicGraph) {
+        const validation = validate_graph(graph);
+        if (validation.valid) {
+            graph_store.load_graph(graph);
+            const node_count = graph.nodes?.length || 0;
+            const connection_count = graph.connections?.length || 0;
+            toast_store.success(
+                `Graph imported: ${node_count} statements, ${connection_count} connections`
+            );
+        } else {
+            const error_summary = validation.errors
+                .slice(0, 3)
+                .map((e) => e.message)
+                .join('; ');
+            toast_store.error(
+                `Invalid graph: ${error_summary}${validation.errors.length > 3 ? '...' : ''}`
+            );
+            alert(`Invalid graph:\n${validation.errors.map((e) => `- ${e.message}`).join('\n')}`);
         }
     }
 
@@ -94,7 +91,7 @@
 >
     <FileActions
         on_new_graph={handle_new_graph}
-        on_import={handle_import}
+        on_import={() => (show_import = true)}
         on_export={() => (show_export = true)}
         on_load_sample={handle_load_sample}
         on_clear={handle_clear}
@@ -119,3 +116,8 @@
 
 <HelpModal bind:is_open={show_help} onclose={() => (show_help = false)} />
 <ExportModal bind:is_open={show_export} onclose={() => (show_export = false)} />
+<ImportModal
+    bind:is_open={show_import}
+    onclose={() => (show_import = false)}
+    onimport={handle_import}
+/>

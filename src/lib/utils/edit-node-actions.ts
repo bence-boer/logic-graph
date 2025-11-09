@@ -6,39 +6,39 @@ import { ConnectionType } from '$lib/types/graph';
 import type { LogicNode } from '$lib/types/graph';
 
 /**
- * Validates and saves node name and description updates.
+ * Validates and saves node statement and details updates.
  *
  * @param node - The node being edited
- * @param name - The new name value
- * @param description - The new description value
+ * @param statement - The new statement value
+ * @param details - The new details value
  *
  * @example
  * ```ts
- * save_node_changes(node, 'New Name', 'New description');
+ * save_node_changes(node, 'New Statement', 'New details');
  * ```
  */
-export function save_node_changes(node: LogicNode, name: string, description: string): void {
-    if (!name.trim()) {
-        toast_store.error('Statement name is required');
+export function save_node_changes(node: LogicNode, statement: string, details: string): void {
+    if (!statement.trim()) {
+        toast_store.error('Statement is required');
         return;
     }
 
-    if (name.length > 100) {
-        toast_store.error('Statement name must be 100 characters or less');
+    if (statement.length > 100) {
+        toast_store.error('Statement must be 100 characters or less');
         return;
     }
 
-    if (description.length > 500) {
-        toast_store.error('Statement description must be 500 characters or less');
+    if (details.length > 500) {
+        toast_store.error('Statement details must be 500 characters or less');
         return;
     }
 
     graph_store.update_node(node.id, {
-        name: name.trim(),
-        description: description.trim()
+        statement: statement.trim(),
+        details: details.trim()
     });
 
-    toast_store.success(`Statement "${name.trim()}" updated successfully`);
+    toast_store.success(`Statement "${statement.trim()}" updated successfully`);
 }
 
 /**
@@ -47,20 +47,43 @@ export function save_node_changes(node: LogicNode, name: string, description: st
  * Pinned nodes have their position fixed at their current coordinates.
  * Unpinned nodes can be moved by the force simulation.
  *
- * @param node - The node to pin or unpin
+ * @param node_id - The ID of the node to pin or unpin
  *
  * @example
  * ```ts
- * toggle_node_pin(node);
+ * toggle_node_pin('node-123');
  * ```
  */
-export function toggle_node_pin(node: LogicNode): void {
+export function toggle_node_pin(node_id: string): void {
+    const node = graph_store.nodes.find((n) => n.id === node_id);
+    if (!node) {
+        toast_store.error('Statement not found');
+        return;
+    }
+
     if (node.fx !== null && node.fx !== undefined) {
+        // Unpin: remove fixed position
         graph_store.update_node(node.id, { fx: null, fy: null });
-        toast_store.info(`Statement "${node.name}" unpinned`);
+        toast_store.info(`Statement "${node.statement}" unpinned`);
     } else {
+        // Pin: set fixed position to current position
+        // Note: x and y should be set by the simulation sync process
+        if (
+            node.x === undefined ||
+            node.x === null ||
+            node.y === undefined ||
+            node.y === null ||
+            Number.isNaN(node.x) ||
+            Number.isNaN(node.y)
+        ) {
+            // This should rarely happen now that we sync positions periodically
+            toast_store.warning(
+                'Node position not yet available. Please wait a moment and try again.'
+            );
+            return;
+        }
         graph_store.update_node(node.id, { fx: node.x, fy: node.y });
-        toast_store.info(`Statement "${node.name}" pinned`);
+        toast_store.info(`Statement "${node.statement}" pinned`);
     }
 }
 
@@ -76,9 +99,9 @@ export function toggle_node_pin(node: LogicNode): void {
  * ```
  */
 export function delete_node_with_confirmation(node: LogicNode, on_deleted: () => void): void {
-    if (confirm(`Delete statement "${node.name}"?`)) {
+    if (confirm(`Delete statement "${node.statement}"?`)) {
         graph_store.remove_node(node.id);
-        toast_store.success(`Statement "${node.name}" deleted`);
+        toast_store.success(`Statement "${node.statement}" deleted`);
         on_deleted();
     }
 }
@@ -95,7 +118,7 @@ export function delete_node_with_confirmation(node: LogicNode, on_deleted: () =>
  * @param targets - Array of node IDs for targets ('current' or 'target' are special values)
  * @param mode - Whether connecting to 'existing' node or 'new' node
  * @param selected_node_id - ID of selected existing node (when mode is 'existing')
- * @param new_node_name - Name for new node (when mode is 'new')
+ * @param new_node_statement - Statement for new node (when mode is 'new')
  * @param all_nodes - Array of all nodes in the graph
  * @returns Object with success status and optional error message
  *
@@ -120,26 +143,29 @@ export function create_node_connection(
     targets: string[],
     mode: 'existing' | 'new',
     selected_node_id: string,
-    new_node_name: string,
+    new_node_statement: string,
     all_nodes: LogicNode[]
-): { success: boolean; error?: string; target_name?: string } {
+): { success: boolean; error?: string; target_statement?: string } {
     let target_node_id: string;
-    let target_name: string;
+    let target_statement: string;
 
     if (mode === 'new') {
-        if (!new_node_name.trim()) {
-            return { success: false, error: 'Statement name is required' };
+        if (!new_node_statement.trim()) {
+            return { success: false, error: 'Statement is required' };
         }
-        const new_node = graph_store.add_node({ name: new_node_name.trim(), description: '' });
+        const new_node = graph_store.add_node({
+            statement: new_node_statement.trim(),
+            details: ''
+        });
         target_node_id = new_node.id;
-        target_name = new_node_name.trim();
+        target_statement = new_node_statement.trim();
     } else {
         if (!selected_node_id) {
             return { success: false, error: 'No node selected' };
         }
         target_node_id = selected_node_id;
         const selected_node = all_nodes.find((n) => n.id === selected_node_id);
-        target_name = selected_node?.name || 'Unknown';
+        target_statement = selected_node?.statement || 'Unknown';
     }
 
     const actual_sources = sources.map((id) =>
@@ -162,9 +188,9 @@ export function create_node_connection(
                 : 'Consequence'
             : 'Contradiction';
 
-    toast_store.success(`${type_name} "${target_name}" added to "${current_node.name}"`);
+    toast_store.success(`${type_name} "${target_statement}" added to "${current_node.statement}"`);
 
-    return { success: true, target_name };
+    return { success: true, target_statement };
 }
 
 /**

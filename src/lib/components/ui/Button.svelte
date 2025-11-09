@@ -20,7 +20,7 @@
 
     const variant_classes = {
         primary:
-            'bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700',
+            'bg-accent-600 border-accent-600 text-white hover:bg-accent-700 hover:border-accent-700',
         secondary:
             'bg-neutral-800 border-neutral-700 text-white hover:border-neutral-600 hover:bg-neutral-750',
         danger: 'bg-transparent border-red-500 text-red-500 hover:bg-red-500/10'

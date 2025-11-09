@@ -18,8 +18,6 @@ function create_ui_store() {
     // Close left panel by default on mobile
     let _left_panel_open = $state(!is_mobile());
     let _right_panel_mode = $state<RightPanelMode>({ type: RightPanelModeType.CLOSED });
-    let _show_labels = $state(true);
-    let _show_descriptions = $state(false);
     let _search_panel_open = $state(false);
 
     return {
@@ -36,20 +34,6 @@ function create_ui_store() {
 
         get right_panel_open() {
             return _right_panel_mode.type !== RightPanelModeType.CLOSED;
-        },
-
-        get show_labels() {
-            return _show_labels;
-        },
-        set show_labels(value: boolean) {
-            _show_labels = value;
-        },
-
-        get show_descriptions() {
-            return _show_descriptions;
-        },
-        set show_descriptions(value: boolean) {
-            _show_descriptions = value;
         },
 
         get search_panel_open() {

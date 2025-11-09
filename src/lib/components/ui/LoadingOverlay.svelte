@@ -13,7 +13,7 @@
     >
         <div class="flex flex-col items-center gap-6">
             <div
-                class="h-12 w-12 animate-[spin_0.8s_linear_infinite] rounded-full border-4 border-neutral-700 border-t-purple-600"
+                class="h-12 w-12 animate-[spin_0.8s_linear_infinite] rounded-full border-4 border-neutral-700 border-t-accent-600"
             ></div>
             <p class="m-0 animate-[pulse_1.5s_ease-in-out_infinite] text-base text-white">
                 {message}

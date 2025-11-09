@@ -20,6 +20,7 @@
     import BasicNodeFields from './BasicNodeFields.svelte';
     import ConnectionSection from './ConnectionSection.svelte';
     import EditNodeFormHeader from './EditNodeFormHeader.svelte';
+    import FormalizedStatement from './FormalizedStatement.svelte';
     import QuickActionsBar from './QuickActionsBar.svelte';
 
     interface Props {
@@ -35,8 +36,8 @@
     let consequences = $derived(get_node_consequences(node_id, graph_store.connections));
     let contradictions = $derived(get_node_contradictions(node_id, graph_store.connections));
 
-    let name = $state('');
-    let description = $state('');
+    let statement = $state('');
+    let details = $state('');
 
     // State for adding connections
     let is_adding_reason = $state(false);
@@ -44,7 +45,7 @@
     let is_adding_contradiction = $state(false);
     let selected_node_for_connection = $state<string>('');
     let connection_mode = $state<'existing' | 'new'>('existing');
-    let new_node_name = $state('');
+    let new_node_statement = $state('');
 
     // Available nodes for connection (excluding current node)
     let available_nodes = $derived(get_available_nodes_for_connection(node_id, graph_store.nodes));
@@ -52,19 +53,18 @@
     // Initialize form values when node loads
     $effect(() => {
         if (node) {
-            name = node.name;
-            description = node.description;
+            statement = node.statement;
+            details = node.details;
         }
     });
 
     function handle_save() {
         if (!node) return;
-        save_node_changes(node, name, description);
+        save_node_changes(node, statement, details);
     }
 
     function handle_pin_toggle() {
-        if (!node) return;
-        toggle_node_pin(node);
+        toggle_node_pin(node_id);
     }
 
     function handle_delete() {
@@ -79,7 +79,7 @@
 
         selected_node_for_connection = '';
         connection_mode = 'existing';
-        new_node_name = '';
+        new_node_statement = '';
     }
 
     function cancel_adding() {
@@ -87,7 +87,7 @@
         is_adding_consequence = false;
         is_adding_contradiction = false;
         selected_node_for_connection = '';
-        new_node_name = '';
+        new_node_statement = '';
     }
 
     function add_connection(type: ConnectionType, sources: string[], targets: string[]) {
@@ -100,7 +100,7 @@
             targets,
             connection_mode,
             selected_node_for_connection,
-            new_node_name,
+            new_node_statement,
             graph_store.nodes
         );
 
@@ -112,9 +112,13 @@
         cancel_adding();
     }
 
-    function handle_connection_delete(connection_id: string, connected_node_name: string) {
+    function handle_connection_delete(connection_id: string, connected_node_statement: string) {
         if (!node) return;
-        delete_connection_with_confirmation(connection_id, node.name, connected_node_name);
+        delete_connection_with_confirmation(
+            connection_id,
+            node.statement,
+            connected_node_statement
+        );
     }
 </script>
 
@@ -125,7 +129,17 @@
         <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
             <QuickActionsBar {node} onpin_toggle={handle_pin_toggle} ondelete={handle_delete} />
 
-            <BasicNodeFields {node} bind:name bind:description onsave={handle_save} />
+            <BasicNodeFields {node} bind:statement bind:details onsave={handle_save} />
+
+            <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
+
+            <FormalizedStatement
+                {node}
+                {reasons}
+                {consequences}
+                {contradictions}
+                all_nodes={graph_store.nodes}
+            />
 
             <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
@@ -140,7 +154,7 @@
                 bind:is_adding={is_adding_reason}
                 bind:connection_mode
                 bind:selected_node_id={selected_node_for_connection}
-                bind:new_node_name
+                bind:new_node_statement
                 onadd_start={() => start_adding('reason')}
                 onadd_confirm={() =>
                     add_connection(ConnectionType.IMPLICATION, ['target'], ['current'])}
@@ -163,7 +177,7 @@
                 bind:is_adding={is_adding_consequence}
                 bind:connection_mode
                 bind:selected_node_id={selected_node_for_connection}
-                bind:new_node_name
+                bind:new_node_statement
                 onadd_start={() => start_adding('consequence')}
                 onadd_confirm={() =>
                     add_connection(ConnectionType.IMPLICATION, ['current'], ['target'])}
@@ -186,7 +200,7 @@
                 bind:is_adding={is_adding_contradiction}
                 bind:connection_mode
                 bind:selected_node_id={selected_node_for_connection}
-                bind:new_node_name
+                bind:new_node_statement
                 onadd_start={() => start_adding('contradiction')}
                 onadd_confirm={() =>
                     add_connection(ConnectionType.CONTRADICTION, ['current'], ['target'])}

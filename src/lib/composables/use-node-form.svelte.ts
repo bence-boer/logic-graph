@@ -11,8 +11,8 @@ export interface FormValidationErrors {
  * Node form state for both create and edit operations
  */
 export interface NodeFormState {
-    node_name: string;
-    node_description: string;
+    node_statement: string;
+    node_details: string;
     validation_errors: FormValidationErrors;
     is_submitting: boolean;
 }
@@ -35,7 +35,7 @@ export interface NodeFormHandlers {
  *
  * @example
  * ```ts
- * const form = use_node_form({ name: 'Example', description: 'Test' });
+ * const form = use_node_form({ statement: 'Example', details: 'Test' });
  * if (form.validate()) {
  *   // Form is valid, submit...
  * }
@@ -44,8 +44,8 @@ export interface NodeFormHandlers {
 export function use_node_form(
     initial_values?: Partial<LogicNode>
 ): NodeFormState & NodeFormHandlers {
-    let node_name = $state(initial_values?.name ?? '');
-    let node_description = $state(initial_values?.description ?? '');
+    let node_statement = $state(initial_values?.statement ?? '');
+    let node_details = $state(initial_values?.details ?? '');
     let validation_errors = $state<FormValidationErrors>({});
     let is_submitting = $state(false);
 
@@ -58,18 +58,18 @@ export function use_node_form(
     function validate(): boolean {
         validation_errors = {};
 
-        if (!node_name.trim()) {
-            validation_errors.name = 'Name is required';
+        if (!node_statement.trim()) {
+            validation_errors.statement = 'Statement is required';
             return false;
         }
 
-        if (node_name.length > 100) {
-            validation_errors.name = 'Name must be less than 100 characters';
+        if (node_statement.length > 100) {
+            validation_errors.statement = 'Statement must be less than 100 characters';
             return false;
         }
 
-        if (node_description.length > 500) {
-            validation_errors.description = 'Description must be less than 500 characters';
+        if (node_details.length > 500) {
+            validation_errors.details = 'Details must be less than 500 characters';
             return false;
         }
 
@@ -80,8 +80,8 @@ export function use_node_form(
      * Resets the form to initial values
      */
     function reset(): void {
-        node_name = initial_values?.name ?? '';
-        node_description = initial_values?.description ?? '';
+        node_statement = initial_values?.statement ?? '';
+        node_details = initial_values?.details ?? '';
         validation_errors = {};
         is_submitting = false;
     }
@@ -95,18 +95,18 @@ export function use_node_form(
 
     return {
         // State (with getters and setters)
-        get node_name() {
-            return node_name;
+        get node_statement() {
+            return node_statement;
         },
-        set node_name(value: string) {
-            node_name = value;
+        set node_statement(value: string) {
+            node_statement = value;
         },
 
-        get node_description() {
-            return node_description;
+        get node_details() {
+            return node_details;
         },
-        set node_description(value: string) {
-            node_description = value;
+        set node_details(value: string) {
+            node_details = value;
         },
 
         get validation_errors() {

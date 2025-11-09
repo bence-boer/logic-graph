@@ -16,13 +16,13 @@
     <span class="shrink-0 text-base leading-none text-(--node-default)">●</span>
     <div class="min-w-0 flex-1">
         <div class="mb-0.5 text-sm font-medium text-(--text-primary)">
-            {node.name}
+            {node.statement}
         </div>
-        {#if node.description}
+        {#if node.details}
             <div
                 class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-(--text-tertiary)"
             >
-                {node.description}
+                {node.details}
             </div>
         {/if}
     </div>

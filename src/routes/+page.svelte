@@ -21,7 +21,7 @@
     {#if ui_store.search_panel_open}
         <SearchPanel />
     {/if}
-    
+
     <!-- Mobile menu button -->
     <button
         class="fixed top-4 left-4 z-1000 hidden h-10 w-10 cursor-pointer items-center justify-center rounded-lg border border-(--border-default) bg-(--bg-elevated) text-(--text-primary) shadow-(--shadow-md) backdrop-blur-md transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-95 max-md:flex"
@@ -31,7 +31,7 @@
     >
         <Menu size={20} />
     </button>
-    
+
     <LoadingOverlay is_loading={loading_store.is_loading} message={loading_store.message} />
     <ToastContainer />
 </div>

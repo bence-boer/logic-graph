@@ -52,8 +52,8 @@ export function search_graph(
             ? []
             : graph.nodes.filter((node) => {
                   const matches_query =
-                      node.name.toLowerCase().includes(query) ||
-                      node.description.toLowerCase().includes(query) ||
+                      node.statement.toLowerCase().includes(query) ||
+                      node.details.toLowerCase().includes(query) ||
                       node.id.toLowerCase().includes(query);
                   return matches_query;
               });

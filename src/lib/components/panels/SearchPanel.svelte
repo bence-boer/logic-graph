@@ -61,7 +61,7 @@
 ></button>
 
 <div
-    class="fixed top-20 right-4 z-900 flex max-h-[calc(100vh-100px)] w-80 animate-[slide-in_0.3s_ease] flex-col rounded-xl border border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-lg) backdrop-blur-md max-md:left-1/2 max-md:top-1/2 max-md:right-auto max-md:h-[90vh] max-md:max-h-[600px] max-md:w-[90vw] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2"
+    class="fixed top-20 right-4 z-900 flex max-h-[calc(100vh-100px)] w-80 animate-[slide-in_0.3s_ease] flex-col rounded-xl border border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-lg) backdrop-blur-md max-md:top-1/2 max-md:right-auto max-md:left-1/2 max-md:h-[90vh] max-md:max-h-[600px] max-md:w-[90vw] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2"
 >
     <div class="border-b border-(--border-default) p-6">
         <div class="flex items-center justify-between">

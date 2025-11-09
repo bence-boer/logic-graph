@@ -10,8 +10,8 @@ function create_graph_store() {
     let _nodes = $state<LogicNode[]>([]);
     let _connections = $state<LogicConnection[]>([]);
     let _metadata = $state({
-        name: 'Untitled Graph',
-        description: '',
+        statement: 'Untitled Graph',
+        details: '',
         created: new Date().toISOString(),
         modified: new Date().toISOString()
     });
@@ -53,16 +53,16 @@ function create_graph_store() {
         },
 
         remove_node(node_id: string): void {
-            _nodes = _nodes.filter((n) => n.id !== node_id);
+            _nodes = _nodes.filter((node) => node.id !== node_id);
             // Also remove any connections involving this node
             _connections = _connections.filter(
-                (c) => !c.sources.includes(node_id) && !c.targets.includes(node_id)
+                (connection) => !connection.sources.includes(node_id) && !connection.targets.includes(node_id)
             );
             this.update_modified();
         },
 
         update_node(node_id: string, updates: Partial<LogicNode>): void {
-            _nodes = _nodes.map((n) => (n.id === node_id ? { ...n, ...updates } : n));
+            _nodes = _nodes.map((node) => (node.id === node_id ? { ...node, ...updates } : node));
             this.update_modified();
         },
 
@@ -77,13 +77,13 @@ function create_graph_store() {
         },
 
         remove_connection(connection_id: string): void {
-            _connections = _connections.filter((c) => c.id !== connection_id);
+            _connections = _connections.filter((connection) => connection.id !== connection_id);
             this.update_modified();
         },
 
         update_connection(connection_id: string, updates: Partial<LogicConnection>): void {
-            _connections = _connections.map((c) =>
-                c.id === connection_id ? { ...c, ...updates } : c
+            _connections = _connections.map((connection) =>
+                connection.id === connection_id ? { ...connection, ...updates } : connection
             );
             this.update_modified();
         },
@@ -93,8 +93,8 @@ function create_graph_store() {
             _connections = graph.connections;
             if (graph.metadata) {
                 _metadata = {
-                    name: graph.metadata.name || _metadata.name,
-                    description: graph.metadata.description || _metadata.description,
+                    statement: graph.metadata.statement || _metadata.statement,
+                    details: graph.metadata.details || _metadata.details,
                     created: graph.metadata.created || _metadata.created,
                     modified: graph.metadata.modified || _metadata.modified
                 };
@@ -113,8 +113,8 @@ function create_graph_store() {
             _nodes = [];
             _connections = [];
             _metadata = {
-                name: 'Untitled Graph',
-                description: '',
+                statement: 'Untitled Graph',
+                details: '',
                 created: new Date().toISOString(),
                 modified: new Date().toISOString()
             };
@@ -132,23 +132,23 @@ function create_graph_store() {
             const sample_nodes: LogicNode[] = [
                 {
                     id: crypto.randomUUID(),
-                    name: 'All humans are mortal',
-                    description: 'Universal statement about human mortality'
+                    statement: 'All humans are mortal',
+                    details: 'Universal statement about human mortality'
                 },
                 {
                     id: crypto.randomUUID(),
-                    name: 'Socrates is human',
-                    description: 'Particular statement about Socrates'
+                    statement: 'Socrates is human',
+                    details: 'Particular statement about Socrates'
                 },
                 {
                     id: crypto.randomUUID(),
-                    name: 'Socrates is mortal',
-                    description: 'Logical conclusion from premises'
+                    statement: 'Socrates is mortal',
+                    details: 'Logical conclusion from premises'
                 },
                 {
                     id: crypto.randomUUID(),
-                    name: 'Socrates is immortal',
-                    description: 'Contradicts the conclusion'
+                    statement: 'Socrates is immortal',
+                    details: 'Contradicts the conclusion'
                 }
             ];
 
@@ -171,8 +171,8 @@ function create_graph_store() {
                 nodes: sample_nodes,
                 connections: sample_connections,
                 metadata: {
-                    name: 'Sample Logic Graph',
-                    description: 'Example demonstrating syllogistic reasoning',
+                    statement: 'Sample Logic Graph',
+                    details: 'Example demonstrating syllogistic reasoning',
                     created: new Date().toISOString(),
                     modified: new Date().toISOString()
                 }

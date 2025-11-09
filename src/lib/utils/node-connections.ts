@@ -6,10 +6,12 @@ import { ConnectionType } from '$lib/types/graph';
  *
  * @property node_id - The ID of the related node
  * @property connection_id - The ID of the connection
+ * @property key - Unique key for this relation (combination of connection_id and node_id)
  */
 export interface NodeConnectionRelation {
     node_id: string;
     connection_id: string;
+    key: string;
 }
 
 /**
@@ -33,9 +35,13 @@ export function get_node_reasons(
     connections: LogicConnection[]
 ): NodeConnectionRelation[] {
     return connections
-        .filter((c) => c.type === ConnectionType.IMPLICATION && c.targets.includes(node_id))
-        .flatMap((c) =>
-            c.sources.map((source_id) => ({ node_id: source_id, connection_id: c.id }))
+        .filter((connection) => connection.type === ConnectionType.IMPLICATION && connection.targets.includes(node_id))
+        .flatMap((connection) =>
+            connection.sources.map((source_id) => ({
+                node_id: source_id,
+                connection_id: connection.id!, // ID will always exist at runtime (normalized during import)
+                key: `${connection.id}-${source_id}`
+            }))
         );
 }
 
@@ -60,9 +66,13 @@ export function get_node_consequences(
     connections: LogicConnection[]
 ): NodeConnectionRelation[] {
     return connections
-        .filter((c) => c.type === ConnectionType.IMPLICATION && c.sources.includes(node_id))
-        .flatMap((c) =>
-            c.targets.map((target_id) => ({ node_id: target_id, connection_id: c.id }))
+        .filter((connection) => connection.type === ConnectionType.IMPLICATION && connection.sources.includes(node_id))
+        .flatMap((connection) =>
+            connection.targets.map((target_id) => ({
+                node_id: target_id,
+                connection_id: connection.id!, // ID will always exist at runtime (normalized during import)
+                key: `${connection.id}-${target_id}`
+            }))
         );
 }
 
@@ -87,14 +97,18 @@ export function get_node_contradictions(
 ): NodeConnectionRelation[] {
     return connections
         .filter(
-            (c) =>
-                c.type === ConnectionType.CONTRADICTION &&
-                (c.sources.includes(node_id) || c.targets.includes(node_id))
+            (connection) =>
+                connection.type === ConnectionType.CONTRADICTION &&
+                (connection.sources.includes(node_id) || connection.targets.includes(node_id))
         )
-        .flatMap((c) => {
+        .flatMap((connection) => {
             // Get the other nodes (not the current node)
-            const other_nodes = [...c.sources, ...c.targets].filter((id) => id !== node_id);
-            return other_nodes.map((other_id) => ({ node_id: other_id, connection_id: c.id }));
+            const other_nodes = [...connection.sources, ...connection.targets].filter((id) => id !== node_id);
+            return other_nodes.map((other_id) => ({
+                node_id: other_id,
+                connection_id: connection.id!, // ID will always exist at runtime (normalized during import)
+                key: `${connection.id}-${other_id}`
+            }));
         });
 }
 
@@ -103,7 +117,7 @@ export function get_node_contradictions(
  *
  * @param current_node_id - The ID of the current node to exclude
  * @param all_nodes - Array of all nodes in the graph
- * @returns Array of objects with value (node ID) and label (node name) for use in Select components
+ * @returns Array of objects with value (node ID) and label (node statement) for use in Select components
  *
  * @example
  * ```ts
@@ -116,6 +130,6 @@ export function get_available_nodes_for_connection(
     all_nodes: LogicNode[]
 ): Array<{ value: string; label: string }> {
     return all_nodes
-        .filter((n) => n.id !== current_node_id)
-        .map((n) => ({ value: n.id, label: n.name }));
+        .filter((node) => node.id !== current_node_id)
+        .map((node) => ({ value: node.id, label: node.statement }));
 }

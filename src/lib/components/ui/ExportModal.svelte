@@ -27,8 +27,8 @@
         onclose?.();
     }
 
-    function handle_backdrop_click(e: MouseEvent) {
-        if (e.target === e.currentTarget) {
+    function handle_backdrop_click(event: MouseEvent) {
+        if (event.target === event.currentTarget) {
             handle_close();
         }
     }
@@ -84,9 +84,9 @@
 
 {#if is_open}
     <div
-        class="fixed top-0 right-0 bottom-0 left-0 z-1000 flex animate-[fade-in_0.2s_ease] items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+        class="fixed top-0 right-0 bottom-0 left-0 z-1000 flex animate-[fade-in_0.2s_ease] items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
         onclick={handle_backdrop_click}
-        onkeydown={(e) => e.key === 'Escape' && handle_close()}
+        onkeydown={(event) => event.key === 'Escape' && handle_close()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="export-modal-title"
@@ -117,7 +117,7 @@
                     <input
                         id="export-filename"
                         type="text"
-                        class="rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 font-sans text-sm text-white transition-all duration-200 hover:border-neutral-600 focus:border-purple-600 focus:bg-neutral-900 focus:outline-none"
+                        class="rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 font-sans text-sm text-white transition-all duration-200 hover:border-neutral-600 focus:border-accent-600 focus:bg-neutral-900 focus:outline-none"
                         bind:value={filename}
                         placeholder="logic-graph"
                     />
@@ -129,7 +129,7 @@
                     >
                     <select
                         id="export-format"
-                        class="cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 font-sans text-sm text-white transition-all duration-200 hover:border-neutral-600 focus:border-purple-600 focus:bg-neutral-900 focus:outline-none"
+                        class="cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 font-sans text-sm text-white transition-all duration-200 hover:border-neutral-600 focus:border-accent-600 focus:bg-neutral-900 focus:outline-none"
                         bind:value={export_format}
                     >
                         <option value="json">JSON (.json)</option>
@@ -146,17 +146,17 @@
                     {#if export_format === 'json'}
                         <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Preserves all graph data and metadata
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Can be re-imported into the application
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Human-readable JSON format
                             </li>
@@ -164,17 +164,17 @@
                     {:else if export_format === 'svg'}
                         <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Vector graphics - scales without quality loss
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Embedded styles included
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Can be edited in vector graphics software
                             </li>
@@ -182,17 +182,17 @@
                     {:else if export_format === 'png'}
                         <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 High-quality raster image (2x resolution)
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Transparent background
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Suitable for presentations and documents
                             </li>
@@ -200,17 +200,17 @@
                     {:else if export_format === 'jpeg'}
                         <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Compressed image format
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Dark background included
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Smaller file size than PNG
                             </li>
@@ -218,22 +218,22 @@
                     {:else if export_format === 'html'}
                         <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Fully interactive standalone webpage
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Includes zoom, pan, and drag functionality
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 No external dependencies required
                             </li>
                             <li
-                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-accent-600 before:content-['•']"
                             >
                                 Open directly in any web browser
                             </li>

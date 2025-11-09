@@ -52,7 +52,7 @@ export interface DragHandlersConfig {
  */
 export function create_drag_started_handler(config: DragHandlersConfig) {
     return function drag_started(
-        event: d3.D3DragEvent<SVGCircleElement, DragTrackingNode, DragTrackingNode>,
+        event: d3.D3DragEvent<SVGGElement, DragTrackingNode, DragTrackingNode>,
         d: DragTrackingNode
     ) {
         if (!event.active && config.simulation) {
@@ -81,7 +81,7 @@ export function create_drag_started_handler(config: DragHandlersConfig) {
  */
 export function create_dragged_handler() {
     return function dragged(
-        event: d3.D3DragEvent<SVGCircleElement, DragTrackingNode, DragTrackingNode>,
+        event: d3.D3DragEvent<SVGGElement, DragTrackingNode, DragTrackingNode>,
         d: DragTrackingNode
     ) {
         d.fx = event.x;
@@ -110,7 +110,7 @@ export function create_dragged_handler() {
  */
 export function create_drag_ended_handler(config: DragHandlersConfig) {
     return function drag_ended(
-        event: d3.D3DragEvent<SVGCircleElement, DragTrackingNode, DragTrackingNode>,
+        event: d3.D3DragEvent<SVGGElement, DragTrackingNode, DragTrackingNode>,
         d: DragTrackingNode
     ) {
         if (!event.active && config.simulation) {

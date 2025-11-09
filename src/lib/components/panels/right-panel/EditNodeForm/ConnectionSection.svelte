@@ -16,13 +16,13 @@
         is_adding: boolean;
         connection_mode: 'existing' | 'new';
         selected_node_id: string;
-        new_node_name: string;
+        new_node_statement: string;
         onadd_start: () => void;
         onadd_confirm: () => void;
         onadd_cancel: () => void;
         onmode_change: (mode: 'existing' | 'new') => void;
         onconnection_click: (node_id: string) => void;
-        onconnection_delete: (connection_id: string, node_name: string) => void;
+        onconnection_delete: (connection_id: string, node_statement: string) => void;
     }
 
     let {
@@ -36,7 +36,7 @@
         is_adding = $bindable(),
         connection_mode = $bindable(),
         selected_node_id = $bindable(),
-        new_node_name = $bindable(),
+        new_node_statement = $bindable(),
         onadd_start,
         onadd_confirm,
         onadd_cancel,
@@ -64,7 +64,7 @@
         <AddConnectionForm
             bind:mode={connection_mode}
             bind:selected_node_id
-            bind:new_node_name
+            bind:new_node_statement
             {available_nodes}
             {onmode_change}
             onconfirm={onadd_confirm}
@@ -73,7 +73,7 @@
     {/if}
     {#if connections.length > 0}
         <div class="flex flex-col gap-1">
-            {#each connections as connection (connection.connection_id)}
+            {#each connections as connection (connection.key)}
                 {@const connected_node = all_nodes.find((n) => n.id === connection.node_id)}
                 {#if connected_node}
                     <ConnectionListItem
@@ -82,7 +82,7 @@
                         {symbol_color}
                         onclick={() => onconnection_click(connected_node.id)}
                         ondelete={() =>
-                            onconnection_delete(connection.connection_id, connected_node.name)}
+                            onconnection_delete(connection.connection_id, connected_node.statement)}
                     />
                 {/if}
             {/each}

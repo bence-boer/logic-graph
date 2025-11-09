@@ -32,7 +32,7 @@
     ></button>
 
     <div
-        class="fixed top-0 right-0 bottom-0 z-900 flex w-[360px] animate-[slide-in_0.3s_ease] flex-col border border-r-0 border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-sm) backdrop-blur-md max-md:left-1/2 max-md:top-1/2 max-md:right-auto max-md:bottom-auto max-md:h-[90vh] max-md:max-h-[600px] max-md:w-[90vw] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:rounded-xl max-md:border"
+        class="fixed top-0 right-0 bottom-0 z-900 flex w-[360px] animate-[slide-in_0.3s_ease] flex-col border border-r-0 border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-sm) backdrop-blur-md max-md:top-1/2 max-md:right-auto max-md:bottom-auto max-md:left-1/2 max-md:h-[90vh] max-md:max-h-[600px] max-md:w-[90vw] max-md:max-w-md max-md:-translate-x-1/2 max-md:-translate-y-1/2 max-md:rounded-xl max-md:border"
     >
         {#if mode.type === RightPanelModeType.CREATE_NODE}
             <CreateNodeForm />

@@ -111,7 +111,7 @@
                     {@const option = options.find((opt) => opt.value === value)}
                     {#if option}
                         <div
-                            class="inline-flex items-center gap-1.5 rounded bg-purple-600 px-2.5 py-1.5 text-xs font-medium text-white"
+                            class="inline-flex items-center gap-1.5 rounded bg-accent-600 px-2.5 py-1.5 text-xs font-medium text-white"
                         >
                             <span class="leading-none">{option.label}</span>
                             <button
@@ -136,7 +136,7 @@
             id={multiselect_id}
             class="flex w-full cursor-pointer items-center rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-left text-sm text-neutral-300 transition-colors {disabled
                 ? 'cursor-not-allowed opacity-50'
-                : 'hover:border-neutral-600 focus:border-purple-600 focus:outline-none'} {selected.length >
+                : 'hover:border-neutral-600 focus:border-accent-600 focus:outline-none'} {selected.length >
             0
                 ? 'text-xs text-neutral-500'
                 : ''}"
@@ -162,7 +162,7 @@
                 <div class="border-b border-neutral-700 p-2">
                     <input
                         type="text"
-                        class="w-full rounded border border-neutral-700 bg-neutral-800 px-2 py-2 font-sans text-sm text-white focus:border-purple-600 focus:outline-none"
+                        class="w-full rounded border border-neutral-700 bg-neutral-800 px-2 py-2 font-sans text-sm text-white focus:border-accent-600 focus:outline-none"
                         bind:value={search_query}
                         placeholder="Search..."
                         onclick={(e) => e.stopPropagation()}
@@ -184,7 +184,7 @@
                                 !is_selected}
                             <button
                                 class="flex w-full cursor-pointer items-start gap-2 rounded border-0 bg-transparent p-2 text-left font-sans text-sm text-white transition-colors duration-200 {is_selected
-                                    ? 'bg-purple-600/10'
+                                    ? 'bg-accent-600/10'
                                     : ''} {is_disabled
                                     ? 'cursor-not-allowed opacity-50'
                                     : 'hover:bg-neutral-800'}"

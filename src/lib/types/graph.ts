@@ -8,10 +8,10 @@
 export interface LogicNode {
     /** Unique identifier for the node */
     id: string;
-    /** Display name of the node (rendered in the UI) */
-    name: string;
-    /** Detailed description of the node (rendered in the UI) */
-    description: string;
+    /** The logical statement represented by this node (rendered in the UI) */
+    statement: string;
+    /** Additional details about the statement (optional, rendered in the UI) */
+    details?: string;
     /** X position (managed by D3 force simulation) */
     x?: number;
     /** Y position (managed by D3 force simulation) */
@@ -40,8 +40,8 @@ export enum ConnectionType {
  * Represents a connection (edge) between nodes in the logic graph
  */
 export interface LogicConnection {
-    /** Unique identifier for the connection */
-    id: string;
+    /** Unique identifier for the connection (optional when importing, will be generated if missing) */
+    id?: string;
     /** Type of logical relationship */
     type: ConnectionType;
     /** Array of source node IDs (supports multiple sources) */
@@ -69,10 +69,10 @@ export interface D3Link {
  * Metadata for the graph
  */
 export interface GraphMetadata {
-    /** Name of the graph */
-    name?: string;
-    /** Description of the graph */
-    description?: string;
+    /** Statement of the graph */
+    statement?: string;
+    /** Details of the graph */
+    details?: string;
     /** Creation timestamp */
     created?: string;
     /** Last modified timestamp */

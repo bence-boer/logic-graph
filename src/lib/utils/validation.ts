@@ -6,7 +6,7 @@
  * during import/export.
  */
 
-import type { LogicGraph, LogicNode, LogicConnection } from '$lib/types/graph';
+import type { LogicConnection, LogicGraph, LogicNode } from '$lib/types/graph';
 import { ConnectionType } from '$lib/types/graph';
 
 /**
@@ -40,7 +40,7 @@ export interface ValidationResult {
  *
  * @example
  * ```ts
- * const node = { id: '1', name: 'Test', description: 'A test node' };
+ * const node = { id: '1', statement: 'Test', details: 'A test node' };
  * const result = validate_node(node);
  * if (result.valid) {
  *   console.log('Node is valid');
@@ -56,12 +56,12 @@ export function validate_node(node: LogicNode): ValidationResult {
         errors.push({ field: 'id', message: 'Node ID is required' });
     }
 
-    if (!node.name || node.name.trim() === '') {
-        errors.push({ field: 'name', message: 'Node name is required' });
+    if (!node.statement || node.statement.trim() === '') {
+        errors.push({ field: 'statement', message: 'Node statement is required' });
     }
 
-    if (node.description === undefined || node.description === null) {
-        errors.push({ field: 'description', message: 'Node description is required' });
+    if (node.details === undefined || node.details === null) {
+        errors.push({ field: 'details', message: 'Node details is required' });
     }
 
     return {
@@ -89,8 +89,8 @@ export function validate_node(node: LogicNode): ValidationResult {
  *   targets: ['b']
  * };
  * const nodes = [
- *   { id: 'a', name: 'A', description: '' },
- *   { id: 'b', name: 'B', description: '' }
+ *   { id: 'a', statement: 'A', details: '' },
+ *   { id: 'b', statement: 'B', details: '' }
  * ];
  * const result = validate_connection(connection, nodes);
  * if (result.valid) {
@@ -105,8 +105,9 @@ export function validate_connection(
     const errors: ValidationError[] = [];
     const node_ids = new Set(nodes.map((n) => n.id));
 
-    if (!connection.id || connection.id.trim() === '') {
-        errors.push({ field: 'id', message: 'Connection ID is required' });
+    // Note: ID is optional during import (will be generated), but should be present after normalization
+    if (connection.id !== undefined && connection.id.trim() === '') {
+        errors.push({ field: 'id', message: 'Connection ID cannot be empty string' });
     }
 
     if (!Object.values(ConnectionType).includes(connection.type)) {
@@ -162,8 +163,8 @@ export function validate_connection(
  * ```ts
  * const graph = {
  *   nodes: [
- *     { id: '1', name: 'Node A', description: 'First node' },
- *     { id: '2', name: 'Node B', description: 'Second node' }
+ *     { id: '1', statement: 'Node A', details: 'First node' },
+ *     { id: '2', statement: 'Node B', details: 'Second node' }
  *   ],
  *   connections: [
  *     { id: '1', type: ConnectionType.IMPLICATION, sources: ['1'], targets: ['2'] }
@@ -204,7 +205,7 @@ export function validate_graph(graph: LogicGraph): ValidationResult {
     }
 
     // Check for duplicate node IDs
-    const node_ids = graph.nodes.map((n) => n.id);
+    const node_ids = graph.nodes.map((node) => node.id);
     const duplicate_ids = node_ids.filter((id, index) => node_ids.indexOf(id) !== index);
     if (duplicate_ids.length > 0) {
         errors.push({
@@ -226,8 +227,8 @@ export function validate_graph(graph: LogicGraph): ValidationResult {
         }
     }
 
-    // Check for duplicate connection IDs
-    const connection_ids = graph.connections.map((c) => c.id);
+    // Check for duplicate connection IDs (only check defined IDs)
+    const connection_ids = graph.connections.map((connection) => connection.id).filter((id): id is string => id !== undefined);
     const duplicate_connection_ids = connection_ids.filter(
         (id, index) => connection_ids.indexOf(id) !== index
     );

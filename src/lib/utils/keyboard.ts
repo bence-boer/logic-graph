@@ -45,19 +45,25 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
 
             if (selected_type === 'node') {
                 const node = graph_store.nodes.find((n) => n.id === selected_id);
-                if (node && confirm(`Delete node "${node.name}"?`)) {
+                if (node && confirm(`Delete node "${node.statement}"?`)) {
                     graph_store.remove_node(selected_id);
-                    toast_store.success(`Statement "${node.name}" deleted`);
+                    toast_store.success(`Statement "${node.statement}" deleted`);
                     selection_store.clear_selection();
                 }
             } else if (selected_type === 'connection') {
-                const connection = graph_store.connections.find((c) => c.id === selected_id);
+                const connection = graph_store.connections.find((connection) => connection.id === selected_id);
                 if (connection) {
                     const source_names = connection.sources
-                        .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+                        .map(
+                            (id) =>
+                                graph_store.nodes.find((n) => n.id === id)?.statement || 'Unknown'
+                        )
                         .join(', ');
                     const target_names = connection.targets
-                        .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+                        .map(
+                            (id) =>
+                                graph_store.nodes.find((n) => n.id === id)?.statement || 'Unknown'
+                        )
                         .join(', ');
 
                     if (confirm(`Delete connection?\n[${source_names}] → [${target_names}]`)) {

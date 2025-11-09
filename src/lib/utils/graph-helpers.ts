@@ -6,28 +6,28 @@
  * for graph traversal and queries.
  */
 
-import type { LogicNode, LogicConnection } from '$lib/types/graph';
+import type { LogicConnection, LogicNode } from '$lib/types/graph';
 import { ConnectionType } from '$lib/types/graph';
 
 /**
- * Get a node's name by ID, with fallback
+ * Get a node's statement by ID, with fallback
  *
- * Searches for a node by ID and returns its name. If the node is not found,
+ * Searches for a node by ID and returns its statement. If the node is not found,
  * returns 'Unknown' as a fallback value to prevent rendering errors.
  *
  * @param node_id - The ID of the node to look up
  * @param nodes - Array of all nodes in the graph
- * @returns The name of the node, or 'Unknown' if not found
+ * @returns The statement of the node, or 'Unknown' if not found
  *
  * @example
  * ```ts
- * const nodes = [{ id: '1', name: 'Node A', description: '' }];
- * const name = get_node_name('1', nodes); // Returns: 'Node A'
+ * const nodes = [{ id: '1', statement: 'Node A', details: '' }];
+ * const statement = get_node_name('1', nodes); // Returns: 'Node A'
  * const missing = get_node_name('999', nodes); // Returns: 'Unknown'
  * ```
  */
 export function get_node_name(node_id: string, nodes: LogicNode[]): string {
-    return nodes.find((n) => n.id === node_id)?.name ?? 'Unknown';
+    return nodes.find((node) => node.id === node_id)?.statement ?? 'Unknown';
 }
 
 /**
@@ -50,9 +50,9 @@ export function get_node_name(node_id: string, nodes: LogicNode[]): string {
  *   targets: ['c']
  * };
  * const nodes = [
- *   { id: 'a', name: 'Alpha', description: '' },
- *   { id: 'b', name: 'Beta', description: '' },
- *   { id: 'c', name: 'Gamma', description: '' }
+ *   { id: 'a', statement: 'Alpha', details: '' },
+ *   { id: 'b', statement: 'Beta', details: '' },
+ *   { id: 'c', statement: 'Gamma', details: '' }
  * ];
  * const display = format_connection_display(connection, nodes);
  * // Returns: "[Alpha, Beta] → [Gamma]"
@@ -97,8 +97,8 @@ export function format_connection_type(type: ConnectionType): string {
  * @example
  * ```ts
  * const nodes = [
- *   { id: '1', name: 'Node A', description: '' },
- *   { id: '2', name: 'Node B', description: '' }
+ *   { id: '1', statement: 'Node A', details: '' },
+ *   { id: '2', statement: 'Node B', details: '' }
  * ];
  * const node_map = create_node_lookup_map(nodes);
  * const node = node_map.get('1'); // O(1) lookup
@@ -107,18 +107,13 @@ export function format_connection_type(type: ConnectionType): string {
  * @see Use this when performing multiple lookups on the same node array
  */
 export function create_node_lookup_map(nodes: LogicNode[]): Map<string, LogicNode> {
-    return new Map(nodes.map((n) => [n.id, n]));
+    return new Map(nodes.map((node) => [node.id, node]));
 }
 
 /**
- * Create a lookup map for O(1) connection access
+ * Create a Map for fast connection lookups by ID
  *
- * Creates a Map that allows fast lookup of connections by ID.
- *
- * Time Complexity: O(n) to build, O(1) for each lookup
- * Space Complexity: O(n)
- *
- * @param connections - Array of connections to index
+ * @param connections - Array of connections
  * @returns Map from connection ID to connection object
  *
  * @example
@@ -133,7 +128,7 @@ export function create_node_lookup_map(nodes: LogicNode[]): Map<string, LogicNod
 export function create_connection_lookup_map(
     connections: LogicConnection[]
 ): Map<string, LogicConnection> {
-    return new Map(connections.map((c) => [c.id, c]));
+    return new Map(connections.map((connection) => [connection.id!, connection])); // ID will always exist at runtime (normalized during import)
 }
 
 /**
@@ -145,13 +140,13 @@ export function create_connection_lookup_map(
  *
  * @example
  * ```ts
- * const nodes = [{ id: '1', name: 'Node A', description: '' }];
+ * const nodes = [{ id: '1', statement: 'Node A', details: '' }];
  * node_exists('1', nodes); // Returns: true
  * node_exists('999', nodes); // Returns: false
  * ```
  */
 export function node_exists(node_id: string, nodes: LogicNode[]): boolean {
-    return nodes.some((n) => n.id === node_id);
+    return nodes.some((node) => node.id === node_id);
 }
 
 /**
@@ -167,9 +162,9 @@ export function node_exists(node_id: string, nodes: LogicNode[]): boolean {
  * @example
  * ```ts
  * const nodes = [
- *   { id: '1', name: 'Node A', description: '' },
- *   { id: '2', name: 'Node B', description: '' },
- *   { id: '3', name: 'Node C', description: '' }
+ *   { id: '1', statement: 'Node A', details: '' },
+ *   { id: '2', statement: 'Node B', details: '' },
+ *   { id: '3', statement: 'Node C', details: '' }
  * ];
  * const selected = get_nodes_by_ids(['1', '3'], nodes);
  * // Returns: [{ id: '1', ... }, { id: '3', ... }]
@@ -177,7 +172,7 @@ export function node_exists(node_id: string, nodes: LogicNode[]): boolean {
  */
 export function get_nodes_by_ids(node_ids: string[], nodes: LogicNode[]): LogicNode[] {
     const id_set = new Set(node_ids);
-    return nodes.filter((n) => id_set.has(n.id));
+    return nodes.filter((node) => id_set.has(node.id));
 }
 
 /**
@@ -201,5 +196,5 @@ export function count_connections_by_type(
     connections: LogicConnection[],
     type: ConnectionType
 ): number {
-    return connections.filter((c) => c.type === type).length;
+    return connections.filter((connection) => connection.type === type).length;
 }

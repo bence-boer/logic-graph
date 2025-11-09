@@ -1,10 +1,10 @@
-import type { LogicNode, LogicConnection } from '$lib/types/graph';
 import type {
-    ForceLayoutSettings,
-    HierarchicalLayoutSettings,
     CircularLayoutSettings,
-    GridLayoutSettings
+    ForceLayoutSettings,
+    GridLayoutSettings,
+    HierarchicalLayoutSettings
 } from '$lib/stores/layout.svelte';
+import type { LogicConnection, LogicNode } from '$lib/types/graph';
 
 export interface PositionedNode extends LogicNode {
     x: number;
@@ -168,7 +168,7 @@ export function apply_circular_layout(
 
         sorted_nodes.sort((a, b) => (degrees.get(b.id) || 0) - (degrees.get(a.id) || 0));
     } else if (settings.sort_by === 'name') {
-        sorted_nodes.sort((a, b) => a.name.localeCompare(b.name));
+        sorted_nodes.sort((a, b) => a.statement.localeCompare(b.statement));
     }
 
     // Position nodes in circle

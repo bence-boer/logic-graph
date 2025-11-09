@@ -5,7 +5,7 @@
     interface Props {
         mode: 'existing' | 'new';
         selected_node_id: string;
-        new_node_name: string;
+        new_node_statement: string;
         available_nodes: Array<{ value: string; label: string }>;
         onmode_change: (mode: 'existing' | 'new') => void;
         onconfirm: () => void;
@@ -15,14 +15,16 @@
     let {
         mode = $bindable(),
         selected_node_id = $bindable(),
-        new_node_name = $bindable(),
+        new_node_statement = $bindable(),
         available_nodes,
         onmode_change,
         onconfirm,
         oncancel
     }: Props = $props();
 
-    let is_disabled = $derived(mode === 'existing' ? !selected_node_id : !new_node_name.trim());
+    let is_disabled = $derived(
+        mode === 'existing' ? !selected_node_id : !new_node_statement.trim()
+    );
 </script>
 
 <div
@@ -55,11 +57,11 @@
             placeholder="Select a statement..."
         />
     {:else}
-        <Input bind:value={new_node_name} placeholder="Enter statement name..." required />
+        <Input bind:value={new_node_statement} placeholder="Enter statement..." required />
     {/if}
     <div class="flex gap-2">
         <button
-            class="flex-1 cursor-pointer rounded-md border border-(--accent-primary) bg-(--accent-primary) px-3 py-1.5 text-sm text-white transition-all duration-200 hover:bg-purple-700 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex-1 cursor-pointer rounded-md border border-(--accent-primary) bg-(--accent-primary) px-3 py-1.5 text-sm text-white transition-all duration-200 hover:bg-accent-700 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
             onclick={onconfirm}
             disabled={is_disabled}
         >

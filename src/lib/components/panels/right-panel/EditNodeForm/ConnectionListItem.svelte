@@ -18,7 +18,7 @@
 >
     <button class="flex flex-1 cursor-pointer items-center gap-2 px-3 py-2 text-left" {onclick}>
         <span class="text-lg leading-none {symbol_color}">{symbol}</span>
-        <span class="text-sm text-(--text-primary)">{node.name}</span>
+        <span class="text-sm text-(--text-primary)">{node.statement}</span>
     </button>
     <button
         class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-tertiary) transition-all duration-200 hover:text-(--accent-secondary) active:scale-98"

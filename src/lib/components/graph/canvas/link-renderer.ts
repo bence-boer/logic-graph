@@ -15,6 +15,78 @@ import {
 } from '$lib/utils/d3-helpers';
 
 /**
+ * Calculates the intersection point between a line and a rectangle.
+ *
+ * Given a line from the center of a source rectangle to the center of a target rectangle,
+ * this function returns the point where the line intersects the edge of the target rectangle.
+ *
+ * @param source_x - X coordinate of the source point (center of source node)
+ * @param source_y - Y coordinate of the source point (center of source node)
+ * @param target_x - X coordinate of the target point (center of target node)
+ * @param target_y - Y coordinate of the target point (center of target node)
+ * @param rect_width - Width of the target rectangle
+ * @param rect_height - Height of the target rectangle
+ * @returns Object with x and y coordinates of the intersection point
+ */
+function get_rect_intersection(
+    source_x: number,
+    source_y: number,
+    target_x: number,
+    target_y: number,
+    rect_width: number,
+    rect_height: number
+): { x: number; y: number } {
+    // Calculate the direction from source to target
+    const dx = target_x - source_x;
+    const dy = target_y - source_y;
+
+    // If source and target are at the same position, return target
+    if (dx === 0 && dy === 0) {
+        return { x: target_x, y: target_y };
+    }
+
+    // Half dimensions of the rectangle
+    const half_width = rect_width / 2;
+    const half_height = rect_height / 2;
+
+    // Calculate the slope
+    const slope = dy / dx;
+
+    // Determine which edge the line intersects
+    // by comparing the angle with the diagonal of the rectangle
+    const rect_slope = rect_height / rect_width;
+
+    let intersection_x: number;
+    let intersection_y: number;
+
+    if (Math.abs(slope) <= rect_slope) {
+        // Line exits through left or right edge
+        if (dx > 0) {
+            // Coming from left, exits right edge
+            intersection_x = target_x - half_width;
+            intersection_y = target_y - half_width * slope;
+        } else {
+            // Coming from right, exits left edge
+            intersection_x = target_x + half_width;
+            intersection_y = target_y + half_width * slope;
+        }
+    } else {
+        // Line exits through top or bottom edge
+        if (dy > 0) {
+            // Coming from top, exits bottom edge
+            intersection_y = target_y - half_height;
+            intersection_x = target_x - half_height / slope;
+        } else {
+            // Coming from bottom, exits top edge
+            intersection_y = target_y + half_height;
+            intersection_x = target_x + half_height / slope;
+        }
+    }
+
+    return { x: intersection_x, y: intersection_y };
+}
+
+/**
  * Renders link elements in the SVG container.
  *
  * Creates SVG line elements for each link with appropriate styling,
@@ -35,39 +107,39 @@ export function render_links(
     const link_selection = container
         .select<SVGGElement>('g.links')
         .selectAll<SVGLineElement, D3Link>('line')
-        .data(links, (d) => `${(d.source as LogicNode).id}-${(d.target as LogicNode).id}`);
+        .data(links, (link) => `${(link.source as LogicNode).id}-${(link.target as LogicNode).id}`);
 
     link_selection.exit().remove();
 
     const link_enter = link_selection
         .enter()
         .append('line')
-        .attr('class', (d) => `link ${get_connection_class(d.connection.type)}`)
-        .attr('stroke', (d) =>
-            d.connection.type === ConnectionType.IMPLICATION
+        .attr('class', (link) => `link ${get_connection_class(link.connection.type)}`)
+        .attr('stroke', (link) =>
+            link.connection.type === ConnectionType.IMPLICATION
                 ? 'var(--link-implication)'
                 : 'var(--link-contradiction)'
         )
         .attr('stroke-width', 2)
-        .attr('stroke-dasharray', (d) => get_connection_stroke_dasharray(d.connection.type))
-        .attr('marker-end', (d) => `url(#${get_arrow_marker_id(d.connection.type)})`)
-        .attr('marker-start', (d) =>
-            d.connection.type === ConnectionType.CONTRADICTION
-                ? `url(#${get_arrow_marker_id(d.connection.type)}-start)`
+        .attr('stroke-dasharray', (link) => get_connection_stroke_dasharray(link.connection.type))
+        .attr('marker-end', (link) => `url(#${get_arrow_marker_id(link.connection.type)})`)
+        .attr('marker-start', (link) =>
+            link.connection.type === ConnectionType.CONTRADICTION
+                ? `url(#${get_arrow_marker_id(link.connection.type)}-start)`
                 : null
         )
         .attr('cursor', 'pointer')
-        .on('click', (event, d) => {
+        .on('click', (event, link) => {
             event.stopPropagation();
-            selection_store.select_connection(d.connection.id);
+            selection_store.select_connection(link.connection.id!); // ID will always exist at runtime
         })
         .on('mouseover', function () {
             d3.select(this)
                 .attr('stroke-width', 4)
                 .style('filter', 'drop-shadow(0 0 4px currentColor)');
         })
-        .on('mouseout', function (_event, d) {
-            const is_selected = selection_store.is_selected(d.connection.id);
+        .on('mouseout', function (_event, link) {
+            const is_selected = selection_store.is_selected(link.connection.id!); // ID will always exist at runtime
             d3.select(this)
                 .attr('stroke-width', is_selected ? 3 : 2)
                 .style('filter', is_selected ? 'drop-shadow(0 0 6px currentColor)' : 'none');
@@ -76,23 +148,23 @@ export function render_links(
     // Update merged link selection
     link_selection
         .merge(link_enter)
-        .attr('stroke-width', (d) => {
-            const is_selected = selection_store.is_selected(d.connection.id);
-            const is_connected = is_link_connected_to_hovered(d);
+        .attr('stroke-width', (link) => {
+            const is_selected = selection_store.is_selected(link.connection.id!); // ID will always exist at runtime
+            const is_connected = is_link_connected_to_hovered(link);
             if (is_selected) return 3;
             if (is_connected) return 3;
             return 2;
         })
-        .style('filter', (d) => {
-            const is_selected = selection_store.is_selected(d.connection.id);
-            const is_connected = is_link_connected_to_hovered(d);
+        .style('filter', (link) => {
+            const is_selected = selection_store.is_selected(link.connection.id!); // ID will always exist at runtime
+            const is_connected = is_link_connected_to_hovered(link);
             if (is_selected) return 'drop-shadow(0 0 6px currentColor)';
             if (is_connected) return 'drop-shadow(0 0 4px currentColor)';
             return 'none';
         })
-        .style('opacity', (d) => {
+        .style('opacity', (link) => {
             if (!hovered_node_id) return 0.8;
-            const is_connected = is_link_connected_to_hovered(d);
+            const is_connected = is_link_connected_to_hovered(link);
             return is_connected ? 1 : 0.3;
         });
 }
@@ -102,16 +174,73 @@ export function render_links(
  *
  * Updates the x1, y1, x2, y2 attributes of all link line elements
  * to match the current positions of their source and target nodes.
+ * Calculates intersection points with node rectangles so arrows stop at edges.
  *
  * @param container - D3 selection of the SVG g element containing links
  */
 export function update_link_positions(
     container: d3.Selection<SVGGElement, unknown, null, undefined>
 ) {
-    container
-        .selectAll<SVGLineElement, D3Link>('line.link')
-        .attr('x1', (d) => (d.source as LogicNode).x!)
-        .attr('y1', (d) => (d.source as LogicNode).y!)
-        .attr('x2', (d) => (d.target as LogicNode).x!)
-        .attr('y2', (d) => (d.target as LogicNode).y!);
+    const nodes_container = container.select<SVGGElement>('g.nodes');
+
+    container.selectAll<SVGLineElement, D3Link>('line.link').each(function (link) {
+        const source = link.source as LogicNode;
+        const target = link.target as LogicNode;
+
+        const source_x = source.x!;
+        const source_y = source.y!;
+        const target_x = target.x!;
+        const target_y = target.y!;
+
+        // Get the actual rectangle dimensions from the DOM
+        const source_node_group = nodes_container
+            .selectAll<SVGGElement, LogicNode>('g.node')
+            .filter((node) => node.id === source.id);
+        const target_node_group = nodes_container
+            .selectAll<SVGGElement, LogicNode>('g.node')
+            .filter((node) => node.id === target.id);
+
+        const source_rect = source_node_group.select('rect').node() as SVGRectElement;
+        const target_rect = target_node_group.select('rect').node() as SVGRectElement;
+
+        let source_width = 60; // Default fallback
+        let source_height = 40;
+        let target_width = 60;
+        let target_height = 40;
+
+        if (source_rect) {
+            source_width = parseFloat(source_rect.getAttribute('width') || '60');
+            source_height = parseFloat(source_rect.getAttribute('height') || '40');
+        }
+        if (target_rect) {
+            target_width = parseFloat(target_rect.getAttribute('width') || '60');
+            target_height = parseFloat(target_rect.getAttribute('height') || '40');
+        }
+
+        // Calculate intersection points at the edges of the rectangles
+        const source_point = get_rect_intersection(
+            target_x,
+            target_y,
+            source_x,
+            source_y,
+            source_width,
+            source_height
+        );
+
+        const target_point = get_rect_intersection(
+            source_x,
+            source_y,
+            target_x,
+            target_y,
+            target_width,
+            target_height
+        );
+
+        // Update line positions to stop at rectangle edges
+        d3.select(this)
+            .attr('x1', source_point.x)
+            .attr('y1', source_point.y)
+            .attr('x2', target_point.x)
+            .attr('y2', target_point.y);
+    });
 }

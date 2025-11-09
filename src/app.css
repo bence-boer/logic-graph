@@ -1,6 +1,33 @@
 @import 'tailwindcss';
 
 /* 
+ * Tailwind Theme Configuration
+ * Define custom 'accent' color that replaces all amber/purple references
+ * 
+ * TO CHANGE THE APP'S ACCENT COLOR:
+ * - Modify --color-accent-500 below (main color)
+ * - Adjust the other shades if needed (50-950)
+ * - Update the hex value in:
+ *   - src/lib/utils/export/svg.ts (line ~63)
+ *   - src/lib/utils/export/html.ts (lines ~68, ~144)
+ * 
+ * Current: Yellow-gold (#eda312)
+ */
+@theme {
+    --color-accent-50: #fef9ec;
+    --color-accent-100: #fdf2d0;
+    --color-accent-200: #fbe49d;
+    --color-accent-300: #f8cf6a;
+    --color-accent-400: #f5b942; /* More yellow, less saturated */
+    --color-accent-500: #eda312; /* Main accent color - yellow-gold */
+    --color-accent-600: #d9840d;
+    --color-accent-700: #b5660a;
+    --color-accent-800: #924e0f;
+    --color-accent-900: #784110;
+    --color-accent-950: #452105;
+}
+
+/* 
  * Base layer - only minimal, non-conflicting resets
  * Following Tailwind CSS best practices
  */
@@ -17,8 +44,8 @@
         --color-text-secondary: #a0a0a0;
         --color-text-tertiary: #666666;
 
-        /* Accent colors */
-        --color-accent-primary: #7c3aed; /* Purple for implications */
+        /* Accent colors - now using Tailwind's accent scale */
+        --color-accent-primary: var(--color-accent-500); /* Yellow-gold for implications */
         --color-accent-secondary: #ef4444; /* Red for contradictions */
         --color-accent-tertiary: #10b981; /* Green for success states */
 

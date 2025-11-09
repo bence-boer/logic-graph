@@ -1,12 +1,12 @@
 <script lang="ts">
+    import FormField from '$lib/components/ui/FormField.svelte';
+    import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
+    import Select from '$lib/components/ui/Select.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
-    import { ui_store } from '$lib/stores/ui.svelte';
     import { toast_store } from '$lib/stores/toast.svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
     import { ConnectionType } from '$lib/types/graph';
-    import Select from '$lib/components/ui/Select.svelte';
-    import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
-    import FormField from '$lib/components/ui/FormField.svelte';
     import { Trash2, X } from '@lucide/svelte';
 
     interface Props {
@@ -15,8 +15,12 @@
 
     let { connection_id }: Props = $props();
 
-    let connection = $derived(graph_store.connections.find((c) => c.id === connection_id));
-    let available_nodes = $derived(graph_store.nodes.map((n) => ({ value: n.id, label: n.name })));
+    let connection = $derived(
+        graph_store.connections.find((connection) => connection.id === connection_id)
+    );
+    let available_nodes = $derived(
+        graph_store.nodes.map((node) => ({ value: node.id, label: node.statement }))
+    );
 
     let type = $state<ConnectionType>(ConnectionType.IMPLICATION);
     let sources = $state<string[]>([]);
@@ -57,17 +61,17 @@
             return;
         }
 
-        graph_store.update_connection(connection.id, {
+        graph_store.update_connection(connection.id!, {
             type,
             sources,
             targets
         });
 
         const source_names = sources
-            .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+            .map((id) => graph_store.nodes.find((node) => node.id === id)?.statement || 'Unknown')
             .join(', ');
         const target_names = targets
-            .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+            .map((id) => graph_store.nodes.find((node) => node.id === id)?.statement || 'Unknown')
             .join(', ');
         const connection_type_label =
             type === ConnectionType.IMPLICATION ? 'implication' : 'contradiction';
@@ -80,23 +84,23 @@
     function handle_delete() {
         if (!connection) return;
 
-        const source_names = connection.sources
-            .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+        const source_statements = connection.sources
+            .map((id) => graph_store.nodes.find((node) => node.id === id)?.statement || 'Unknown')
             .join(', ');
-        const target_names = connection.targets
-            .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+        const target_statements = connection.targets
+            .map((id) => graph_store.nodes.find((node) => node.id === id)?.statement || 'Unknown')
             .join(', ');
         const connection_type_label =
             connection.type === ConnectionType.IMPLICATION ? 'implication' : 'contradiction';
 
         if (
             confirm(
-                `Delete this ${connection_type_label} connection?\n[${source_names}] → [${target_names}]`
+                `Delete this ${connection_type_label} connection?\n[${source_statements}] → [${target_statements}]`
             )
         ) {
-            graph_store.remove_connection(connection.id);
+            graph_store.remove_connection(connection.id!);
             toast_store.success(
-                `${connection_type_label} connection deleted: [${source_names}] → [${target_names}]`
+                `${connection_type_label} connection deleted: [${source_statements}] → [${target_statements}]`
             );
             close_panel();
         }
@@ -123,7 +127,7 @@
                     <div
                         class="rounded-md border border-(--border-default) bg-(--bg-secondary) px-4 py-2 font-mono text-sm text-(--text-tertiary)"
                     >
-                        {connection.id}
+                        {connection.id!}
                     </div>
                 </FormField>
 

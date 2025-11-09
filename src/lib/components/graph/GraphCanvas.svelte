@@ -1,29 +1,27 @@
 <script lang="ts">
-    import { onMount, onDestroy } from 'svelte';
-    import * as d3 from 'd3';
-    import type { Simulation } from 'd3';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
-    import type { LogicNode, D3Link } from '$lib/types/graph';
+    import type { D3Link, LogicNode } from '$lib/types/graph';
     import { convert_connections_to_d3_links } from '$lib/utils/d3-helpers';
-    import { GraphTopology } from '$lib/utils/graph-algorithms';
-    import {
-        create_simulation,
-        update_simulation,
-        sync_simulation_nodes,
-        DEFAULT_SIMULATION_CONFIG
-    } from '$lib/utils/d3/simulation';
     import { create_drag_handlers } from '$lib/utils/d3/interactions';
     import {
-        render_links,
-        update_link_positions,
-        render_nodes,
-        update_node_positions,
-        render_labels,
-        update_label_positions
-    } from './canvas';
+        create_simulation,
+        DEFAULT_SIMULATION_CONFIG,
+        sync_simulation_nodes,
+        update_simulation
+    } from '$lib/utils/d3/simulation';
+    import { GraphTopology } from '$lib/utils/graph-algorithms';
+    import type { Simulation } from 'd3';
+    import * as d3 from 'd3';
+    import { onDestroy, onMount } from 'svelte';
     import ArrowMarkers from './ArrowMarkers.svelte';
+    import {
+        render_links,
+        render_nodes,
+        update_link_positions,
+        update_node_positions
+    } from './canvas';
 
     let svg_container: SVGSVGElement;
     let width = $state(0);
@@ -36,6 +34,10 @@
     let simulation_nodes: LogicNode[] = [];
     let simulation_links: D3Link[] = [];
 
+    // Track last time we synced positions to avoid too frequent updates
+    let last_position_sync = 0;
+    const POSITION_SYNC_INTERVAL = 1000; // Sync every 1 second during simulation
+
     // SVG container reference
     let svg_zoom_container: d3.Selection<SVGGElement, unknown, null, undefined> | null = null;
 
@@ -43,8 +45,6 @@
     let nodes = $derived(graph_store.nodes);
     let connections = $derived(graph_store.connections);
     let links = $derived(convert_connections_to_d3_links(connections));
-    let show_labels = $derived(ui_store.show_labels);
-    let show_descriptions = $derived(ui_store.show_descriptions);
 
     // Use GraphTopology for efficient neighbor lookups
     let topology = $derived(new GraphTopology(connections));
@@ -134,7 +134,7 @@
         svg.call(zoom_behavior);
 
         // Create initial mutable copies for simulation
-        simulation_nodes = nodes.map((n) => ({ ...n }));
+        simulation_nodes = nodes.map((node) => ({ ...node }));
         simulation_links = links.map((l) => ({ ...l }));
 
         // Initialize force simulation with extracted utility
@@ -144,6 +144,11 @@
         });
 
         simulation.on('tick', tick_handler);
+
+        // Sync positions back to store after simulation stabilizes
+        simulation.on('end', () => {
+            sync_positions_to_store();
+        });
 
         // Initial render
         render_graph();
@@ -165,15 +170,7 @@
             drag_handlers,
             hovered_node_id,
             connected_node_ids,
-            show_descriptions,
             handle_node_hover
-        );
-        render_labels(
-            svg_zoom_container,
-            simulation_nodes,
-            hovered_node_id,
-            connected_node_ids,
-            show_labels
         );
     }
 
@@ -183,7 +180,32 @@
         // Delegate position updates to utility functions
         update_link_positions(svg_zoom_container);
         update_node_positions(svg_zoom_container);
-        update_label_positions(svg_zoom_container);
+
+        // Periodically sync positions to store (throttled)
+        const now = Date.now();
+        if (now - last_position_sync > POSITION_SYNC_INTERVAL) {
+            sync_positions_to_store();
+            last_position_sync = now;
+        }
+    }
+
+    /**
+     * Syncs node positions from the D3 simulation back to the store.
+     * This ensures nodes have their x,y coordinates available for operations like pinning.
+     */
+    function sync_positions_to_store() {
+        simulation_nodes.forEach((sim_node) => {
+            const store_node = nodes.find((node) => node.id === sim_node.id);
+            if (store_node && sim_node.x !== undefined && sim_node.y !== undefined) {
+                // Only update if positions have changed or weren't set
+                if (store_node.x !== sim_node.x || store_node.y !== sim_node.y) {
+                    graph_store.update_node(sim_node.id, {
+                        x: sim_node.x,
+                        y: sim_node.y
+                    });
+                }
+            }
+        });
     }
 
     /**
@@ -193,11 +215,9 @@
         if (!svg_container || !zoom_behavior || !svg_zoom_container) return;
 
         const svg = d3.select(svg_container);
-        
+
         // Reset to identity transform (no zoom, no pan)
-        svg.transition()
-            .duration(750)
-            .call(zoom_behavior.transform, d3.zoomIdentity);
+        svg.transition().duration(750).call(zoom_behavior.transform, d3.zoomIdentity);
     }
 
     // React to data changes
@@ -208,21 +228,10 @@
             simulation_nodes = sync_simulation_nodes(simulation_nodes, nodes);
 
             // Update links
-            simulation_links = links.map((l) => ({ ...l }));
+            simulation_links = links.map((link) => ({ ...link }));
 
             // Update simulation with new data using extracted utility
             update_simulation(simulation, simulation_nodes, simulation_links);
-            render_graph();
-        }
-    });
-
-    // React to UI setting changes
-    $effect(() => {
-        // When show_labels or show_descriptions changes, re-render
-        if (simulation) {
-            // Access the reactive values to track them
-            void show_labels;
-            void show_descriptions;
             render_graph();
         }
     });
@@ -239,8 +248,8 @@
         selection_store.clear_selection();
         ui_store.close_right_panel();
     }}
-    onkeydown={(e) => {
-        if (e.key === 'Escape') {
+    onkeydown={(event) => {
+        if (event.key === 'Escape') {
             selection_store.clear_selection();
             ui_store.close_right_panel();
         }
@@ -274,10 +283,13 @@
         user-select: none;
     }
 
-    :global(circle) {
+    :global(.node rect) {
         transition:
-            r 0.2s ease,
             stroke-width 0.2s ease,
             opacity 0.2s ease;
+    }
+
+    :global(.node text) {
+        user-select: none;
     }
 </style>

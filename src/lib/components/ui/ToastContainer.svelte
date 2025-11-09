@@ -22,15 +22,15 @@
     const toast_border_classes = {
         success: 'border-l-4 border-l-emerald-500',
         error: 'border-l-4 border-l-red-500',
-        warning: 'border-l-4 border-l-amber-500',
-        info: 'border-l-4 border-l-purple-600'
+        warning: 'border-l-4 border-l-accent-500',
+        info: 'border-l-4 border-l-accent-600'
     };
 
     const icon_color_classes = {
         success: 'text-emerald-500',
         error: 'text-red-500',
-        warning: 'text-amber-500',
-        info: 'text-purple-600'
+        warning: 'text-accent-500',
+        info: 'text-accent-600'
     };
 </script>
 
