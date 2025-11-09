@@ -24,7 +24,9 @@
 </script>
 
 {#if is_open}
-    <div class="right-panel">
+    <div
+        class="fixed top-0 right-0 bottom-0 z-900 flex w-[360px] animate-[slide-in_0.3s_ease] flex-col border border-r-0 border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-sm) backdrop-blur-md max-md:bottom-0 max-md:w-full max-md:max-w-80"
+    >
         {#if mode.type === RightPanelModeType.CREATE_NODE}
             <CreateNodeForm />
         {:else if mode.type === RightPanelModeType.CREATE_CONNECTION}
@@ -38,40 +40,12 @@
 {/if}
 
 <style>
-    .right-panel {
-        position: fixed;
-        right: 0;
-        top: 80px;
-        bottom: var(--spacing-md);
-        width: 360px;
-        background: var(--bg-elevated);
-        backdrop-filter: blur(var(--blur-md));
-        border: 1px solid var(--border-default);
-        border-right: none;
-        border-top-left-radius: 12px;
-        border-bottom-left-radius: 12px;
-        box-shadow: var(--shadow-lg);
-        z-index: 900;
-        display: flex;
-        flex-direction: column;
-        animation: slide-in 0.3s ease;
-    }
-
     @keyframes slide-in {
         from {
             transform: translateX(100%);
         }
         to {
             transform: translateX(0);
-        }
-    }
-
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .right-panel {
-            width: 100%;
-            max-width: 320px;
-            bottom: 80px;
         }
     }
 </style>

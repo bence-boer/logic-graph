@@ -4,10 +4,10 @@
     import { ui_store } from '$lib/stores/ui.svelte';
     import { toast_store } from '$lib/stores/toast.svelte';
     import { ConnectionType } from '$lib/types/graph';
-    import Button from '$lib/components/ui/Button.svelte';
     import Input from '$lib/components/ui/Input.svelte';
     import Textarea from '$lib/components/ui/Textarea.svelte';
     import FormField from '$lib/components/ui/FormField.svelte';
+    import { Pin, PinOff, Trash2, X } from '@lucide/svelte';
 
     interface Props {
         node_id: string;
@@ -69,8 +69,8 @@
 
         if (node.fx !== null && node.fx !== undefined) {
             // Unpin
-            graph_store.update_node(node.id, { 
-                fx: null, 
+            graph_store.update_node(node.id, {
+                fx: null,
                 fy: null
             });
             toast_store.info('Node unpinned');
@@ -96,16 +96,27 @@
 </script>
 
 {#if node}
-    <div class="form-container">
-        <div class="form-header">
-            <h3>Edit Node</h3>
-            <button class="close-btn" onclick={close_panel} aria-label="Close">✕</button>
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-(--border-default) p-3">
+            <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Edit Node</h3>
+            <button
+                class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+                onclick={close_panel}
+                aria-label="Close"
+                title="Close"
+            >
+                <X size={18} />
+            </button>
         </div>
 
-        <div class="form-body">
-            <div class="panel-section">
+        <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
+            <div class="flex flex-col gap-3">
                 <FormField label="ID">
-                    <div class="field-value readonly">{node.id}</div>
+                    <div
+                        class="rounded-md border border-(--border-default) bg-(--bg-secondary) px-4 py-2 font-mono text-sm text-(--text-tertiary)"
+                    >
+                        {node.id}
+                    </div>
                 </FormField>
 
                 <Input bind:value={name} label="Name" required onchange={handle_save} />
@@ -120,139 +131,81 @@
 
                 {#if node.x !== undefined && node.y !== undefined}
                     <FormField label="Position">
-                        <div class="position-info">
+                        <div
+                            class="flex gap-4 rounded-md bg-(--bg-secondary) px-4 py-2 text-sm text-(--text-secondary)"
+                        >
                             <span>X: {Math.round(node.x)}</span>
                             <span>Y: {Math.round(node.y)}</span>
                         </div>
                     </FormField>
                 {/if}
-
-                <Button onclick={handle_pin_toggle}>
-                    {node.fx !== null && node.fx !== undefined ? 'Unpin Node' : 'Pin Node'}
-                </Button>
             </div>
 
-            <div class="divider"></div>
+            <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
-            <div class="panel-section">
-                <h3 class="section-title">Connected To</h3>
+            <div class="flex flex-col gap-3">
+                <h3
+                    class="m-0 text-sm font-semibold tracking-wide text-(--text-secondary) uppercase"
+                >
+                    Connected To
+                </h3>
                 {#if connected_connections.length > 0}
-                    <div class="connections-list">
+                    <div class="flex flex-col gap-1">
                         {#each connected_connections as conn}
-                            <div class="connection-item">
-                                <span class="connection-type {conn.type}">
+                            <div
+                                class="flex cursor-pointer items-center gap-2 rounded-md bg-(--bg-secondary) px-2 py-2 transition-colors duration-200 hover:bg-(--bg-tertiary)"
+                            >
+                                <span
+                                    class="text-xl leading-none {conn.type ===
+                                    ConnectionType.IMPLICATION
+                                        ? 'text-(--link-implication)'
+                                        : 'text-(--link-contradiction)'}"
+                                >
                                     {conn.type === ConnectionType.IMPLICATION ? '→' : '⟷'}
                                 </span>
-                                <span class="connection-label">
+                                <span class="text-sm text-(--text-secondary)">
                                     {conn.sources.length} source(s) → {conn.targets.length} target(s)
                                 </span>
                             </div>
                         {/each}
                     </div>
                 {:else}
-                    <p class="empty-message">No connections</p>
+                    <p class="p-4 text-center text-sm text-(--text-tertiary)">No connections</p>
                 {/if}
             </div>
 
-            <div class="divider"></div>
+            <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
-            <div class="panel-section">
-                <Button variant="danger" onclick={handle_delete}>Delete Node</Button>
+            <div class="flex gap-1">
+                <button
+                    class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+                    onclick={handle_pin_toggle}
+                    title={node.fx !== null && node.fx !== undefined ? 'Unpin Node' : 'Pin Node'}
+                    aria-label={node.fx !== null && node.fx !== undefined
+                        ? 'Unpin Node'
+                        : 'Pin Node'}
+                >
+                    {#if node.fx !== null && node.fx !== undefined}
+                        <PinOff size={18} />
+                    {:else}
+                        <Pin size={18} />
+                    {/if}
+                </button>
+                <button
+                    class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--accent-secondary) transition-all duration-200 hover:border-(--accent-secondary) hover:bg-[rgba(239,68,68,0.1)] active:scale-98"
+                    onclick={handle_delete}
+                    title="Delete Node"
+                    aria-label="Delete Node"
+                >
+                    <Trash2 size={18} />
+                </button>
             </div>
         </div>
     </div>
 {:else}
-    <div class="form-container">
-        <div class="form-body">
-            <p class="error-message">Node not found</p>
+    <div class="flex h-full flex-col">
+        <div class="flex-1 p-3">
+            <p class="p-4 text-center text-sm text-red-500">Node not found</p>
         </div>
     </div>
 {/if}
-
-<style>
-    .field-value {
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-size: 0.875rem;
-        font-family: 'Monaco', 'Courier New', monospace;
-    }
-
-    .field-value.readonly {
-        color: var(--text-tertiary);
-    }
-
-    .position-info {
-        display: flex;
-        gap: var(--spacing-md);
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: var(--bg-secondary);
-        border-radius: 6px;
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    .section-title {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }
-
-    .connections-list {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-
-    .connection-item {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-        padding: var(--spacing-sm);
-        background: var(--bg-secondary);
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background 0.2s ease;
-    }
-
-    .connection-item:hover {
-        background: var(--bg-tertiary);
-    }
-
-    .connection-type {
-        font-size: 1.25rem;
-        line-height: 1;
-    }
-
-    .connection-type.implication {
-        color: var(--link-implication);
-    }
-
-    .connection-type.contradiction {
-        color: var(--link-contradiction);
-    }
-
-    .connection-label {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    .empty-message {
-        font-size: 0.875rem;
-        color: var(--text-tertiary);
-        text-align: center;
-        padding: var(--spacing-md);
-    }
-
-    .error-message {
-        font-size: 0.875rem;
-        color: var(--error);
-        text-align: center;
-        padding: var(--spacing-md);
-    }
-</style>

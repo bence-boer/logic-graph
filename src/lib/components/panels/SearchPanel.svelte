@@ -8,6 +8,15 @@
     import { selection_store } from '$lib/stores/selection.svelte';
     import { ConnectionType } from '$lib/types/graph';
     import type { LogicNode, LogicConnection } from '$lib/types/graph';
+    import {
+        X,
+        Circle,
+        Link2,
+        ArrowRight,
+        ArrowLeftRight,
+        ListFilter,
+        CircleDot
+    } from '@lucide/svelte';
 
     let search_results = $derived.by(() => {
         const query = search_store.query.toLowerCase().trim();
@@ -54,92 +63,122 @@
     }
 </script>
 
-<div class="search-panel">
-    <div class="search-header">
-        <h3 class="search-title">Search & Filter</h3>
+<div
+    class="fixed top-20 right-4 z-900 flex max-h-[calc(100vh-100px)] w-80 animate-[slide-in_0.3s_ease] flex-col rounded-xl border border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-lg) backdrop-blur-md"
+>
+    <div class="border-b border-(--border-default) p-6">
+        <h3 class="m-0 text-base font-semibold text-(--text-primary)">Search & Filter</h3>
     </div>
 
-    <div class="search-content">
-        <div class="search-input-wrapper">
+    <div
+        class="flex flex-1 flex-col gap-4 overflow-y-auto p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:bg-(--border-default) [&::-webkit-scrollbar-thumb:hover]:bg-(--border-hover) [&::-webkit-scrollbar-track]:bg-transparent"
+    >
+        <div class="relative">
             <input
                 type="text"
-                class="search-input"
+                class="w-full rounded-md border border-(--border-default) bg-(--bg-secondary) px-4 py-2 pr-10 text-sm text-(--text-primary) transition-all duration-200 focus:border-(--accent-primary) focus:bg-(--bg-primary) focus:outline-none"
                 placeholder="Search nodes and connections..."
                 bind:value={search_store.query}
             />
             {#if search_store.query}
-                <button class="clear-btn" onclick={handle_clear} aria-label="Clear search">✕</button
+                <button
+                    class="absolute top-1/2 right-2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded border-0 bg-transparent text-sm text-(--text-secondary) transition-all duration-200 hover:bg-(--bg-secondary) hover:text-(--text-primary)"
+                    onclick={handle_clear}
+                    aria-label="Clear search"
+                    title="Clear search"
                 >
+                    <X size={14} />
+                </button>
             {/if}
         </div>
 
-        <div class="filter-section">
-            <div class="filter-group">
-                <span class="filter-label">Show:</span>
-                <div class="filter-buttons">
+        <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-1">
+                <span class="text-xs font-medium tracking-wider text-(--text-secondary) uppercase"
+                    >Show:</span
+                >
+                <div class="flex gap-1">
                     <button
-                        class="filter-btn {search_store.filter_type === SearchFilterType.ALL
-                            ? 'active'
-                            : ''}"
+                        class="flex flex-1 cursor-pointer items-center justify-center rounded-md border p-2 transition-all duration-200 active:scale-98 {search_store.filter_type ===
+                        SearchFilterType.ALL
+                            ? 'border-(--accent-primary) bg-(--accent-primary) text-white hover:border-[#6d28d9] hover:bg-[#6d28d9]'
+                            : 'border-transparent bg-transparent text-(--text-secondary) hover:border-(--border-hover) hover:bg-(--bg-secondary) hover:text-(--text-primary)'}"
                         onclick={() => (search_store.filter_type = SearchFilterType.ALL)}
+                        title="Show All"
+                        aria-label="Show All"
                     >
-                        All
+                        <ListFilter size={18} />
                     </button>
                     <button
-                        class="filter-btn {search_store.filter_type === SearchFilterType.NODES
-                            ? 'active'
-                            : ''}"
+                        class="flex flex-1 cursor-pointer items-center justify-center rounded-md border p-2 transition-all duration-200 active:scale-98 {search_store.filter_type ===
+                        SearchFilterType.NODES
+                            ? 'border-(--accent-primary) bg-(--accent-primary) text-white hover:border-[#6d28d9] hover:bg-[#6d28d9]'
+                            : 'border-transparent bg-transparent text-(--text-secondary) hover:border-(--border-hover) hover:bg-(--bg-secondary) hover:text-(--text-primary)'}"
                         onclick={() => (search_store.filter_type = SearchFilterType.NODES)}
+                        title="Show Nodes Only"
+                        aria-label="Show Nodes Only"
                     >
-                        Nodes
+                        <CircleDot size={18} />
                     </button>
                     <button
-                        class="filter-btn {search_store.filter_type === SearchFilterType.CONNECTIONS
-                            ? 'active'
-                            : ''}"
+                        class="flex flex-1 cursor-pointer items-center justify-center rounded-md border p-2 transition-all duration-200 active:scale-98 {search_store.filter_type ===
+                        SearchFilterType.CONNECTIONS
+                            ? 'border-(--accent-primary) bg-(--accent-primary) text-white hover:border-[#6d28d9] hover:bg-[#6d28d9]'
+                            : 'border-transparent bg-transparent text-(--text-secondary) hover:border-(--border-hover) hover:bg-(--bg-secondary) hover:text-(--text-primary)'}"
                         onclick={() => (search_store.filter_type = SearchFilterType.CONNECTIONS)}
+                        title="Show Connections Only"
+                        aria-label="Show Connections Only"
                     >
-                        Connections
+                        <Link2 size={18} />
                     </button>
                 </div>
             </div>
 
             {#if search_store.filter_type !== SearchFilterType.NODES}
-                <div class="filter-group">
-                    <span class="filter-label">Type:</span>
-                    <div class="filter-buttons">
+                <div class="flex flex-col gap-1">
+                    <span
+                        class="text-xs font-medium tracking-wider text-(--text-secondary) uppercase"
+                        >Type:</span
+                    >
+                    <div class="flex gap-1">
                         <button
-                            class="filter-btn {search_store.connection_type_filter ===
+                            class="flex flex-1 cursor-pointer items-center justify-center rounded-md border p-2 transition-all duration-200 active:scale-98 {search_store.connection_type_filter ===
                             CONNECTION_TYPE_FILTER_VALUE.ALL
-                                ? 'active'
-                                : ''}"
+                                ? 'border-(--accent-primary) bg-(--accent-primary) text-white hover:border-[#6d28d9] hover:bg-[#6d28d9]'
+                                : 'border-transparent bg-transparent text-(--text-secondary) hover:border-(--border-hover) hover:bg-(--bg-secondary) hover:text-(--text-primary)'}"
                             onclick={() =>
                                 (search_store.connection_type_filter =
                                     CONNECTION_TYPE_FILTER_VALUE.ALL)}
+                            title="All Connection Types"
+                            aria-label="All Connection Types"
                         >
-                            All
+                            <ListFilter size={18} />
                         </button>
                         <button
-                            class="filter-btn {search_store.connection_type_filter ===
+                            class="flex flex-1 cursor-pointer items-center justify-center rounded-md border p-2 transition-all duration-200 active:scale-98 {search_store.connection_type_filter ===
                             CONNECTION_TYPE_FILTER_VALUE.IMPLICATION
-                                ? 'active'
-                                : ''}"
+                                ? 'border-(--accent-primary) bg-(--accent-primary) text-white hover:border-[#6d28d9] hover:bg-[#6d28d9]'
+                                : 'border-transparent bg-transparent text-(--text-secondary) hover:border-(--border-hover) hover:bg-(--bg-secondary) hover:text-(--text-primary)'}"
                             onclick={() =>
                                 (search_store.connection_type_filter =
                                     CONNECTION_TYPE_FILTER_VALUE.IMPLICATION)}
+                            title="Implications Only"
+                            aria-label="Implications Only"
                         >
-                            Implications
+                            <ArrowRight size={18} />
                         </button>
                         <button
-                            class="filter-btn {search_store.connection_type_filter ===
+                            class="flex flex-1 cursor-pointer items-center justify-center rounded-md border p-2 transition-all duration-200 active:scale-98 {search_store.connection_type_filter ===
                             CONNECTION_TYPE_FILTER_VALUE.CONTRADICTION
-                                ? 'active'
-                                : ''}"
+                                ? 'border-(--accent-primary) bg-(--accent-primary) text-white hover:border-[#6d28d9] hover:bg-[#6d28d9]'
+                                : 'border-transparent bg-transparent text-(--text-secondary) hover:border-(--border-hover) hover:bg-(--bg-secondary) hover:text-(--text-primary)'}"
                             onclick={() =>
                                 (search_store.connection_type_filter =
                                     CONNECTION_TYPE_FILTER_VALUE.CONTRADICTION)}
+                            title="Contradictions Only"
+                            aria-label="Contradictions Only"
                         >
-                            Contradictions
+                            <ArrowLeftRight size={18} />
                         </button>
                     </div>
                 </div>
@@ -147,24 +186,33 @@
         </div>
 
         {#if search_store.query}
-            <div class="results-section">
+            <div class="flex flex-col gap-4">
                 {#if has_results}
                     {#if search_results.nodes.length > 0}
-                        <div class="results-group">
-                            <h4 class="results-title">
+                        <div class="flex flex-col gap-2">
+                            <h4 class="m-0 text-sm font-semibold text-(--text-primary)">
                                 Nodes ({search_results.nodes.length})
                             </h4>
-                            <div class="results-list">
+                            <div class="flex flex-col gap-1">
                                 {#each search_results.nodes as node}
                                     <button
-                                        class="result-item"
+                                        class="flex w-full cursor-pointer items-start gap-2 rounded-md border border-(--border-default) bg-(--bg-secondary) p-2 text-left transition-all duration-200 hover:border-(--accent-primary) hover:bg-(--bg-primary)"
                                         onclick={() => handle_select_node(node)}
                                     >
-                                        <span class="result-icon">●</span>
-                                        <div class="result-content">
-                                            <div class="result-name">{node.name}</div>
+                                        <span
+                                            class="shrink-0 text-base leading-none text-(--node-default)"
+                                            >●</span
+                                        >
+                                        <div class="min-w-0 flex-1">
+                                            <div
+                                                class="mb-0.5 text-sm font-medium text-(--text-primary)"
+                                            >
+                                                {node.name}
+                                            </div>
                                             {#if node.description}
-                                                <div class="result-description">
+                                                <div
+                                                    class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-(--text-tertiary)"
+                                                >
                                                     {node.description}
                                                 </div>
                                             {/if}
@@ -176,29 +224,36 @@
                     {/if}
 
                     {#if search_results.connections.length > 0}
-                        <div class="results-group">
-                            <h4 class="results-title">
+                        <div class="flex flex-col gap-2">
+                            <h4 class="m-0 text-sm font-semibold text-(--text-primary)">
                                 Connections ({search_results.connections.length})
                             </h4>
-                            <div class="results-list">
+                            <div class="flex flex-col gap-1">
                                 {#each search_results.connections as conn}
                                     <button
-                                        class="result-item"
+                                        class="flex w-full cursor-pointer items-start gap-2 rounded-md border border-(--border-default) bg-(--bg-secondary) p-2 text-left transition-all duration-200 hover:border-(--accent-primary) hover:bg-(--bg-primary)"
                                         onclick={() => handle_select_connection(conn)}
                                     >
                                         <span
-                                            class="result-icon connection-icon {conn.type === ConnectionType.IMPLICATION ? 'implication' : 'contradiction'}"
+                                            class="shrink-0 text-xl leading-none {conn.type ===
+                                            ConnectionType.IMPLICATION
+                                                ? 'text-(--link-implication)'
+                                                : 'text-(--link-contradiction)'}"
                                         >
-                                            {conn.type === ConnectionType.IMPLICATION
-                                                ? '→'
-                                                : '⟷'}
+                                            {conn.type === ConnectionType.IMPLICATION ? '→' : '⟷'}
                                         </span>
-                                        <div class="result-content">
-                                            <div class="result-name">
+                                        <div class="min-w-0 flex-1">
+                                            <div
+                                                class="mb-0.5 text-sm font-medium text-(--text-primary)"
+                                            >
                                                 {conn.sources.length} source(s) → {conn.targets
                                                     .length} target(s)
                                             </div>
-                                            <div class="result-description">{conn.id}</div>
+                                            <div
+                                                class="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-(--text-tertiary)"
+                                            >
+                                                {conn.id}
+                                            </div>
                                         </div>
                                     </button>
                                 {/each}
@@ -206,7 +261,7 @@
                         </div>
                     {/if}
                 {:else}
-                    <div class="no-results">
+                    <div class="p-6 text-center text-sm text-(--text-tertiary)">
                         <p>No results found for "{search_store.query}"</p>
                     </div>
                 {/if}
@@ -216,23 +271,6 @@
 </div>
 
 <style>
-    .search-panel {
-        position: fixed;
-        top: 80px;
-        right: var(--spacing-md);
-        width: 320px;
-        max-height: calc(100vh - 100px);
-        background: var(--bg-elevated);
-        backdrop-filter: blur(var(--blur-md));
-        border: 1px solid var(--border-default);
-        border-radius: 12px;
-        box-shadow: var(--shadow-lg);
-        z-index: 900;
-        display: flex;
-        flex-direction: column;
-        animation: slide-in 0.3s ease;
-    }
-
     @keyframes slide-in {
         from {
             opacity: 0;
@@ -244,232 +282,9 @@
         }
     }
 
-    .search-header {
-        padding: var(--spacing-lg);
-        border-bottom: 1px solid var(--border-default);
-    }
-
-    .search-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin: 0;
-    }
-
-    .search-content {
-        flex: 1;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-md);
-        padding: var(--spacing-lg);
-    }
-
-    .search-input-wrapper {
-        position: relative;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: var(--spacing-sm) var(--spacing-md);
-        padding-right: 40px;
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-size: 0.875rem;
-        transition: all 0.2s ease;
-    }
-
-    .search-input:focus {
-        outline: none;
-        border-color: var(--accent-primary);
-        background: var(--bg-primary);
-    }
-
-    .clear-btn {
-        position: absolute;
-        right: 8px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 24px;
-        height: 24px;
-        background: transparent;
-        border: none;
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-    }
-
-    .clear-btn:hover {
-        background: var(--bg-secondary);
-        color: var(--text-primary);
-    }
-
-    .filter-section {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
-
-    .filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-
-    .filter-label {
-        font-size: 0.75rem;
-        font-weight: 500;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .filter-buttons {
-        display: flex;
-        gap: var(--spacing-xs);
-    }
-
-    .filter-btn {
-        flex: 1;
-        padding: var(--spacing-xs) var(--spacing-sm);
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-default);
-        border-radius: 4px;
-        color: var(--text-secondary);
-        font-size: 0.75rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .filter-btn:hover {
-        border-color: var(--border-hover);
-        color: var(--text-primary);
-    }
-
-    .filter-btn.active {
-        background: var(--accent-primary);
-        border-color: var(--accent-primary);
-        color: white;
-    }
-
-    .results-section {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-md);
-    }
-
-    .results-group {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
-
-    .results-title {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin: 0;
-    }
-
-    .results-list {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-
-    .result-item {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--spacing-sm);
-        padding: var(--spacing-sm);
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-align: left;
-        width: 100%;
-    }
-
-    .result-item:hover {
-        background: var(--bg-primary);
-        border-color: var(--accent-primary);
-    }
-
-    .result-icon {
-        font-size: 1rem;
-        color: var(--node-default);
-        flex-shrink: 0;
-        line-height: 1;
-    }
-
-    .result-icon.connection-icon {
-        font-size: 1.25rem;
-    }
-
-    .result-icon.implication {
-        color: var(--link-implication);
-    }
-
-    .result-icon.contradiction {
-        color: var(--link-contradiction);
-    }
-
-    .result-content {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .result-name {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--text-primary);
-        margin-bottom: 2px;
-    }
-
-    .result-description {
-        font-size: 0.75rem;
-        color: var(--text-tertiary);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .no-results {
-        padding: var(--spacing-lg);
-        text-align: center;
-        color: var(--text-tertiary);
-        font-size: 0.875rem;
-    }
-
-    /* Scrollbar styling */
-    .search-content::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .search-content::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .search-content::-webkit-scrollbar-thumb {
-        background: var(--border-default);
-        border-radius: 3px;
-    }
-
-    .search-content::-webkit-scrollbar-thumb:hover {
-        background: var(--border-hover);
-    }
-
     /* Mobile responsiveness */
     @media (max-width: 768px) {
-        .search-panel {
+        div:first-child {
             width: 100%;
             max-width: 320px;
             right: 50%;

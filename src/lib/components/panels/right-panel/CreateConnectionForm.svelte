@@ -7,7 +7,7 @@
     import Select from '$lib/components/ui/Select.svelte';
     import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
     import FormField from '$lib/components/ui/FormField.svelte';
-    import Button from '$lib/components/ui/Button.svelte';
+    import { Link, X as XIcon } from '@lucide/svelte';
 
     let connection_type = $state<ConnectionType>(ConnectionType.IMPLICATION);
     let source_ids = $state<string[]>([]);
@@ -79,15 +79,26 @@
     }
 </script>
 
-<div class="form-container">
-    <div class="form-header">
-        <h3>Create New Connection</h3>
-        <button class="close-btn" onclick={handle_cancel} aria-label="Close">✕</button>
+<div class="flex h-full flex-col">
+    <div class="flex items-center justify-between border-b border-(--border-default) p-3">
+        <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Create New Connection</h3>
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+            onclick={handle_cancel}
+            aria-label="Close"
+            title="Close"
+        >
+            <XIcon size={18} />
+        </button>
     </div>
 
-    <div class="form-body">
+    <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
         {#if !has_enough_nodes}
-            <div class="warning-message">You need at least 2 nodes to create a connection</div>
+            <div
+                class="flex items-center gap-1 rounded-md border border-[#f59e0b] bg-[rgba(251,191,36,0.1)] px-4 py-2 text-sm text-[#f59e0b] before:text-base before:content-['⚠']"
+            >
+                You need at least 2 nodes to create a connection
+            </div>
         {:else}
             <FormField label="Connection Type" required>
                 <Select
@@ -126,23 +137,32 @@
             </FormField>
 
             {#if validation_errors.overlap}
-                <div class="error-message">{validation_errors.overlap}</div>
+                <div
+                    class="flex items-center gap-1 rounded-md border border-(--accent-secondary) bg-[rgba(239,68,68,0.1)] px-4 py-2 text-sm text-(--accent-secondary) before:text-base before:content-['⚠']"
+                >
+                    {validation_errors.overlap}
+                </div>
             {/if}
         {/if}
     </div>
 
-    <div class="form-actions">
-        <Button
-            variant="primary"
+    <div class="flex gap-1 border-t border-(--border-default) bg-(--bg-secondary) p-3">
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--accent-primary) transition-all duration-200 hover:border-(--accent-primary) hover:bg-[rgba(139,92,246,0.1)] active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
             onclick={handle_create}
             disabled={is_submitting || !has_enough_nodes}
+            title={is_submitting ? 'Creating Connection...' : 'Create Connection'}
+            aria-label={is_submitting ? 'Creating Connection...' : 'Create Connection'}
         >
-            {is_submitting ? 'Creating...' : 'Create Connection'}
-        </Button>
-        <Button variant="secondary" onclick={handle_cancel}>Cancel</Button>
+            <Link size={18} />
+        </button>
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-elevated) active:scale-98"
+            onclick={handle_cancel}
+            title="Cancel"
+            aria-label="Cancel"
+        >
+            <XIcon size={18} />
+        </button>
     </div>
 </div>
-
-<style>
-    @import '$lib/styles/forms.css';
-</style>

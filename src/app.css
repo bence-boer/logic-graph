@@ -1,133 +1,142 @@
 @import 'tailwindcss';
 
-/* Design System Variables - Figma-inspired Dark Theme */
-:root {
-    /* Background colors */
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #2a2a2a;
-    --bg-elevated: rgba(42, 42, 42, 0.8);
-
-    /* Text colors */
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    --text-tertiary: #666666;
-
-    /* Accent colors */
-    --accent-primary: #7c3aed; /* Purple for implications */
-    --accent-secondary: #ef4444; /* Red for contradictions */
-    --accent-tertiary: #10b981; /* Green for success states */
-
-    /* Border colors */
-    --border-default: #3a3a3a;
-    --border-hover: #4a4a4a;
-
-    /* Graph element colors */
-    --node-default: #4a5568;
-    --node-selected: var(--accent-primary);
-    --node-hover: #5a6578;
-
-    --link-implication: var(--accent-primary);
-    --link-contradiction: var(--accent-secondary);
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-
-    /* Blur */
-    --blur-sm: 8px;
-    --blur-md: 12px;
-    --blur-lg: 16px;
-
-    /* Spacing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-}
-
-/* Reset and base styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family:
-        'Inter',
-        -apple-system,
-        BlinkMacSystemFont,
-        'Segoe UI',
-        Roboto,
-        sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    overflow: hidden;
-}
-
-/* Ensure full viewport usage */
-html,
-body,
-#app {
-    width: 100%;
-    height: 100%;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
+/* 
+ * Base layer - only minimal, non-conflicting resets
+ * Following Tailwind CSS best practices
+ */
+@layer base {
+    /* Design System Variables - Figma-inspired Dark Theme */
     :root {
-        --spacing-xs: 0.125rem;
-        --spacing-sm: 0.375rem;
-        --spacing-md: 0.75rem;
-        --spacing-lg: 1rem;
-        --spacing-xl: 1.5rem;
+        /* Background colors */
+        --color-bg-primary: #1a1a1a;
+        --color-bg-secondary: #2a2a2a;
+        --color-bg-elevated: rgba(42, 42, 42, 0.8);
+
+        /* Text colors */
+        --color-text-primary: #ffffff;
+        --color-text-secondary: #a0a0a0;
+        --color-text-tertiary: #666666;
+
+        /* Accent colors */
+        --color-accent-primary: #7c3aed; /* Purple for implications */
+        --color-accent-secondary: #ef4444; /* Red for contradictions */
+        --color-accent-tertiary: #10b981; /* Green for success states */
+
+        /* Border colors */
+        --color-border-default: #3a3a3a;
+        --color-border-hover: #4a4a4a;
+
+        /* Graph element colors */
+        --color-node-default: #4a5568;
+        --color-node-selected: var(--color-accent-primary);
+        --color-node-hover: #5a6578;
+
+        --color-link-implication: var(--color-accent-tertiary);
+        --color-link-contradiction: var(--color-accent-secondary);
+
+        /* Shadows */
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+        /* Blur */
+        --blur-sm: 8px;
+        --blur-md: 12px;
+        --blur-lg: 16px;
+
+        /* Legacy variable names for backwards compatibility */
+        --bg-primary: var(--color-bg-primary);
+        --bg-secondary: var(--color-bg-secondary);
+        --bg-elevated: var(--color-bg-elevated);
+
+        --text-primary: var(--color-text-primary);
+        --text-secondary: var(--color-text-secondary);
+        --text-tertiary: var(--color-text-tertiary);
+
+        --accent-primary: var(--color-accent-primary);
+        --accent-secondary: var(--color-accent-secondary);
+        --accent-tertiary: var(--color-accent-tertiary);
+
+        --border-default: var(--color-border-default);
+        --border-hover: var(--color-border-hover);
+
+        --node-default: var(--color-node-default);
+        --node-selected: var(--color-node-selected);
+        --node-hover: var(--color-node-hover);
+
+        --link-implication: var(--color-link-implication);
+        --link-contradiction: var(--color-link-contradiction);
+    }
+
+    /* Minimal reset - only what's necessary, won't conflict with Tailwind */
+    html {
+        scroll-behavior: smooth;
     }
 
     body {
-        font-size: 14px;
+        font-family:
+            'Inter',
+            -apple-system,
+            BlinkMacSystemFont,
+            'Segoe UI',
+            Roboto,
+            sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        overflow: hidden;
+    }
+
+    /* Ensure full viewport usage */
+    html,
+    body,
+    #app {
+        width: 100%;
+        height: 100%;
     }
 }
 
-/* Touch-friendly interactions on mobile */
-@media (hover: none) and (pointer: coarse) {
-    button,
-    .toolbar-btn {
-        min-height: 44px;
-        min-width: 44px;
+/* 
+ * Components layer - for custom component styles
+ * These have higher specificity than base but won't override utilities
+ */
+@layer components {
+    /* Custom scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--border-default);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--border-hover);
     }
 }
 
-/* Prevent text selection on interactive elements */
-button,
-.toolbar-btn,
-.close-btn {
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
+/* 
+ * Utilities layer - for custom utility classes
+ * These can override component styles but work with Tailwind utilities
+ */
+@layer utilities {
+    /* Touch-friendly interactions on mobile */
+    @media (hover: none) and (pointer: coarse) {
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+    }
 
-/* Smooth scrolling */
-* {
-    scroll-behavior: smooth;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--border-default);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--border-hover);
+    /* Prevent text selection utility */
+    .no-select {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
 }

@@ -38,17 +38,21 @@
     let char_count = $derived(maxlength ? value.length : null);
 </script>
 
-<div class="textarea-wrapper">
+<div class="flex flex-col gap-1.5">
     {#if label}
-        <div class="textarea-header">
-            <label class="textarea-label" for={textarea_id}>
+        <div class="flex items-center justify-between">
+            <label class="text-sm font-medium text-neutral-400" for={textarea_id}>
                 {label}
                 {#if required}
-                    <span class="required">*</span>
+                    <span class="text-red-500">*</span>
                 {/if}
             </label>
             {#if maxlength}
-                <span class="char-count" class:over-limit={char_count && char_count > maxlength}>
+                <span
+                    class="text-xs {char_count && char_count > maxlength
+                        ? 'text-red-500'
+                        : 'text-neutral-500'}"
+                >
                     {char_count}/{maxlength}
                 </span>
             {/if}
@@ -56,7 +60,7 @@
     {/if}
     <textarea
         id={textarea_id}
-        class="textarea"
+        class="scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent hover:scrollbar-thumb-neutral-600 scrollbar-thumb-rounded min-h-20 resize-y rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 font-sans text-sm text-white transition-all duration-200 placeholder:text-neutral-500 hover:border-neutral-600 focus:border-purple-600 focus:bg-neutral-900 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         {value}
         {placeholder}
         {disabled}
@@ -67,86 +71,3 @@
         onchange={handle_change}
     ></textarea>
 </div>
-
-<style>
-    .textarea-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-
-    .textarea-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .textarea-label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--text-secondary);
-    }
-
-    .required {
-        color: var(--accent-secondary);
-    }
-
-    .char-count {
-        font-size: 0.75rem;
-        color: var(--text-tertiary);
-    }
-
-    .char-count.over-limit {
-        color: var(--accent-secondary);
-    }
-
-    .textarea {
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-size: 0.875rem;
-        font-family: inherit;
-        resize: vertical;
-        min-height: 80px;
-        transition: all 0.2s ease;
-    }
-
-    .textarea:hover:not(:disabled) {
-        border-color: var(--border-hover);
-    }
-
-    .textarea:focus {
-        outline: none;
-        border-color: var(--accent-primary);
-        background: var(--bg-primary);
-    }
-
-    .textarea:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .textarea::placeholder {
-        color: var(--text-tertiary);
-    }
-
-    /* Custom scrollbar */
-    .textarea::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .textarea::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .textarea::-webkit-scrollbar-thumb {
-        background: var(--border-default);
-        border-radius: 3px;
-    }
-
-    .textarea::-webkit-scrollbar-thumb:hover {
-        background: var(--border-hover);
-    }
-</style>

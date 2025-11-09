@@ -1,5 +1,4 @@
 <script lang="ts">
-    import Button from './Button.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { loading_store } from '$lib/stores/loading.svelte';
     import { toast_store } from '$lib/stores/toast.svelte';
@@ -10,6 +9,7 @@
         download_as_jpeg,
         download_as_html
     } from '$lib/utils/export';
+    import { X, Download } from '@lucide/svelte';
 
     interface Props {
         is_open: boolean;
@@ -80,7 +80,7 @@
 
 {#if is_open}
     <div
-        class="modal-backdrop"
+        class="fixed top-0 right-0 bottom-0 left-0 z-1000 flex animate-[fade-in_0.2s_ease] items-center justify-center bg-black/70 backdrop-blur-sm"
         onclick={handle_backdrop_click}
         onkeydown={(e) => e.key === 'Escape' && handle_close()}
         role="dialog"
@@ -88,101 +88,183 @@
         aria-labelledby="export-modal-title"
         tabindex="-1"
     >
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="export-modal-title" class="modal-title">Export Graph</h2>
-                <button class="close-btn" onclick={handle_close} aria-label="Close">✕</button>
+        <div
+            class="flex max-h-[80vh] w-[90%] max-w-[500px] animate-[slide-up_0.3s_ease] flex-col rounded-xl border border-neutral-700 bg-neutral-800/80 shadow-[0_10px_15px_rgba(0,0,0,0.5)]"
+        >
+            <div class="flex items-center justify-between border-b border-neutral-700 p-6">
+                <h2 id="export-modal-title" class="m-0 text-xl font-semibold text-white">
+                    Export Graph
+                </h2>
+                <button
+                    class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-white transition-all duration-200 hover:border-neutral-600 hover:bg-neutral-800 active:scale-98"
+                    onclick={handle_close}
+                    aria-label="Close"
+                    title="Close"
+                >
+                    <X size={18} />
+                </button>
             </div>
 
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="export-filename" class="form-label">Filename</label>
+            <div class="flex flex-1 flex-col gap-6 overflow-y-auto p-6">
+                <div class="flex flex-col gap-1.5">
+                    <label for="export-filename" class="text-sm font-medium text-neutral-400"
+                        >Filename</label
+                    >
                     <input
                         id="export-filename"
                         type="text"
-                        class="form-input"
+                        class="rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 font-sans text-sm text-white transition-all duration-200 hover:border-neutral-600 focus:border-purple-600 focus:bg-neutral-900 focus:outline-none"
                         bind:value={filename}
                         placeholder="logic-graph"
                     />
                 </div>
 
-                <div class="form-group">
-                    <label for="export-format" class="form-label">Format</label>
-                    <select id="export-format" class="form-select" bind:value={export_format}>
+                <div class="flex flex-col gap-1.5">
+                    <label for="export-format" class="text-sm font-medium text-neutral-400"
+                        >Format</label
+                    >
+                    <select
+                        id="export-format"
+                        class="cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 font-sans text-sm text-white transition-all duration-200 hover:border-neutral-600 focus:border-purple-600 focus:bg-neutral-900 focus:outline-none"
+                        bind:value={export_format}
+                    >
                         <option value="json">JSON (.json)</option>
                         <option value="svg">SVG (.svg)</option>
                         <option value="png">PNG (.png)</option>
                         <option value="jpeg">JPEG (.jpg)</option>
                         <option value="html">HTML (.html)</option>
                     </select>
-                    <p class="form-help">{format_descriptions[export_format]}</p>
+                    <p class="m-0 text-xs text-neutral-500">{format_descriptions[export_format]}</p>
                 </div>
 
-                <div class="format-info">
-                    <h3 class="info-title">Format Details</h3>
+                <div class="rounded-md bg-neutral-800 p-4">
+                    <h3 class="m-0 mb-2 text-sm font-semibold text-white">Format Details</h3>
                     {#if export_format === 'json'}
-                        <ul class="info-list">
-                            <li>Preserves all graph data and metadata</li>
-                            <li>Can be re-imported into the application</li>
-                            <li>Human-readable JSON format</li>
+                        <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Preserves all graph data and metadata
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Can be re-imported into the application
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Human-readable JSON format
+                            </li>
                         </ul>
                     {:else if export_format === 'svg'}
-                        <ul class="info-list">
-                            <li>Vector graphics - scales without quality loss</li>
-                            <li>Embedded styles included</li>
-                            <li>Can be edited in vector graphics software</li>
+                        <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Vector graphics - scales without quality loss
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Embedded styles included
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Can be edited in vector graphics software
+                            </li>
                         </ul>
                     {:else if export_format === 'png'}
-                        <ul class="info-list">
-                            <li>High-quality raster image (2x resolution)</li>
-                            <li>Transparent background</li>
-                            <li>Suitable for presentations and documents</li>
+                        <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                High-quality raster image (2x resolution)
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Transparent background
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Suitable for presentations and documents
+                            </li>
                         </ul>
                     {:else if export_format === 'jpeg'}
-                        <ul class="info-list">
-                            <li>Compressed image format</li>
-                            <li>Dark background included</li>
-                            <li>Smaller file size than PNG</li>
+                        <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Compressed image format
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Dark background included
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Smaller file size than PNG
+                            </li>
                         </ul>
                     {:else if export_format === 'html'}
-                        <ul class="info-list">
-                            <li>Fully interactive standalone webpage</li>
-                            <li>Includes zoom, pan, and drag functionality</li>
-                            <li>No external dependencies required</li>
-                            <li>Open directly in any web browser</li>
+                        <ul class="m-0 flex list-none flex-col gap-1.5 p-0">
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Fully interactive standalone webpage
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Includes zoom, pan, and drag functionality
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                No external dependencies required
+                            </li>
+                            <li
+                                class="relative pl-4 text-sm text-neutral-400 before:absolute before:left-0 before:text-purple-600 before:content-['•']"
+                            >
+                                Open directly in any web browser
+                            </li>
                         </ul>
                     {/if}
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <Button variant="secondary" onclick={handle_close} disabled={is_exporting}>
-                    Cancel
-                </Button>
-                <Button onclick={handle_export} disabled={is_exporting}>
-                    {is_exporting ? 'Exporting...' : 'Export'}
-                </Button>
+            <div class="flex gap-1 border-t border-neutral-700 p-6">
+                <button
+                    class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-white transition-all duration-200 hover:border-neutral-600 hover:bg-neutral-700 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
+                    onclick={handle_close}
+                    disabled={is_exporting}
+                    title="Cancel"
+                    aria-label="Cancel"
+                >
+                    <X size={18} />
+                </button>
+                <button
+                    class="flex cursor-pointer items-center justify-center rounded-md border p-2 text-white transition-all duration-200 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 {is_exporting
+                        ? 'border-transparent bg-transparent opacity-50'
+                        : 'border-(--accent-primary) bg-(--accent-primary) hover:border-[#6d28d9] hover:bg-[#6d28d9]'}"
+                    onclick={handle_export}
+                    disabled={is_exporting}
+                    title={is_exporting ? 'Exporting...' : 'Export'}
+                    aria-label={is_exporting ? 'Exporting...' : 'Export'}
+                >
+                    <Download size={18} />
+                </button>
             </div>
         </div>
     </div>
 {/if}
 
 <style>
-    .modal-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(var(--blur-sm));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        animation: fade-in 0.2s ease;
-    }
-
     @keyframes fade-in {
         from {
             opacity: 0;
@@ -190,19 +272,6 @@
         to {
             opacity: 1;
         }
-    }
-
-    .modal-content {
-        background: var(--bg-elevated);
-        border: 1px solid var(--border-default);
-        border-radius: 12px;
-        box-shadow: var(--shadow-lg);
-        width: 90%;
-        max-width: 500px;
-        max-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        animation: slide-up 0.3s ease;
     }
 
     @keyframes slide-up {
@@ -216,170 +285,21 @@
         }
     }
 
-    .modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: var(--spacing-lg);
-        border-bottom: 1px solid var(--border-default);
-    }
-
-    .modal-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin: 0;
-    }
-
-    .close-btn {
-        width: 32px;
-        height: 32px;
-        background: transparent;
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-size: 1rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-    }
-
-    .close-btn:hover {
-        background: var(--bg-secondary);
-        border-color: var(--border-hover);
-    }
-
-    .modal-body {
-        flex: 1;
-        padding: var(--spacing-lg);
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-lg);
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-
-    .form-label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--text-secondary);
-    }
-
-    .form-input,
-    .form-select {
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-size: 0.875rem;
-        font-family: inherit;
-        transition: all 0.2s ease;
-    }
-
-    .form-input:hover,
-    .form-select:hover {
-        border-color: var(--border-hover);
-    }
-
-    .form-input:focus,
-    .form-select:focus {
-        outline: none;
-        border-color: var(--accent-primary);
-        background: var(--bg-primary);
-    }
-
-    .form-select {
-        cursor: pointer;
-    }
-
-    .form-help {
-        font-size: 0.75rem;
-        color: var(--text-tertiary);
-        margin: 0;
-    }
-
-    .format-info {
-        padding: var(--spacing-md);
-        background: var(--bg-secondary);
-        border-radius: 6px;
-    }
-
-    .info-title {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin: 0 0 var(--spacing-sm) 0;
-    }
-
-    .info-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-
-    .info-list li {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-        padding-left: var(--spacing-md);
-        position: relative;
-    }
-
-    .info-list li::before {
-        content: '•';
-        position: absolute;
-        left: 0;
-        color: var(--accent-primary);
-    }
-
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: var(--spacing-sm);
-        padding: var(--spacing-lg);
-        border-top: 1px solid var(--border-default);
-    }
-
-    /* Scrollbar styling */
-    .modal-body::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .modal-body::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .modal-body::-webkit-scrollbar-thumb {
-        background: var(--border-default);
-        border-radius: 3px;
-    }
-
-    .modal-body::-webkit-scrollbar-thumb:hover {
-        background: var(--border-hover);
-    }
-
     /* Mobile responsiveness */
     @media (max-width: 768px) {
-        .modal-content {
+        .w-\[90\%\] {
             width: 95%;
+        }
+
+        .max-h-\[80vh\] {
             max-height: 90vh;
         }
 
-        .info-list li {
+        .text-sm {
             font-size: 0.75rem;
         }
 
-        .form-help {
+        .text-xs {
             font-size: 0.7rem;
         }
     }

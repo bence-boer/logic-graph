@@ -12,66 +12,29 @@
     const field_id = `field-${Math.random().toString(36).substring(2, 9)}`;
 </script>
 
-<div class="form-field">
+<div class="flex flex-col gap-1.5">
     {#if label}
-        <label class="field-label" for={field_id}>
+        <label class="text-sm font-medium text-neutral-400" for={field_id}>
             {label}
             {#if required}
-                <span class="required">*</span>
+                <span class="text-red-500">*</span>
             {/if}
         </label>
     {/if}
-    <div class="field-content" id={field_id}>
+    <div class="contents" id={field_id}>
         {@render children()}
     </div>
     {#if error}
-        <div class="field-error" role="alert">
+        <div
+            class="flex items-center gap-1.5 text-xs text-red-500 before:text-sm before:content-['⚠']"
+            role="alert"
+        >
             {error}
         </div>
     {/if}
     {#if hint && !error}
-        <div class="field-hint">
+        <div class="text-xs text-neutral-500">
             {hint}
         </div>
     {/if}
 </div>
-
-<style>
-    .form-field {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-
-    .field-label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--text-secondary);
-    }
-
-    .required {
-        color: var(--accent-secondary);
-    }
-
-    .field-content {
-        display: contents;
-    }
-
-    .field-error {
-        font-size: 0.75rem;
-        color: var(--accent-secondary);
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-    }
-
-    .field-error::before {
-        content: '⚠';
-        font-size: 0.875rem;
-    }
-
-    .field-hint {
-        font-size: 0.75rem;
-        color: var(--text-tertiary);
-    }
-</style>

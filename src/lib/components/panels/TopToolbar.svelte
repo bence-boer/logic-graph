@@ -7,6 +7,16 @@
     import { ConnectionType, SelectionTypeEnum } from '$lib/types/graph';
     import HelpModal from '$lib/components/ui/HelpModal.svelte';
     import ExportModal from '$lib/components/ui/ExportModal.svelte';
+    import {
+        Plus,
+        Download,
+        Upload,
+        CirclePlus,
+        Link,
+        Trash2,
+        Search,
+        HelpCircle
+    } from '@lucide/svelte';
 
     interface Props {
         show_help?: boolean;
@@ -67,136 +77,80 @@
     }
 </script>
 
-<div class="toolbar">
-    <div class="toolbar-section">
-        <button class="toolbar-btn" onclick={handle_new_graph} title="New Graph">
-            <span class="icon">📄</span>
-            <span class="label">New</span>
-        </button>
-        <button class="toolbar-btn" onclick={handle_import} title="Import JSON">
-            <span class="icon">📂</span>
-            <span class="label">Import</span>
-        </button>
-        <button class="toolbar-btn" onclick={() => (show_export = true)} title="Export">
-            <span class="icon">�</span>
-            <span class="label">Export</span>
-        </button>
-    </div>
-
-    <div class="toolbar-divider"></div>
-
-    <div class="toolbar-section">
-        <button class="toolbar-btn" onclick={handle_add_node} title="Add Node">
-            <span class="icon">➕</span>
-            <span class="label">Add Node</span>
-        </button>
-        <button class="toolbar-btn" onclick={handle_add_connection} title="Add Connection">
-            <span class="icon">🔗</span>
-            <span class="label">Add Link</span>
-        </button>
-        <button class="toolbar-btn danger" onclick={handle_delete_selected} title="Delete Selected">
-            <span class="icon">🗑️</span>
-            <span class="label">Delete</span>
-        </button>
-    </div>
-
-    <div class="toolbar-divider"></div>
-
-    <div class="toolbar-section">
+<div
+    class="fixed bottom-4 left-1/2 z-1000 flex -translate-x-1/2 items-center gap-2 rounded-lg border border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-md) backdrop-blur-md"
+>
+    <div class="flex items-center gap-1.5">
         <button
-            class="toolbar-btn {ui_store.search_panel_open ? 'active' : ''}"
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+            onclick={handle_new_graph}
+            title="New Graph"
+        >
+            <Plus size={18} />
+        </button>
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+            onclick={handle_import}
+            title="Import JSON"
+        >
+            <Download size={18} />
+        </button>
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+            onclick={() => (show_export = true)}
+            title="Export"
+        >
+            <Upload size={18} />
+        </button>
+    </div>
+
+    <div class="h-6 w-px bg-(--border-default)"></div>
+
+    <div class="flex items-center gap-2">
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+            onclick={handle_add_node}
+            title="Add Node"
+        >
+            <CirclePlus size={18} />
+        </button>
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+            onclick={handle_add_connection}
+            title="Add Connection"
+        >
+            <Link size={18} />
+        </button>
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--accent-secondary) hover:bg-[rgba(239,68,68,0.1)] hover:text-(--accent-secondary) active:scale-98"
+            onclick={handle_delete_selected}
+            title="Delete Selected"
+        >
+            <Trash2 size={18} />
+        </button>
+    </div>
+
+    <div class="h-6 w-px bg-(--border-default)"></div>
+
+    <div class="flex items-center gap-2">
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98 {ui_store.search_panel_open
+                ? 'border-(--border-hover) bg-(--bg-secondary)'
+                : ''}"
             onclick={() => ui_store.toggle_search_panel()}
             title="Search (Ctrl+F)"
         >
-            <span class="icon">🔍</span>
-            <span class="label">Search</span>
+            <Search size={18} />
         </button>
-        <button class="toolbar-btn" onclick={() => (show_help = true)} title="Help (?)">
-            <span class="icon">❓</span>
-            <span class="label">Help</span>
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+            onclick={() => (show_help = true)}
+            title="Help (?)"
+        >
+            <HelpCircle size={18} />
         </button>
     </div>
 </div>
 
 <HelpModal bind:is_open={show_help} onclose={() => (show_help = false)} />
 <ExportModal bind:is_open={show_export} onclose={() => (show_export = false)} />
-
-<style>
-    .toolbar {
-        position: fixed;
-        top: var(--spacing-md);
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-        background: var(--bg-elevated);
-        backdrop-filter: blur(var(--blur-md));
-        border: 1px solid var(--border-default);
-        border-radius: 8px;
-        padding: var(--spacing-sm) var(--spacing-md);
-        box-shadow: var(--shadow-lg);
-        z-index: 1000;
-    }
-
-    .toolbar-section {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-    }
-
-    .toolbar-divider {
-        width: 1px;
-        height: 24px;
-        background: var(--border-default);
-    }
-
-    .toolbar-btn {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: transparent;
-        border: 1px solid transparent;
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .toolbar-btn:hover {
-        background: var(--bg-secondary);
-        border-color: var(--border-hover);
-    }
-
-    .toolbar-btn:active {
-        transform: scale(0.98);
-    }
-
-    .toolbar-btn.danger:hover {
-        background: rgba(239, 68, 68, 0.1);
-        border-color: var(--accent-secondary);
-        color: var(--accent-secondary);
-    }
-
-    .toolbar-btn .icon {
-        font-size: 1rem;
-        line-height: 1;
-    }
-
-    .toolbar-btn .label {
-        font-weight: 500;
-    }
-
-    @media (max-width: 768px) {
-        .toolbar {
-            flex-wrap: wrap;
-            max-width: 90vw;
-        }
-
-        .toolbar-btn .label {
-            display: none;
-        }
-    }
-</style>

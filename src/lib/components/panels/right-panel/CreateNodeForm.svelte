@@ -6,7 +6,7 @@
     import Input from '$lib/components/ui/Input.svelte';
     import Textarea from '$lib/components/ui/Textarea.svelte';
     import FormField from '$lib/components/ui/FormField.svelte';
-    import Button from '$lib/components/ui/Button.svelte';
+    import { CirclePlus, X as XIcon } from '@lucide/svelte';
 
     let node_name = $state('');
     let node_description = $state('');
@@ -61,13 +61,20 @@
     }
 </script>
 
-<div class="form-container">
-    <div class="form-header">
-        <h3>Create New Node</h3>
-        <button class="close-btn" onclick={handle_cancel} aria-label="Close">✕</button>
+<div class="flex h-full flex-col">
+    <div class="flex items-center justify-between border-b border-(--border-default) p-3">
+        <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Create New Node</h3>
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+            onclick={handle_cancel}
+            aria-label="Close"
+            title="Close"
+        >
+            <XIcon size={18} />
+        </button>
     </div>
 
-    <div class="form-body">
+    <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
         <FormField label="Name" error={validation_errors.name} required>
             <Input bind:value={node_name} placeholder="Enter node name..." required />
         </FormField>
@@ -86,14 +93,23 @@
         </FormField>
     </div>
 
-    <div class="form-actions">
-        <Button variant="primary" onclick={handle_create} disabled={is_submitting}>
-            {is_submitting ? 'Creating...' : 'Create Node'}
-        </Button>
-        <Button variant="secondary" onclick={handle_cancel}>Cancel</Button>
+    <div class="flex gap-1 border-t border-(--border-default) bg-(--bg-secondary) p-3">
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--accent-primary) transition-all duration-200 hover:border-(--accent-primary) hover:bg-[rgba(139,92,246,0.1)] active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
+            onclick={handle_create}
+            disabled={is_submitting}
+            title={is_submitting ? 'Creating Node...' : 'Create Node'}
+            aria-label={is_submitting ? 'Creating Node...' : 'Create Node'}
+        >
+            <CirclePlus size={18} />
+        </button>
+        <button
+            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-elevated) active:scale-98"
+            onclick={handle_cancel}
+            title="Cancel"
+            aria-label="Cancel"
+        >
+            <XIcon size={18} />
+        </button>
     </div>
 </div>
-
-<style>
-    @import '$lib/styles/forms.css';
-</style>

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { keyboard_shortcuts, get_shortcut_display } from '$lib/utils/keyboard';
     import Button from '$lib/components/ui/Button.svelte';
+    import { X } from '@lucide/svelte';
 
     interface Props {
         is_open: boolean;
@@ -23,7 +24,7 @@
 
 {#if is_open}
     <div
-        class="modal-backdrop"
+        class="fixed top-0 right-0 bottom-0 left-0 z-1000 flex animate-[fade-in_0.2s_ease] items-center justify-center bg-black/70 backdrop-blur-sm"
         onclick={handle_backdrop_click}
         onkeydown={(e) => e.key === 'Escape' && handle_close()}
         role="dialog"
@@ -31,20 +32,35 @@
         aria-labelledby="help-modal-title"
         tabindex="-1"
     >
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="help-modal-title" class="modal-title">Keyboard Shortcuts</h2>
-                <button class="close-btn" onclick={handle_close} aria-label="Close">✕</button>
+        <div
+            class="flex max-h-[80vh] w-[90%] max-w-[600px] animate-[slide-up_0.3s_ease] flex-col rounded-xl border border-neutral-700 bg-neutral-800/80 shadow-[0_10px_15px_rgba(0,0,0,0.5)]"
+        >
+            <div class="flex items-center justify-between border-b border-neutral-700 p-6">
+                <h2 id="help-modal-title" class="m-0 text-xl font-semibold text-white">
+                    Keyboard Shortcuts
+                </h2>
+                <button
+                    class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-white transition-all duration-200 hover:border-neutral-600 hover:bg-neutral-800 active:scale-98"
+                    onclick={handle_close}
+                    aria-label="Close"
+                    title="Close"
+                >
+                    <X size={18} />
+                </button>
             </div>
 
-            <div class="modal-body">
-                <div class="shortcuts-grid">
+            <div class="flex-1 overflow-y-auto p-6">
+                <div class="flex flex-col gap-2">
                     {#each keyboard_shortcuts as shortcut}
-                        <div class="shortcut-row">
-                            <div class="shortcut-keys">
+                        <div
+                            class="grid grid-cols-[180px_1fr] items-center gap-6 rounded-md bg-neutral-800 px-4 py-2"
+                        >
+                            <div
+                                class="rounded border border-neutral-700 bg-neutral-900 px-2 py-1.5 text-center font-['Monaco','Courier_New',monospace] text-sm font-semibold text-purple-600"
+                            >
                                 {get_shortcut_display(shortcut)}
                             </div>
-                            <div class="shortcut-description">
+                            <div class="text-sm text-neutral-400">
                                 {shortcut.description}
                             </div>
                         </div>
@@ -52,7 +68,7 @@
                 </div>
             </div>
 
-            <div class="modal-footer">
+            <div class="flex justify-end border-t border-neutral-700 p-6">
                 <Button onclick={handle_close}>Close</Button>
             </div>
         </div>
@@ -60,21 +76,6 @@
 {/if}
 
 <style>
-    .modal-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(var(--blur-sm));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        animation: fade-in 0.2s ease;
-    }
-
     @keyframes fade-in {
         from {
             opacity: 0;
@@ -82,19 +83,6 @@
         to {
             opacity: 1;
         }
-    }
-
-    .modal-content {
-        background: var(--bg-elevated);
-        border: 1px solid var(--border-default);
-        border-radius: 12px;
-        box-shadow: var(--shadow-lg);
-        width: 90%;
-        max-width: 600px;
-        max-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        animation: slide-up 0.3s ease;
     }
 
     @keyframes slide-up {
@@ -108,122 +96,25 @@
         }
     }
 
-    .modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: var(--spacing-lg);
-        border-bottom: 1px solid var(--border-default);
-    }
-
-    .modal-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin: 0;
-    }
-
-    .close-btn {
-        width: 32px;
-        height: 32px;
-        background: transparent;
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-size: 1rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-    }
-
-    .close-btn:hover {
-        background: var(--bg-secondary);
-        border-color: var(--border-hover);
-    }
-
-    .modal-body {
-        flex: 1;
-        padding: var(--spacing-lg);
-        overflow-y: auto;
-    }
-
-    .shortcuts-grid {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
-
-    .shortcut-row {
-        display: grid;
-        grid-template-columns: 180px 1fr;
-        gap: var(--spacing-lg);
-        align-items: center;
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: var(--bg-secondary);
-        border-radius: 6px;
-    }
-
-    .shortcut-keys {
-        font-family: 'Monaco', 'Courier New', monospace;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--accent-primary);
-        padding: var(--spacing-xs) var(--spacing-sm);
-        background: var(--bg-primary);
-        border: 1px solid var(--border-default);
-        border-radius: 4px;
-        text-align: center;
-    }
-
-    .shortcut-description {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        padding: var(--spacing-lg);
-        border-top: 1px solid var(--border-default);
-    }
-
-    /* Scrollbar styling */
-    .modal-body::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .modal-body::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .modal-body::-webkit-scrollbar-thumb {
-        background: var(--border-default);
-        border-radius: 3px;
-    }
-
-    .modal-body::-webkit-scrollbar-thumb:hover {
-        background: var(--border-hover);
-    }
-
     /* Mobile responsiveness */
     @media (max-width: 768px) {
-        .modal-content {
+        .w-\[90\%\] {
             width: 95%;
+        }
+
+        .max-h-\[80vh\] {
             max-height: 90vh;
         }
 
-        .shortcut-row {
+        .grid-cols-\[180px_1fr\] {
             grid-template-columns: 140px 1fr;
-            gap: var(--spacing-sm);
         }
 
-        .shortcut-keys {
-            font-size: 0.75rem;
+        .gap-6 {
+            gap: 0.5rem;
         }
 
-        .shortcut-description {
+        .text-sm {
             font-size: 0.75rem;
         }
     }

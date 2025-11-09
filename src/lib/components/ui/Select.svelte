@@ -33,18 +33,18 @@
     const select_id = `select-${Math.random().toString(36).substring(2, 9)}`;
 </script>
 
-<div class="select-wrapper">
+<div class="flex flex-col gap-1.5">
     {#if label}
-        <label class="select-label" for={select_id}>
+        <label class="text-sm font-medium text-neutral-400" for={select_id}>
             {label}
             {#if required}
-                <span class="required">*</span>
+                <span class="text-red-500">*</span>
             {/if}
         </label>
     {/if}
     <select
         id={select_id}
-        class="select"
+        class="cursor-pointer appearance-none rounded-md border border-neutral-700 bg-neutral-800 bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2712%27%20height=%2712%27%20viewBox=%270%200%2012%2012%27%3E%3Cpath%20fill=%27%23a0a0a0%27%20d=%27M6%209L1%204h10z%27/%3E%3C/svg%3E')] bg-[right_1rem_center] bg-no-repeat px-4 py-2 pr-10 font-sans text-sm text-white transition-all duration-200 hover:border-neutral-600 focus:border-purple-600 focus:bg-neutral-900 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         {value}
         {disabled}
         {required}
@@ -54,64 +54,9 @@
             <option value="" disabled selected>{placeholder}</option>
         {/if}
         {#each options as option}
-            <option value={option.value}>
+            <option value={option.value} class="bg-neutral-800 text-white">
                 {option.label}
             </option>
         {/each}
     </select>
 </div>
-
-<style>
-    .select-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-xs);
-    }
-
-    .select-label {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--text-secondary);
-    }
-
-    .required {
-        color: var(--accent-secondary);
-    }
-
-    .select {
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-size: 0.875rem;
-        font-family: inherit;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0a0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right var(--spacing-md) center;
-        padding-right: calc(var(--spacing-md) * 2 + 12px);
-    }
-
-    .select:hover:not(:disabled) {
-        border-color: var(--border-hover);
-    }
-
-    .select:focus {
-        outline: none;
-        border-color: var(--accent-primary);
-        background-color: var(--bg-primary);
-    }
-
-    .select:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .select option {
-        background: var(--bg-secondary);
-        color: var(--text-primary);
-    }
-</style>

@@ -29,6 +29,8 @@
     let nodes = $derived(graph_store.nodes);
     let connections = $derived(graph_store.connections);
     let links = $derived(convert_connections_to_d3_links(connections));
+    let show_labels = $derived(ui_store.show_labels);
+    let show_descriptions = $derived(ui_store.show_descriptions);
 
     // Get connected node IDs for highlighting
     function get_connected_node_ids(node_id: string): Set<string> {
@@ -94,8 +96,8 @@
         svg.call(zoom_behavior);
 
         // Create initial mutable copies for simulation
-        simulation_nodes = nodes.map(n => ({...n}));
-        simulation_links = links.map(l => ({...l}));
+        simulation_nodes = nodes.map((n) => ({ ...n }));
+        simulation_links = links.map((l) => ({ ...l }));
 
         // Initialize force simulation
         simulation = d3
@@ -127,7 +129,10 @@
         const link_selection = container
             .select<SVGGElement>('g.links')
             .selectAll<SVGLineElement, D3Link>('line')
-            .data(simulation_links, (d) => `${(d.source as LogicNode).id}-${(d.target as LogicNode).id}`);
+            .data(
+                simulation_links,
+                (d) => `${(d.source as LogicNode).id}-${(d.target as LogicNode).id}`
+            );
 
         link_selection.exit().remove();
 
@@ -238,9 +243,12 @@
             });
 
         // Add title (tooltip) for nodes
-        node_enter
-            .append('title')
-            .text((d) => `${d.name}${d.description ? '\n' + d.description : ''}`);
+        node_enter.append('title').text((d) => {
+            if (show_descriptions && d.description) {
+                return `${d.name}\n${d.description}`;
+            }
+            return d.name;
+        });
 
         // Update merged selections
         node_selection
@@ -274,6 +282,17 @@
                 return 0.3;
             });
 
+        // Update tooltips for all nodes (both new and existing)
+        node_selection
+            .merge(node_enter)
+            .select('title')
+            .text((d) => {
+                if (show_descriptions && d.description) {
+                    return `${d.name}\n${d.description}`;
+                }
+                return d.name;
+            });
+
         // Add labels
         const label_selection = container
             .select<SVGGElement>('g.labels')
@@ -293,10 +312,12 @@
             .attr('pointer-events', 'none')
             .text((d) => d.name);
 
-        // Update label opacity based on hover state
+        // Update label opacity based on hover state and show_labels setting
         label_selection
             .merge(label_enter)
+            .style('display', show_labels ? 'block' : 'none')
             .style('opacity', (d) => {
+                if (!show_labels) return 0;
                 if (!hovered_node_id) return 1;
                 if (d.id === hovered_node_id) return 1;
                 if (get_connected_node_ids(hovered_node_id).has(d.id)) return 1;
@@ -370,10 +391,10 @@
         if (simulation) {
             // Sync store data to simulation arrays
             // Update existing nodes and add new ones
-            const node_map = new Map(simulation_nodes.map(n => [n.id, n]));
-            
+            const node_map = new Map(simulation_nodes.map((n) => [n.id, n]));
+
             // Update or add nodes from store
-            nodes.forEach(store_node => {
+            nodes.forEach((store_node) => {
                 const sim_node = node_map.get(store_node.id);
                 if (sim_node) {
                     // Update existing node properties (preserve D3 properties)
@@ -385,18 +406,18 @@
                     });
                 } else {
                     // Add new node
-                    simulation_nodes.push({...store_node});
+                    simulation_nodes.push({ ...store_node });
                 }
             });
-            
+
             // Remove deleted nodes
-            simulation_nodes = simulation_nodes.filter(sim_node => 
-                nodes.some(store_node => store_node.id === sim_node.id)
+            simulation_nodes = simulation_nodes.filter((sim_node) =>
+                nodes.some((store_node) => store_node.id === sim_node.id)
             );
-            
+
             // Update links
-            simulation_links = links.map(l => ({...l}));
-            
+            simulation_links = links.map((l) => ({ ...l }));
+
             // Update simulation with new data
             simulation.nodes(simulation_nodes);
             const link_force = simulation.force<d3.ForceLink<LogicNode, D3Link>>('link');
@@ -407,13 +428,24 @@
             render_graph();
         }
     });
+
+    // React to UI setting changes
+    $effect(() => {
+        // When show_labels or show_descriptions changes, re-render
+        if (simulation) {
+            // Access the reactive values to track them
+            show_labels;
+            show_descriptions;
+            render_graph();
+        }
+    });
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <svg
     bind:this={svg_container}
-    class="graph-canvas"
+    class="h-full w-full cursor-grab bg-(--bg-primary) active:cursor-grabbing"
     role="application"
     aria-label="Logic graph visualization"
     onclick={() => {
@@ -437,17 +469,6 @@
 </svg>
 
 <style>
-    .graph-canvas {
-        width: 100%;
-        height: 100%;
-        background: var(--bg-primary);
-        cursor: grab;
-    }
-
-    .graph-canvas:active {
-        cursor: grabbing;
-    }
-
     :global(.link) {
         opacity: 0.8;
         transition:

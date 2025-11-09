@@ -8,30 +8,21 @@
 </script>
 
 {#if is_loading}
-    <div class="loading-overlay">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <p class="loading-message">{message}</p>
+    <div
+        class="fixed top-0 right-0 bottom-0 left-0 z-9999 flex animate-[fade-in_0.2s_ease] items-center justify-center bg-black/80 backdrop-blur-md"
+    >
+        <div class="flex flex-col items-center gap-6">
+            <div
+                class="h-12 w-12 animate-[spin_0.8s_linear_infinite] rounded-full border-4 border-neutral-700 border-t-purple-600"
+            ></div>
+            <p class="m-0 animate-[pulse_1.5s_ease-in-out_infinite] text-base text-white">
+                {message}
+            </p>
         </div>
     </div>
 {/if}
 
 <style>
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(var(--blur-md));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        animation: fade-in 0.2s ease;
-    }
-
     @keyframes fade-in {
         from {
             opacity: 0;
@@ -41,33 +32,10 @@
         }
     }
 
-    .loading-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--spacing-lg);
-    }
-
-    .spinner {
-        width: 48px;
-        height: 48px;
-        border: 4px solid var(--border-default);
-        border-top-color: var(--accent-primary);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-
     @keyframes spin {
         to {
             transform: rotate(360deg);
         }
-    }
-
-    .loading-message {
-        font-size: 1rem;
-        color: var(--text-primary);
-        margin: 0;
-        animation: pulse 1.5s ease-in-out infinite;
     }
 
     @keyframes pulse {

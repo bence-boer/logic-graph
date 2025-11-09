@@ -10,7 +10,7 @@
     import { loading_store } from '$lib/stores/loading.svelte';
 </script>
 
-<div class="app-container">
+<div class="relative h-screen w-screen overflow-hidden">
     <TopToolbar />
     <LeftPanel />
     <RightPanel />
@@ -21,12 +21,3 @@
     <LoadingOverlay is_loading={loading_store.is_loading} message={loading_store.message} />
     <ToastContainer />
 </div>
-
-<style>
-    .app-container {
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
-    }
-</style>

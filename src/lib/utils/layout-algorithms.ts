@@ -114,17 +114,25 @@ export function apply_hierarchical_layout(
 
             if (direction === 'top-down') {
                 y = level_index * level_separation + 100;
-                x = (node_index + 1) * node_separation + (width - level_nodes.length * node_separation) / 2;
+                x =
+                    (node_index + 1) * node_separation +
+                    (width - level_nodes.length * node_separation) / 2;
             } else if (direction === 'bottom-up') {
                 y = height - (level_index * level_separation + 100);
-                x = (node_index + 1) * node_separation + (width - level_nodes.length * node_separation) / 2;
+                x =
+                    (node_index + 1) * node_separation +
+                    (width - level_nodes.length * node_separation) / 2;
             } else if (direction === 'left-right') {
                 x = level_index * level_separation + 100;
-                y = (node_index + 1) * node_separation + (height - level_nodes.length * node_separation) / 2;
+                y =
+                    (node_index + 1) * node_separation +
+                    (height - level_nodes.length * node_separation) / 2;
             } else {
                 // right-left
                 x = width - (level_index * level_separation + 100);
-                y = (node_index + 1) * node_separation + (height - level_nodes.length * node_separation) / 2;
+                y =
+                    (node_index + 1) * node_separation +
+                    (height - level_nodes.length * node_separation) / 2;
             }
 
             positioned.push({ ...node, x, y });

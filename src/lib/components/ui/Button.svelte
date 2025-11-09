@@ -14,71 +14,30 @@
         disabled = false,
         children
     }: Props = $props();
+
+    const base_classes =
+        'inline-flex items-center justify-center gap-1.5 border rounded-md font-medium cursor-pointer transition-all duration-200 ease-in-out';
+
+    const variant_classes = {
+        primary:
+            'bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700',
+        secondary:
+            'bg-neutral-800 border-neutral-700 text-white hover:border-neutral-600 hover:bg-neutral-750',
+        danger: 'bg-transparent border-red-500 text-red-500 hover:bg-red-500/10'
+    };
+
+    const size_classes = {
+        sm: 'px-2.5 py-1.5 text-xs',
+        md: 'px-4 py-2 text-sm',
+        lg: 'px-6 py-3 text-base'
+    };
+
+    const disabled_classes = 'disabled:opacity-50 disabled:cursor-not-allowed';
+    const active_classes = 'active:scale-[0.98]';
+
+    const button_classes = `${base_classes} ${variant_classes[variant]} ${size_classes[size]} ${disabled_classes} ${active_classes}`;
 </script>
 
-<button class="btn {variant} {size}" {onclick} {disabled}>
+<button class={button_classes} {onclick} {disabled}>
     {@render children()}
 </button>
-
-<style>
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: var(--spacing-xs);
-        padding: var(--spacing-sm) var(--spacing-md);
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        background: var(--bg-secondary);
-        color: var(--text-primary);
-    }
-
-    .btn:hover:not(:disabled) {
-        border-color: var(--border-hover);
-        background: var(--bg-elevated);
-    }
-
-    .btn:active:not(:disabled) {
-        transform: scale(0.98);
-    }
-
-    .btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .btn.primary {
-        background: var(--accent-primary);
-        border-color: var(--accent-primary);
-        color: white;
-    }
-
-    .btn.primary:hover:not(:disabled) {
-        background: #6d28d9;
-        border-color: #6d28d9;
-    }
-
-    .btn.danger {
-        background: transparent;
-        border-color: var(--accent-secondary);
-        color: var(--accent-secondary);
-    }
-
-    .btn.danger:hover:not(:disabled) {
-        background: rgba(239, 68, 68, 0.1);
-    }
-
-    .btn.sm {
-        padding: var(--spacing-xs) var(--spacing-sm);
-        font-size: 0.75rem;
-    }
-
-    .btn.lg {
-        padding: var(--spacing-md) var(--spacing-lg);
-        font-size: 1rem;
-    }
-</style>

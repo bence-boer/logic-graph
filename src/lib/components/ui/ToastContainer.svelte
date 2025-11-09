@@ -18,15 +18,36 @@
                 return 'ℹ';
         }
     }
+
+    const toast_border_classes = {
+        success: 'border-l-4 border-l-emerald-500',
+        error: 'border-l-4 border-l-red-500',
+        warning: 'border-l-4 border-l-amber-500',
+        info: 'border-l-4 border-l-purple-600'
+    };
+
+    const icon_color_classes = {
+        success: 'text-emerald-500',
+        error: 'text-red-500',
+        warning: 'text-amber-500',
+        info: 'text-purple-600'
+    };
 </script>
 
-<div class="toast-container">
+<div class="pointer-events-none fixed right-6 bottom-6 z-10000 flex flex-col gap-2">
     {#each toast_store.toasts as toast (toast.id)}
-        <div class="toast toast-{toast.type}" role="alert">
-            <span class="toast-icon">{get_icon(toast.type)}</span>
-            <span class="toast-message">{toast.message}</span>
+        <div
+            class="pointer-events-auto flex max-w-[400px] min-w-[300px] animate-[slide-in_0.3s_ease] items-center gap-4 rounded-lg border border-neutral-700 bg-neutral-800/80 px-6 py-4 shadow-[0_10px_15px_rgba(0,0,0,0.5)] backdrop-blur-md {toast_border_classes[
+                toast.type
+            ]}"
+            role="alert"
+        >
+            <span class="shrink-0 text-xl leading-none {icon_color_classes[toast.type]}"
+                >{get_icon(toast.type)}</span
+            >
+            <span class="flex-1 text-sm leading-snug text-white">{toast.message}</span>
             <button
-                class="toast-close"
+                class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded border-0 bg-transparent text-base text-neutral-400 transition-all duration-200 hover:bg-neutral-800 hover:text-white"
                 onclick={() => handle_close(toast.id)}
                 aria-label="Close notification"
             >
@@ -37,33 +58,6 @@
 </div>
 
 <style>
-    .toast-container {
-        position: fixed;
-        bottom: var(--spacing-lg);
-        right: var(--spacing-lg);
-        z-index: 10000;
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-sm);
-        pointer-events: none;
-    }
-
-    .toast {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        padding: var(--spacing-md) var(--spacing-lg);
-        background: var(--bg-elevated);
-        backdrop-filter: blur(var(--blur-md));
-        border: 1px solid var(--border-default);
-        border-radius: 8px;
-        box-shadow: var(--shadow-lg);
-        min-width: 300px;
-        max-width: 400px;
-        pointer-events: auto;
-        animation: slide-in 0.3s ease;
-    }
-
     @keyframes slide-in {
         from {
             transform: translateX(100%);
@@ -75,83 +69,12 @@
         }
     }
 
-    .toast-success {
-        border-left: 4px solid var(--accent-tertiary);
-    }
-
-    .toast-error {
-        border-left: 4px solid var(--accent-secondary);
-    }
-
-    .toast-warning {
-        border-left: 4px solid #f59e0b;
-    }
-
-    .toast-info {
-        border-left: 4px solid var(--accent-primary);
-    }
-
-    .toast-icon {
-        font-size: 1.25rem;
-        line-height: 1;
-        flex-shrink: 0;
-    }
-
-    .toast-success .toast-icon {
-        color: var(--accent-tertiary);
-    }
-
-    .toast-error .toast-icon {
-        color: var(--accent-secondary);
-    }
-
-    .toast-warning .toast-icon {
-        color: #f59e0b;
-    }
-
-    .toast-info .toast-icon {
-        color: var(--accent-primary);
-    }
-
-    .toast-message {
-        flex: 1;
-        font-size: 0.875rem;
-        color: var(--text-primary);
-        line-height: 1.4;
-    }
-
-    .toast-close {
-        width: 24px;
-        height: 24px;
-        background: transparent;
-        border: none;
-        color: var(--text-secondary);
-        font-size: 1rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-        flex-shrink: 0;
-        transition: all 0.2s ease;
-    }
-
-    .toast-close:hover {
-        background: var(--bg-secondary);
-        color: var(--text-primary);
-    }
-
     /* Mobile responsiveness */
     @media (max-width: 768px) {
-        .toast-container {
-            left: var(--spacing-md);
-            right: var(--spacing-md);
-            bottom: var(--spacing-md);
-        }
-
-        .toast {
-            min-width: auto;
-            max-width: 100%;
+        div.fixed {
+            left: 1rem;
+            right: 1rem;
+            bottom: 1rem;
         }
     }
 </style>

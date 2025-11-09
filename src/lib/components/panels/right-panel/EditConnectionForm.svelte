@@ -4,10 +4,10 @@
     import { ui_store } from '$lib/stores/ui.svelte';
     import { toast_store } from '$lib/stores/toast.svelte';
     import { ConnectionType } from '$lib/types/graph';
-    import Button from '$lib/components/ui/Button.svelte';
     import Select from '$lib/components/ui/Select.svelte';
     import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
     import FormField from '$lib/components/ui/FormField.svelte';
+    import { Trash2, X } from '@lucide/svelte';
 
     interface Props {
         connection_id: string;
@@ -16,9 +16,7 @@
     let { connection_id }: Props = $props();
 
     let connection = $derived(graph_store.connections.find((c) => c.id === connection_id));
-    let available_nodes = $derived(
-        graph_store.nodes.map((n) => ({ value: n.id, label: n.name }))
-    );
+    let available_nodes = $derived(graph_store.nodes.map((n) => ({ value: n.id, label: n.name })));
 
     let type = $state<ConnectionType>(ConnectionType.IMPLICATION);
     let sources = $state<string[]>([]);
@@ -80,16 +78,27 @@
 </script>
 
 {#if connection}
-    <div class="form-container">
-        <div class="form-header">
-            <h3>Edit Connection</h3>
-            <button class="close-btn" onclick={close_panel} aria-label="Close">✕</button>
+    <div class="flex h-full flex-col">
+        <div class="flex items-center justify-between border-b border-(--border-default) p-3">
+            <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Edit Connection</h3>
+            <button
+                class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
+                onclick={close_panel}
+                aria-label="Close"
+                title="Close"
+            >
+                <X size={18} />
+            </button>
         </div>
 
-        <div class="form-body">
-            <div class="panel-section">
+        <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
+            <div class="flex flex-col gap-3">
                 <FormField label="ID">
-                    <div class="field-value readonly">{connection.id}</div>
+                    <div
+                        class="rounded-md border border-(--border-default) bg-(--bg-secondary) px-4 py-2 font-mono text-sm text-(--text-tertiary)"
+                    >
+                        {connection.id}
+                    </div>
                 </FormField>
 
                 <Select
@@ -122,40 +131,24 @@
                 />
             </div>
 
-            <div class="divider"></div>
+            <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
-            <div class="panel-section">
-                <Button variant="danger" onclick={handle_delete}>Delete Connection</Button>
+            <div class="flex gap-1">
+                <button
+                    class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--accent-secondary) transition-all duration-200 hover:border-(--accent-secondary) hover:bg-[rgba(239,68,68,0.1)] active:scale-98"
+                    onclick={handle_delete}
+                    title="Delete Connection"
+                    aria-label="Delete Connection"
+                >
+                    <Trash2 size={18} />
+                </button>
             </div>
         </div>
     </div>
 {:else}
-    <div class="form-container">
-        <div class="form-body">
-            <p class="error-message">Connection not found</p>
+    <div class="flex h-full flex-col">
+        <div class="flex-1 p-3">
+            <p class="p-4 text-center text-sm text-red-500">Connection not found</p>
         </div>
     </div>
 {/if}
-
-<style>
-    .field-value {
-        padding: var(--spacing-sm) var(--spacing-md);
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-default);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-size: 0.875rem;
-        font-family: 'Monaco', 'Courier New', monospace;
-    }
-
-    .field-value.readonly {
-        color: var(--text-tertiary);
-    }
-
-    .error-message {
-        font-size: 0.875rem;
-        color: var(--error);
-        text-align: center;
-        padding: var(--spacing-md);
-    }
-</style>
