@@ -2,22 +2,17 @@
     import { graph_store } from '$lib/stores/graph.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
     import { trigger_import_dialog } from '$lib/utils/import';
-    import {
-        download_graph_as_json,
-        download_as_svg,
-        download_as_png,
-        download_as_jpeg,
-        download_as_html
-    } from '$lib/utils/export';
     import { validate_graph } from '$lib/utils/validation';
     import { ConnectionType } from '$lib/types/graph';
     import HelpModal from '$lib/components/ui/HelpModal.svelte';
+    import ExportModal from '$lib/components/ui/ExportModal.svelte';
 
     interface Props {
         show_help?: boolean;
     }
 
     let { show_help = $bindable(false) }: Props = $props();
+    let show_export = $state(false);
 
     async function handle_import() {
         const graph = await trigger_import_dialog();
@@ -31,43 +26,6 @@
                 );
             }
         }
-    }
-
-    function handle_export_json() {
-        const graph = graph_store.get_graph();
-        download_graph_as_json(graph);
-    }
-
-    function handle_export_svg() {
-        try {
-            download_as_svg();
-        } catch (error) {
-            console.error('Failed to export SVG:', error);
-            alert('Failed to export SVG');
-        }
-    }
-
-    async function handle_export_png() {
-        try {
-            await download_as_png();
-        } catch (error) {
-            console.error('Failed to export PNG:', error);
-            alert('Failed to export PNG');
-        }
-    }
-
-    async function handle_export_jpeg() {
-        try {
-            await download_as_jpeg();
-        } catch (error) {
-            console.error('Failed to export JPEG:', error);
-            alert('Failed to export JPEG');
-        }
-    }
-
-    function handle_export_html() {
-        const graph = graph_store.get_graph();
-        download_as_html(graph);
     }
 
     function handle_new_graph() {
@@ -153,30 +111,9 @@
             <span class="icon">📂</span>
             <span class="label">Import</span>
         </button>
-        <button class="toolbar-btn" onclick={handle_export_json} title="Export JSON">
-            <span class="icon">💾</span>
-            <span class="label">Export JSON</span>
-        </button>
-    </div>
-
-    <div class="toolbar-divider"></div>
-
-    <div class="toolbar-section">
-        <button class="toolbar-btn" onclick={handle_export_svg} title="Export SVG">
-            <span class="icon">🎨</span>
-            <span class="label">SVG</span>
-        </button>
-        <button class="toolbar-btn" onclick={handle_export_png} title="Export PNG">
-            <span class="icon">🖼️</span>
-            <span class="label">PNG</span>
-        </button>
-        <button class="toolbar-btn" onclick={handle_export_jpeg} title="Export JPEG">
-            <span class="icon">📷</span>
-            <span class="label">JPEG</span>
-        </button>
-        <button class="toolbar-btn" onclick={handle_export_html} title="Export HTML">
-            <span class="icon">🌐</span>
-            <span class="label">HTML</span>
+        <button class="toolbar-btn" onclick={() => (show_export = true)} title="Export">
+            <span class="icon">�</span>
+            <span class="label">Export</span>
         </button>
     </div>
 
@@ -208,6 +145,7 @@
 </div>
 
 <HelpModal bind:is_open={show_help} onclose={() => (show_help = false)} />
+<ExportModal bind:is_open={show_export} onclose={() => (show_export = false)} />
 
 <style>
     .toolbar {
