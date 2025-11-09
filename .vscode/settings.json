@@ -1,0 +1,41 @@
+{
+    "github.copilot.chat.reviewSelection.instructions": [
+        {
+            "text": "Verify TypeScript is used (not JavaScript) with explicit types where appropriate. Check for proper use of TypeScript strict mode features."
+        },
+        {
+            "text": "Ensure Svelte 5 runes syntax ($state, $derived, $effect) is used instead of legacy Svelte reactivity patterns."
+        },
+        {
+            "text": "Check stores follow the pattern: .svelte.ts files, IIFE wrapper, _state internal variable, data getter/setter, snake_case naming with _store suffix."
+        },
+        {
+            "text": "Verify no server-side runtime logic is used (this is a static site). Check that generic type parameters use descriptive PascalCase names."
+        },
+        {
+            "text": "Ensure Tailwind CSS classes are used properly and components are small and focused with good composition."
+        }
+    ],
+    "github.copilot.chat.commitMessageGeneration.instructions": [
+        {
+            "text": "Write a single descriptive, dense sentence that summarizes all changes, using commas to enumerate multiple changes when necessary."
+        },
+        {
+            "text": "Be specific and technical, mentioning affected components, functions, or files directly in the sentence."
+        },
+        {
+            "text": "Keep the message under 100 characters when possible, but prioritize clarity over brevity."
+        }
+    ],
+    "github.copilot.chat.pullRequestDescriptionGeneration.instructions": [
+        {
+            "text": "Always include a list of key changes in bullet points."
+        },
+        {
+            "text": "Reference any breaking changes or important migration notes."
+        },
+        {
+            "text": "Follow conventional commit format for the title: type(scope): description."
+        }
+    ]
+}
