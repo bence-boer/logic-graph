@@ -47,12 +47,20 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
                 const node = graph_store.nodes.find((n) => n.id === selected_id);
                 if (node && confirm(`Delete node "${node.name}"?`)) {
                     graph_store.remove_node(selected_id);
+                    toast_store.success(`Statement "${node.name}" deleted`);
                     selection_store.clear_selection();
                 }
             } else if (selected_type === 'connection') {
-                if (confirm('Delete this connection?')) {
-                    graph_store.remove_connection(selected_id);
-                    selection_store.clear_selection();
+                const connection = graph_store.connections.find((c) => c.id === selected_id);
+                if (connection) {
+                    const source_names = connection.sources.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
+                    const target_names = connection.targets.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
+
+                    if (confirm(`Delete connection?\n[${source_names}] → [${target_names}]`)) {
+                        graph_store.remove_connection(selected_id);
+                        toast_store.success(`Connection deleted: [${source_names}] → [${target_names}]`);
+                        selection_store.clear_selection();
+                    }
                 }
             }
         }
@@ -93,7 +101,10 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
         description: 'Save graph as JSON',
         action: async () => {
             const graph = graph_store.get_graph();
+            const node_count = graph.nodes?.length || 0;
+            const connection_count = graph.connections?.length || 0;
             download_graph_as_json(graph);
+            toast_store.success(`Graph saved: ${node_count} statements, ${connection_count} connections`);
         }
     },
     {
@@ -102,9 +113,15 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
         description: 'Open JSON file',
         action: async () => {
             try {
-                await trigger_import_dialog();
+                const graph = await trigger_import_dialog();
+                if (graph) {
+                    const node_count = graph.nodes?.length || 0;
+                    const connection_count = graph.connections?.length || 0;
+                    toast_store.success(`Graph imported: ${node_count} statements, ${connection_count} connections`);
+                }
             } catch (error) {
                 console.error('Failed to import file:', error);
+                toast_store.error('Failed to import graph file');
             }
         }
     },

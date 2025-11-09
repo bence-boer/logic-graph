@@ -42,13 +42,13 @@
                 description: node_description.trim()
             });
 
-            toast_store.success(`Node "${node_name}" created`);
+            toast_store.success(`Statement "${node_name}" created`);
 
             // Select the new node and switch to edit mode
             selection_store.select_node(new_node.id);
             ui_store.open_edit_node_form(new_node.id);
         } catch (error) {
-            toast_store.error('Failed to create node');
+            toast_store.error('Failed to create statement');
             console.error(error);
         } finally {
             is_submitting = false;
@@ -63,7 +63,7 @@
 
 <div class="flex h-full flex-col">
     <div class="flex items-center justify-between border-b border-(--border-default) p-3">
-        <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Create New Node</h3>
+        <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Create New Statement</h3>
         <button
             class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
             onclick={handle_cancel}
@@ -76,7 +76,7 @@
 
     <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
         <FormField label="Name" error={validation_errors.name} required>
-            <Input bind:value={node_name} placeholder="Enter node name..." required />
+            <Input bind:value={node_name} placeholder="Enter statement name..." required />
         </FormField>
 
         <FormField
@@ -98,8 +98,8 @@
             class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--accent-primary) transition-all duration-200 hover:border-(--accent-primary) hover:bg-[rgba(139,92,246,0.1)] active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
             onclick={handle_create}
             disabled={is_submitting}
-            title={is_submitting ? 'Creating Node...' : 'Create Node'}
-            aria-label={is_submitting ? 'Creating Node...' : 'Create Node'}
+            title={is_submitting ? 'Creating Statement...' : 'Create Statement'}
+            aria-label={is_submitting ? 'Creating Statement...' : 'Create Statement'}
         >
             <CirclePlus size={18} />
         </button>

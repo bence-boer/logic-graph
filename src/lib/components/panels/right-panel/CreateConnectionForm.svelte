@@ -60,7 +60,11 @@
                 targets: target_ids
             });
 
-            toast_store.success('Connection created');
+            const source_names = source_ids.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
+            const target_names = target_ids.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
+            const connection_type_label = connection_type === ConnectionType.IMPLICATION ? 'Implication' : 'Contradiction';
+            
+            toast_store.success(`${connection_type_label} connection created: [${source_names}] → [${target_names}]`);
 
             // Select the new connection and switch to edit mode
             selection_store.select_connection(new_connection.id);

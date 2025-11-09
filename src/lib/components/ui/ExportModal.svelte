@@ -39,6 +39,8 @@
 
         try {
             const graph = graph_store.get_graph();
+            const node_count = graph.nodes?.length || 0;
+            const connection_count = graph.connections?.length || 0;
 
             switch (export_format) {
                 case 'json':
@@ -58,7 +60,7 @@
                     break;
             }
 
-            toast_store.success(`Exported as ${export_format.toUpperCase()}`);
+            toast_store.success(`Graph exported as ${export_format.toUpperCase()}: ${filename} (${node_count} statements, ${connection_count} connections)`);
             handle_close();
         } catch (error) {
             console.error('Export failed:', error);

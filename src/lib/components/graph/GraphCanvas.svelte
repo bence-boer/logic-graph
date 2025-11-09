@@ -364,6 +364,9 @@
         if (!event.active && simulation) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
         d.fy = d.y;
+        // Store the starting position to detect if node was actually dragged
+        (d as any)._drag_start_x = d.x;
+        (d as any)._drag_start_y = d.y;
     }
 
     function dragged(event: d3.D3DragEvent<SVGCircleElement, LogicNode, LogicNode>, d: LogicNode) {
@@ -376,13 +379,37 @@
         d: LogicNode
     ) {
         if (!event.active && simulation) simulation.alphaTarget(0);
-        // Keep node pinned after drag and sync to store
-        graph_store.update_node(d.id, {
-            x: d.x,
-            y: d.y,
-            fx: d.fx,
-            fy: d.fy
-        });
+        
+        // Check if the node was actually dragged (moved more than 5 pixels)
+        const start_x = (d as any)._drag_start_x ?? d.x;
+        const start_y = (d as any)._drag_start_y ?? d.y;
+        const distance_moved = Math.sqrt(
+            Math.pow((d.x ?? 0) - start_x, 2) + Math.pow((d.y ?? 0) - start_y, 2)
+        );
+        
+        if (distance_moved > 5) {
+            // Node was dragged - keep it pinned
+            graph_store.update_node(d.id, {
+                x: d.x,
+                y: d.y,
+                fx: d.fx,
+                fy: d.fy
+            });
+        } else {
+            // Node was just clicked - unpin it
+            d.fx = null;
+            d.fy = null;
+            graph_store.update_node(d.id, {
+                x: d.x,
+                y: d.y,
+                fx: null,
+                fy: null
+            });
+        }
+        
+        // Clean up temporary drag tracking properties
+        delete (d as any)._drag_start_x;
+        delete (d as any)._drag_start_y;
     }
 
     // React to data changes

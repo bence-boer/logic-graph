@@ -1,6 +1,7 @@
 <script lang="ts">
     import { ui_store } from '$lib/stores/ui.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
+    import { toast_store } from '$lib/stores/toast.svelte';
     import { Database, Trash2 } from '@lucide/svelte';
 
     let is_open = $derived(ui_store.left_panel_open);
@@ -20,6 +21,21 @@
 
     function toggle_descriptions() {
         ui_store.show_descriptions = !ui_store.show_descriptions;
+    }
+
+    function handle_load_sample() {
+        graph_store.load_sample_data();
+        toast_store.success('Sample graph loaded: "Socrates is mortal" syllogism');
+    }
+
+    function handle_clear() {
+        const node_count = graph_store.nodes.length;
+        const connection_count = graph_store.connections.length;
+        
+        if (confirm('Clear the entire graph? This will delete all statements and connections.')) {
+            graph_store.clear();
+            toast_store.info(`Graph cleared (${node_count} statements, ${connection_count} connections removed)`);
+        }
     }
 </script>
 
@@ -52,7 +68,7 @@
                     <div
                         class="flex items-center justify-between rounded-md bg-(--bg-secondary) p-2"
                     >
-                        <span class="text-sm text-(--text-secondary)">Nodes:</span>
+                        <span class="text-sm text-(--text-secondary)">Statements:</span>
                         <span class="text-sm font-medium text-(--text-primary)">{node_count}</span>
                     </div>
                     <div
@@ -80,7 +96,7 @@
                             checked={show_labels}
                             onchange={toggle_labels}
                         />
-                        <span class="text-sm text-(--text-primary)">Show node labels</span>
+                        <span class="text-sm text-(--text-primary)">Show statement labels</span>
                     </label>
                     <label
                         class="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors duration-200 hover:bg-(--bg-secondary)"
@@ -103,7 +119,7 @@
                 <div class="flex gap-1">
                     <button
                         class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
-                        onclick={() => graph_store.load_sample_data()}
+                        onclick={handle_load_sample}
                         title="Load Sample Data"
                         aria-label="Load Sample Data"
                     >
@@ -111,7 +127,7 @@
                     </button>
                     <button
                         class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--accent-secondary) transition-all duration-200 hover:border-(--accent-secondary) hover:bg-[rgba(239,68,68,0.1)] active:scale-98"
-                        onclick={() => graph_store.clear()}
+                        onclick={handle_clear}
                         title="Clear Graph"
                         aria-label="Clear Graph"
                     >
