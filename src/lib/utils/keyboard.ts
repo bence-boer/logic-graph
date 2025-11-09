@@ -1,6 +1,7 @@
 import { graph_store } from '$lib/stores/graph.svelte';
 import { selection_store } from '$lib/stores/selection.svelte';
 import { ui_store } from '$lib/stores/ui.svelte';
+import { toast_store } from '$lib/stores/toast.svelte';
 import { trigger_import_dialog } from './import';
 import { download_graph_as_json } from './export';
 
@@ -24,8 +25,12 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
     },
     {
         key: 'Escape',
-        description: 'Clear selection',
+        description: 'Clear selection / Close panel',
         action: () => {
+            const mode = ui_store.right_panel_mode;
+            if (mode.type !== 'closed') {
+                ui_store.close_right_panel();
+            }
             selection_store.clear_selection();
         }
     },
@@ -64,9 +69,22 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
     {
         key: 'n',
         ctrl: true,
-        description: 'Add new node',
+        description: 'Create new node',
         action: () => {
             ui_store.open_create_node_form();
+        }
+    },
+    {
+        key: 'c',
+        ctrl: true,
+        shift: true,
+        description: 'Create new connection',
+        action: () => {
+            if (graph_store.nodes.length < 2) {
+                toast_store.error('You need at least 2 nodes to create a connection');
+                return;
+            }
+            ui_store.open_create_connection_form();
         }
     },
     {
@@ -109,15 +127,15 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
     {
         key: 'r',
         ctrl: true,
-        description: 'Toggle right panel',
+        description: 'Close right panel',
         action: () => {
-            ui_store.toggle_right_panel();
+            ui_store.close_right_panel();
         }
     },
     {
         key: 'a',
         ctrl: true,
-        description: 'Add new node',
+        description: 'Create new node',
         action: () => {
             const shortcut = keyboard_shortcuts.find((s) => s.key === 'n' && s.ctrl);
             if (shortcut) shortcut.action();

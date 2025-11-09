@@ -4,6 +4,7 @@
     import type { Simulation, SimulationNodeDatum, SimulationLinkDatum } from 'd3';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
     import type { LogicNode, D3Link } from '$lib/types/graph';
     import { ConnectionType } from '$lib/types/graph';
     import {
@@ -372,10 +373,14 @@
     class="graph-canvas"
     role="application"
     aria-label="Logic graph visualization"
-    onclick={() => selection_store.clear_selection()}
+    onclick={() => {
+        selection_store.clear_selection();
+        ui_store.close_right_panel();
+    }}
     onkeydown={(e) => {
         if (e.key === 'Escape') {
             selection_store.clear_selection();
+            ui_store.close_right_panel();
         }
     }}
     tabindex="0"
