@@ -2,7 +2,7 @@
     import { selection_store } from '$lib/stores/selection.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
-    import { ConnectionType } from '$lib/types/graph';
+    import { ConnectionType, SelectionTypeEnum } from '$lib/types/graph';
     import Button from '$lib/components/ui/Button.svelte';
     import Input from '$lib/components/ui/Input.svelte';
 
@@ -11,19 +11,23 @@
     let is_open = $derived(ui_store.right_panel_open);
 
     let selected_node = $derived(
-        selected_type === 'node' ? graph_store.nodes.find((n) => n.id === selected_id) : null
+        selected_type === SelectionTypeEnum.NODE
+            ? graph_store.nodes.find((n) => n.id === selected_id)
+            : null
     );
 
     let selected_connection = $derived(
-        selected_type === 'connection'
+        selected_type === SelectionTypeEnum.CONNECTION
             ? graph_store.connections.find((c) => c.id === selected_id)
             : null
     );
 
     // Watch for selection changes to open/close panel
     $effect(() => {
-        if (selected_type && selected_id) {
-            ui_store.open_right_panel();
+        if (selected_type === SelectionTypeEnum.NODE && selected_id) {
+            ui_store.open_edit_node_form(selected_id);
+        } else if (selected_type === SelectionTypeEnum.CONNECTION && selected_id) {
+            ui_store.open_edit_connection_form(selected_id);
         }
     });
 
@@ -90,7 +94,7 @@
     <div class="right-panel">
         <div class="panel-header">
             <h2 class="panel-title">
-                {selected_type === 'node' ? 'Edit Node' : 'Edit Connection'}
+                {selected_type === SelectionTypeEnum.NODE ? 'Edit Node' : 'Edit Connection'}
             </h2>
             <button class="close-btn" onclick={close_panel} aria-label="Close panel">✕</button>
         </div>

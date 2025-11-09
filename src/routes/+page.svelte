@@ -1,6 +1,8 @@
 <script lang="ts">
     import GraphCanvas from '$lib/components/graph/GraphCanvas.svelte';
     import TopToolbar from '$lib/components/panels/TopToolbar.svelte';
+    import LeftPanel from '$lib/components/panels/LeftPanel.svelte';
+    import RightPanel from '$lib/components/panels/RightPanel.svelte';
     import SearchPanel from '$lib/components/panels/SearchPanel.svelte';
     import LoadingOverlay from '$lib/components/ui/LoadingOverlay.svelte';
     import ToastContainer from '$lib/components/ui/ToastContainer.svelte';
@@ -10,6 +12,8 @@
 
 <div class="app-container">
     <TopToolbar />
+    <LeftPanel />
+    <RightPanel />
     <GraphCanvas />
     {#if ui_store.search_panel_open}
         <SearchPanel />

@@ -94,7 +94,12 @@ export interface LogicGraph {
 /**
  * Selection state types
  */
-export type SelectionType = 'node' | 'connection' | null;
+export enum SelectionTypeEnum {
+    NODE = 'node',
+    CONNECTION = 'connection'
+}
+
+export type SelectionType = SelectionTypeEnum | null;
 
 export interface Selection {
     /** Type of selected item */
@@ -102,3 +107,21 @@ export interface Selection {
     /** ID of selected item */
     id: string | null;
 }
+
+/**
+ * Right panel mode types
+ */
+export enum RightPanelModeType {
+    CLOSED = 'closed',
+    EDIT_NODE = 'edit-node',
+    EDIT_CONNECTION = 'edit-connection',
+    CREATE_NODE = 'create-node',
+    CREATE_CONNECTION = 'create-connection'
+}
+
+export type RightPanelMode =
+    | { type: RightPanelModeType.CLOSED }
+    | { type: RightPanelModeType.EDIT_NODE; node_id: string }
+    | { type: RightPanelModeType.EDIT_CONNECTION; connection_id: string }
+    | { type: RightPanelModeType.CREATE_NODE }
+    | { type: RightPanelModeType.CREATE_CONNECTION };

@@ -4,6 +4,7 @@
  */
 
 import type { SelectionType } from '$lib/types/graph';
+import { SelectionTypeEnum } from '$lib/types/graph';
 
 function create_selection_store() {
     let _selected_type = $state<SelectionType>(null);
@@ -18,12 +19,12 @@ function create_selection_store() {
         },
 
         select_node(node_id: string): void {
-            _selected_type = 'node';
+            _selected_type = SelectionTypeEnum.NODE;
             _selected_id = node_id;
         },
 
         select_connection(connection_id: string): void {
-            _selected_type = 'connection';
+            _selected_type = SelectionTypeEnum.CONNECTION;
             _selected_id = connection_id;
         },
 

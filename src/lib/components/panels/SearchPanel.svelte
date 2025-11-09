@@ -1,5 +1,9 @@
 <script lang="ts">
-    import { search_store } from '$lib/stores/search.svelte';
+    import {
+        search_store,
+        SearchFilterType,
+        CONNECTION_TYPE_FILTER_VALUE
+    } from '$lib/stores/search.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
     import { ConnectionType } from '$lib/types/graph';
@@ -10,7 +14,7 @@
         if (!query) return { nodes: [], connections: [] };
 
         const nodes = graph_store.nodes.filter((node) => {
-            if (search_store.filter_type === 'connections') return false;
+            if (search_store.filter_type === SearchFilterType.CONNECTIONS) return false;
             const matches_query =
                 node.name.toLowerCase().includes(query) ||
                 node.description.toLowerCase().includes(query) ||
@@ -19,9 +23,9 @@
         });
 
         const connections = graph_store.connections.filter((conn) => {
-            if (search_store.filter_type === 'nodes') return false;
+            if (search_store.filter_type === SearchFilterType.NODES) return false;
             if (
-                search_store.connection_type_filter !== 'all' &&
+                search_store.connection_type_filter !== CONNECTION_TYPE_FILTER_VALUE.ALL &&
                 conn.type !== search_store.connection_type_filter
             ) {
                 return false;
@@ -74,58 +78,66 @@
                 <span class="filter-label">Show:</span>
                 <div class="filter-buttons">
                     <button
-                        class="filter-btn {search_store.filter_type === 'all' ? 'active' : ''}"
-                        onclick={() => (search_store.filter_type = 'all')}
+                        class="filter-btn {search_store.filter_type === SearchFilterType.ALL
+                            ? 'active'
+                            : ''}"
+                        onclick={() => (search_store.filter_type = SearchFilterType.ALL)}
                     >
                         All
                     </button>
                     <button
-                        class="filter-btn {search_store.filter_type === 'nodes' ? 'active' : ''}"
-                        onclick={() => (search_store.filter_type = 'nodes')}
+                        class="filter-btn {search_store.filter_type === SearchFilterType.NODES
+                            ? 'active'
+                            : ''}"
+                        onclick={() => (search_store.filter_type = SearchFilterType.NODES)}
                     >
                         Nodes
                     </button>
                     <button
-                        class="filter-btn {search_store.filter_type === 'connections'
+                        class="filter-btn {search_store.filter_type === SearchFilterType.CONNECTIONS
                             ? 'active'
                             : ''}"
-                        onclick={() => (search_store.filter_type = 'connections')}
+                        onclick={() => (search_store.filter_type = SearchFilterType.CONNECTIONS)}
                     >
                         Connections
                     </button>
                 </div>
             </div>
 
-            {#if search_store.filter_type !== 'nodes'}
+            {#if search_store.filter_type !== SearchFilterType.NODES}
                 <div class="filter-group">
                     <span class="filter-label">Type:</span>
                     <div class="filter-buttons">
                         <button
-                            class="filter-btn {search_store.connection_type_filter === 'all'
+                            class="filter-btn {search_store.connection_type_filter ===
+                            CONNECTION_TYPE_FILTER_VALUE.ALL
                                 ? 'active'
                                 : ''}"
-                            onclick={() => (search_store.connection_type_filter = 'all')}
+                            onclick={() =>
+                                (search_store.connection_type_filter =
+                                    CONNECTION_TYPE_FILTER_VALUE.ALL)}
                         >
                             All
                         </button>
                         <button
                             class="filter-btn {search_store.connection_type_filter ===
-                            ConnectionType.IMPLICATION
+                            CONNECTION_TYPE_FILTER_VALUE.IMPLICATION
                                 ? 'active'
                                 : ''}"
                             onclick={() =>
-                                (search_store.connection_type_filter = ConnectionType.IMPLICATION)}
+                                (search_store.connection_type_filter =
+                                    CONNECTION_TYPE_FILTER_VALUE.IMPLICATION)}
                         >
                             Implications
                         </button>
                         <button
                             class="filter-btn {search_store.connection_type_filter ===
-                            ConnectionType.CONTRADICTION
+                            CONNECTION_TYPE_FILTER_VALUE.CONTRADICTION
                                 ? 'active'
                                 : ''}"
                             onclick={() =>
                                 (search_store.connection_type_filter =
-                                    ConnectionType.CONTRADICTION)}
+                                    CONNECTION_TYPE_FILTER_VALUE.CONTRADICTION)}
                         >
                             Contradictions
                         </button>

@@ -4,7 +4,7 @@
     import { ui_store } from '$lib/stores/ui.svelte';
     import { trigger_import_dialog } from '$lib/utils/import';
     import { validate_graph } from '$lib/utils/validation';
-    import { ConnectionType } from '$lib/types/graph';
+    import { ConnectionType, SelectionTypeEnum } from '$lib/types/graph';
     import HelpModal from '$lib/components/ui/HelpModal.svelte';
     import ExportModal from '$lib/components/ui/ExportModal.svelte';
 
@@ -92,9 +92,9 @@
         }
 
         if (confirm(`Delete selected ${selected_type}?`)) {
-            if (selected_type === 'node') {
+            if (selected_type === SelectionTypeEnum.NODE) {
                 graph_store.remove_node(selected_id);
-            } else if (selected_type === 'connection') {
+            } else if (selected_type === SelectionTypeEnum.CONNECTION) {
                 graph_store.remove_connection(selected_id);
             }
             selection_store.clear_selection();

@@ -3,7 +3,31 @@
  * Manages layout algorithm settings and preferences
  */
 
-export type LayoutAlgorithm = 'force' | 'hierarchical' | 'circular' | 'grid';
+export enum LayoutAlgorithm {
+    FORCE = 'force',
+    HIERARCHICAL = 'hierarchical',
+    CIRCULAR = 'circular',
+    GRID = 'grid'
+}
+
+export enum HierarchicalDirection {
+    TOP_DOWN = 'top-down',
+    BOTTOM_UP = 'bottom-up',
+    LEFT_RIGHT = 'left-right',
+    RIGHT_LEFT = 'right-left'
+}
+
+export enum CircularSortBy {
+    NONE = 'none',
+    DEGREE = 'degree',
+    NAME = 'name'
+}
+
+export enum GridAlignment {
+    CENTER = 'center',
+    LEFT = 'left',
+    RIGHT = 'right'
+}
 
 export interface ForceLayoutSettings {
     strength: number; // Link strength (-100 to 0)
@@ -14,7 +38,7 @@ export interface ForceLayoutSettings {
 }
 
 export interface HierarchicalLayoutSettings {
-    direction: 'top-down' | 'bottom-up' | 'left-right' | 'right-left';
+    direction: HierarchicalDirection;
     level_separation: number; // Space between levels (50 to 300)
     node_separation: number; // Space between nodes in same level (20 to 200)
 }
@@ -22,19 +46,19 @@ export interface HierarchicalLayoutSettings {
 export interface CircularLayoutSettings {
     radius: number; // Circle radius (100 to 500)
     start_angle: number; // Starting angle in degrees (0 to 360)
-    sort_by: 'none' | 'degree' | 'name';
+    sort_by: CircularSortBy;
 }
 
 export interface GridLayoutSettings {
     columns: number; // Number of columns (1 to 10)
     cell_width: number; // Width of each cell (50 to 300)
     cell_height: number; // Height of each cell (50 to 300)
-    alignment: 'center' | 'left' | 'right';
+    alignment: GridAlignment;
 }
 
 function create_layout_store() {
-    let _current_algorithm = $state<LayoutAlgorithm>('force');
-    
+    let _current_algorithm = $state<LayoutAlgorithm>(LayoutAlgorithm.FORCE);
+
     let _force_settings = $state<ForceLayoutSettings>({
         strength: -30,
         distance: 100,
@@ -44,7 +68,7 @@ function create_layout_store() {
     });
 
     let _hierarchical_settings = $state<HierarchicalLayoutSettings>({
-        direction: 'top-down',
+        direction: HierarchicalDirection.TOP_DOWN,
         level_separation: 150,
         node_separation: 100
     });
@@ -52,14 +76,14 @@ function create_layout_store() {
     let _circular_settings = $state<CircularLayoutSettings>({
         radius: 250,
         start_angle: 0,
-        sort_by: 'none'
+        sort_by: CircularSortBy.NONE
     });
 
     let _grid_settings = $state<GridLayoutSettings>({
         columns: 3,
         cell_width: 150,
         cell_height: 150,
-        alignment: 'center'
+        alignment: GridAlignment.CENTER
     });
 
     return {
@@ -135,20 +159,20 @@ function create_layout_store() {
                 center_strength: 0.1
             };
             _hierarchical_settings = {
-                direction: 'top-down',
+                direction: HierarchicalDirection.TOP_DOWN,
                 level_separation: 150,
                 node_separation: 100
             };
             _circular_settings = {
                 radius: 250,
                 start_angle: 0,
-                sort_by: 'none'
+                sort_by: CircularSortBy.NONE
             };
             _grid_settings = {
                 columns: 3,
                 cell_width: 150,
                 cell_height: 150,
-                alignment: 'center'
+                alignment: GridAlignment.CENTER
             };
         }
     };
