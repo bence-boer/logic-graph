@@ -53,7 +53,7 @@
         {#if placeholder && !value}
             <option value="" disabled selected>{placeholder}</option>
         {/if}
-        {#each options as option}
+        {#each options as option (option.value)}
             <option value={option.value} class="bg-neutral-800 text-white">
                 {option.label}
             </option>

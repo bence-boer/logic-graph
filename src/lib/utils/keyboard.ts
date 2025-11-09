@@ -53,12 +53,18 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
             } else if (selected_type === 'connection') {
                 const connection = graph_store.connections.find((c) => c.id === selected_id);
                 if (connection) {
-                    const source_names = connection.sources.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
-                    const target_names = connection.targets.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
+                    const source_names = connection.sources
+                        .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+                        .join(', ');
+                    const target_names = connection.targets
+                        .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+                        .join(', ');
 
                     if (confirm(`Delete connection?\n[${source_names}] → [${target_names}]`)) {
                         graph_store.remove_connection(selected_id);
-                        toast_store.success(`Connection deleted: [${source_names}] → [${target_names}]`);
+                        toast_store.success(
+                            `Connection deleted: [${source_names}] → [${target_names}]`
+                        );
                         selection_store.clear_selection();
                     }
                 }
@@ -104,7 +110,9 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
             const node_count = graph.nodes?.length || 0;
             const connection_count = graph.connections?.length || 0;
             download_graph_as_json(graph);
-            toast_store.success(`Graph saved: ${node_count} statements, ${connection_count} connections`);
+            toast_store.success(
+                `Graph saved: ${node_count} statements, ${connection_count} connections`
+            );
         }
     },
     {
@@ -117,7 +125,9 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
                 if (graph) {
                     const node_count = graph.nodes?.length || 0;
                     const connection_count = graph.connections?.length || 0;
-                    toast_store.success(`Graph imported: ${node_count} statements, ${connection_count} connections`);
+                    toast_store.success(
+                        `Graph imported: ${node_count} statements, ${connection_count} connections`
+                    );
                 }
             } catch (error) {
                 console.error('Failed to import file:', error);

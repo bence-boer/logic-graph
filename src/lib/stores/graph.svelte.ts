@@ -131,22 +131,22 @@ function create_graph_store() {
         load_sample_data(): void {
             const sample_nodes: LogicNode[] = [
                 {
-                    id: '1',
+                    id: crypto.randomUUID(),
                     name: 'All humans are mortal',
                     description: 'Universal statement about human mortality'
                 },
                 {
-                    id: '2',
+                    id: crypto.randomUUID(),
                     name: 'Socrates is human',
                     description: 'Particular statement about Socrates'
                 },
                 {
-                    id: '3',
+                    id: crypto.randomUUID(),
                     name: 'Socrates is mortal',
                     description: 'Logical conclusion from premises'
                 },
                 {
-                    id: '4',
+                    id: crypto.randomUUID(),
                     name: 'Socrates is immortal',
                     description: 'Contradicts the conclusion'
                 }
@@ -154,16 +154,16 @@ function create_graph_store() {
 
             const sample_connections: LogicConnection[] = [
                 {
-                    id: 'c1',
+                    id: crypto.randomUUID(),
                     type: ConnectionType.IMPLICATION,
-                    sources: ['1', '2'],
-                    targets: ['3']
+                    sources: [sample_nodes[0].id, sample_nodes[1].id],
+                    targets: [sample_nodes[2].id]
                 },
                 {
-                    id: 'c2',
+                    id: crypto.randomUUID(),
                     type: ConnectionType.CONTRADICTION,
-                    sources: ['3'],
-                    targets: ['4']
+                    sources: [sample_nodes[2].id],
+                    targets: [sample_nodes[3].id]
                 }
             ];
 

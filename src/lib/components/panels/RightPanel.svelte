@@ -4,7 +4,7 @@
     import { RightPanelModeType, SelectionTypeEnum } from '$lib/types/graph';
     import CreateNodeForm from './right-panel/CreateNodeForm.svelte';
     import CreateConnectionForm from './right-panel/CreateConnectionForm.svelte';
-    import EditNodeForm from './right-panel/EditNodeForm.svelte';
+    import EditNodeForm from './right-panel/EditNodeForm';
     import EditConnectionForm from './right-panel/EditConnectionForm.svelte';
 
     let mode = $derived(ui_store.right_panel_mode);

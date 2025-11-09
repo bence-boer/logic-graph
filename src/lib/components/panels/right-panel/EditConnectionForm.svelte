@@ -63,23 +63,41 @@
             targets
         });
 
-        const source_names = sources.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
-        const target_names = targets.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
-        const connection_type_label = type === ConnectionType.IMPLICATION ? 'implication' : 'contradiction';
-        
-        toast_store.success(`${connection_type_label} connection updated: [${source_names}] → [${target_names}]`);
+        const source_names = sources
+            .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+            .join(', ');
+        const target_names = targets
+            .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+            .join(', ');
+        const connection_type_label =
+            type === ConnectionType.IMPLICATION ? 'implication' : 'contradiction';
+
+        toast_store.success(
+            `${connection_type_label} connection updated: [${source_names}] → [${target_names}]`
+        );
     }
 
     function handle_delete() {
         if (!connection) return;
 
-        const source_names = connection.sources.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
-        const target_names = connection.targets.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
-        const connection_type_label = connection.type === ConnectionType.IMPLICATION ? 'implication' : 'contradiction';
-        
-        if (confirm(`Delete this ${connection_type_label} connection?\n[${source_names}] → [${target_names}]`)) {
+        const source_names = connection.sources
+            .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+            .join(', ');
+        const target_names = connection.targets
+            .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+            .join(', ');
+        const connection_type_label =
+            connection.type === ConnectionType.IMPLICATION ? 'implication' : 'contradiction';
+
+        if (
+            confirm(
+                `Delete this ${connection_type_label} connection?\n[${source_names}] → [${target_names}]`
+            )
+        ) {
             graph_store.remove_connection(connection.id);
-            toast_store.success(`${connection_type_label} connection deleted: [${source_names}] → [${target_names}]`);
+            toast_store.success(
+                `${connection_type_label} connection deleted: [${source_names}] → [${target_names}]`
+            );
             close_panel();
         }
     }

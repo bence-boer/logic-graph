@@ -31,10 +31,12 @@
     function handle_clear() {
         const node_count = graph_store.nodes.length;
         const connection_count = graph_store.connections.length;
-        
+
         if (confirm('Clear the entire graph? This will delete all statements and connections.')) {
             graph_store.clear();
-            toast_store.info(`Graph cleared (${node_count} statements, ${connection_count} connections removed)`);
+            toast_store.info(
+                `Graph cleared (${node_count} statements, ${connection_count} connections removed)`
+            );
         }
     }
 </script>

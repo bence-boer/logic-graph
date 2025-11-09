@@ -5,19 +5,10 @@
     import { toast_store } from '$lib/stores/toast.svelte';
     import { trigger_import_dialog } from '$lib/utils/import';
     import { validate_graph } from '$lib/utils/validation';
-    import { ConnectionType, SelectionTypeEnum } from '$lib/types/graph';
+    import { SelectionTypeEnum } from '$lib/types/graph';
     import HelpModal from '$lib/components/ui/HelpModal.svelte';
     import ExportModal from '$lib/components/ui/ExportModal.svelte';
-    import {
-        Plus,
-        Download,
-        Upload,
-        CirclePlus,
-        Link,
-        Trash2,
-        Search,
-        HelpCircle
-    } from '@lucide/svelte';
+    import { FileActions, EditActions, UtilityActions } from './TopToolbar';
 
     interface Props {
         show_help?: boolean;
@@ -34,10 +25,17 @@
                 graph_store.load_graph(graph);
                 const node_count = graph.nodes?.length || 0;
                 const connection_count = graph.connections?.length || 0;
-                toast_store.success(`Graph imported: ${node_count} statements, ${connection_count} connections`);
+                toast_store.success(
+                    `Graph imported: ${node_count} statements, ${connection_count} connections`
+                );
             } else {
-                const error_summary = validation.errors.slice(0, 3).map((e) => e.message).join('; ');
-                toast_store.error(`Invalid graph: ${error_summary}${validation.errors.length > 3 ? '...' : ''}`);
+                const error_summary = validation.errors
+                    .slice(0, 3)
+                    .map((e) => e.message)
+                    .join('; ');
+                toast_store.error(
+                    `Invalid graph: ${error_summary}${validation.errors.length > 3 ? '...' : ''}`
+                );
                 alert(
                     `Invalid graph:\n${validation.errors.map((e) => `- ${e.message}`).join('\n')}`
                 );
@@ -48,10 +46,12 @@
     function handle_new_graph() {
         const node_count = graph_store.nodes.length;
         const connection_count = graph_store.connections.length;
-        
+
         if (confirm('Create a new graph? This will clear the current graph.')) {
             graph_store.clear();
-            toast_store.info(`New graph created (cleared ${node_count} statements, ${connection_count} connections)`);
+            toast_store.info(
+                `New graph created (cleared ${node_count} statements, ${connection_count} connections)`
+            );
         }
     }
 
@@ -86,12 +86,18 @@
         } else if (selected_type === SelectionTypeEnum.CONNECTION) {
             const connection = graph_store.connections.find((c) => c.id === selected_id);
             if (connection) {
-                const source_names = connection.sources.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
-                const target_names = connection.targets.map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown').join(', ');
-                
+                const source_names = connection.sources
+                    .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+                    .join(', ');
+                const target_names = connection.targets
+                    .map((id) => graph_store.nodes.find((n) => n.id === id)?.name || 'Unknown')
+                    .join(', ');
+
                 if (confirm(`Delete connection?\n[${source_names}] → [${target_names}]`)) {
                     graph_store.remove_connection(selected_id);
-                    toast_store.success(`Connection deleted: [${source_names}] → [${target_names}]`);
+                    toast_store.success(
+                        `Connection deleted: [${source_names}] → [${target_names}]`
+                    );
                     selection_store.clear_selection();
                 }
             }
@@ -102,76 +108,27 @@
 <div
     class="fixed bottom-4 left-1/2 z-1000 flex -translate-x-1/2 items-center gap-2 rounded-lg border border-(--border-default) bg-(--bg-elevated) shadow-(--shadow-md) backdrop-blur-md"
 >
-    <div class="flex items-center gap-1.5">
-        <button
-            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
-            onclick={handle_new_graph}
-            title="New Graph"
-        >
-            <Plus size={18} />
-        </button>
-        <button
-            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
-            onclick={handle_import}
-            title="Import JSON"
-        >
-            <Download size={18} />
-        </button>
-        <button
-            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
-            onclick={() => (show_export = true)}
-            title="Export"
-        >
-            <Upload size={18} />
-        </button>
-    </div>
+    <FileActions
+        on_new_graph={handle_new_graph}
+        on_import={handle_import}
+        on_export={() => (show_export = true)}
+    />
 
     <div class="h-6 w-px bg-(--border-default)"></div>
 
-    <div class="flex items-center gap-2">
-        <button
-            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
-            onclick={handle_add_node}
-            title="Add Statement"
-        >
-            <CirclePlus size={18} />
-        </button>
-        <button
-            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
-            onclick={handle_add_connection}
-            title="Add Connection"
-        >
-            <Link size={18} />
-        </button>
-        <button
-            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--accent-secondary) hover:bg-[rgba(239,68,68,0.1)] hover:text-(--accent-secondary) active:scale-98"
-            onclick={handle_delete_selected}
-            title="Delete Selected"
-        >
-            <Trash2 size={18} />
-        </button>
-    </div>
+    <EditActions
+        on_add_node={handle_add_node}
+        on_add_connection={handle_add_connection}
+        on_delete_selected={handle_delete_selected}
+    />
 
     <div class="h-6 w-px bg-(--border-default)"></div>
 
-    <div class="flex items-center gap-2">
-        <button
-            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98 {ui_store.search_panel_open
-                ? 'border-(--border-hover) bg-(--bg-secondary)'
-                : ''}"
-            onclick={() => ui_store.toggle_search_panel()}
-            title="Search (Ctrl+F)"
-        >
-            <Search size={18} />
-        </button>
-        <button
-            class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
-            onclick={() => (show_help = true)}
-            title="Help (?)"
-        >
-            <HelpCircle size={18} />
-        </button>
-    </div>
+    <UtilityActions
+        on_toggle_search={() => ui_store.toggle_search_panel()}
+        on_show_help={() => (show_help = true)}
+        search_panel_open={ui_store.search_panel_open}
+    />
 </div>
 
 <HelpModal bind:is_open={show_help} onclose={() => (show_help = false)} />

@@ -1,224 +1,34 @@
 /**
- * Export utilities for saving graphs to various formats
+ * HTML export utilities for logic graphs
+ *
+ * Provides functionality to export graphs as standalone HTML files
+ * with embedded D3 visualization code.
  */
 
 import type { LogicGraph } from '$lib/types/graph';
-
-/**
- * Export graph as JSON string
- */
-export function export_graph_to_json(graph: LogicGraph): string {
-    return JSON.stringify(graph, null, 2);
-}
-
-/**
- * Trigger a download of the graph as a JSON file
- */
-export function download_graph_as_json(graph: LogicGraph, filename = 'logic-graph.json'): void {
-    const json_string = export_graph_to_json(graph);
-    const blob = new Blob([json_string], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-
-    URL.revokeObjectURL(url);
-}
-
-/**
- * Export SVG to string with embedded styles
- */
-export function export_to_svg(svg_element?: SVGSVGElement): string {
-    const svg_node = svg_element || document.querySelector('svg.graph-canvas');
-    if (!svg_node) {
-        throw new Error('No SVG element found');
-    }
-
-    // Ensure we have an SVGSVGElement
-    if (!(svg_node instanceof SVGSVGElement)) {
-        throw new Error('Element is not an SVG element');
-    }
-
-    // Clone the SVG to avoid modifying the original
-    const svg_clone = svg_node.cloneNode(true) as SVGSVGElement;
-
-    // Get the bounding box of the content
-    const bbox = svg_node.getBBox();
-    const padding = 40;
-
-    // Set viewBox to content bounds with padding
-    svg_clone.setAttribute(
-        'viewBox',
-        `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + padding * 2} ${bbox.height + padding * 2}`
-    );
-    svg_clone.setAttribute('width', `${bbox.width + padding * 2}`);
-    svg_clone.setAttribute('height', `${bbox.height + padding * 2}`);
-
-    // Embed CSS styles
-    const style = document.createElement('style');
-    style.textContent = `
-        .graph-canvas {
-            background: #1a1a1a;
-        }
-        .link {
-            opacity: 0.8;
-        }
-        .link-implication {
-            stroke: #7c3aed;
-        }
-        .link-contradiction {
-            stroke: #ef4444;
-        }
-        circle {
-            fill: #4a5568;
-            stroke: #3a3a3a;
-            stroke-width: 2;
-        }
-        .node-label {
-            fill: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 12px;
-            text-anchor: middle;
-            user-select: none;
-        }
-    `;
-    svg_clone.insertBefore(style, svg_clone.firstChild);
-
-    const serializer = new XMLSerializer();
-    let svg_string = serializer.serializeToString(svg_clone);
-
-    // Add XML declaration
-    svg_string = '<?xml version="1.0" standalone="no"?>\r\n' + svg_string;
-
-    return svg_string;
-}
-
-/**
- * Download SVG as file
- */
-export function download_as_svg(filename = 'logic-graph.svg', svg_element?: SVGSVGElement): void {
-    const svg_string = export_to_svg(svg_element);
-    const blob = new Blob([svg_string], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-
-    URL.revokeObjectURL(url);
-}
-
-/**
- * Export to PNG or JPEG with custom dimensions and scale
- */
-export async function export_to_image(
-    format: 'png' | 'jpeg',
-    options: {
-        svg_element?: SVGSVGElement;
-        scale?: number;
-        background_color?: string;
-    } = {}
-): Promise<Blob> {
-    const { svg_element, scale = 2, background_color } = options;
-
-    const svg_string = export_to_svg(svg_element);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
-        throw new Error('Failed to get canvas context');
-    }
-
-    const img = new Image();
-    const svg_blob = new Blob([svg_string], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(svg_blob);
-
-    return new Promise((resolve, reject) => {
-        img.onload = () => {
-            // Apply scale for higher quality
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
-
-            // Scale the context
-            ctx.scale(scale, scale);
-
-            // Fill background
-            const bg_color = background_color || (format === 'jpeg' ? '#1a1a1a' : 'transparent');
-            if (bg_color !== 'transparent') {
-                ctx.fillStyle = bg_color;
-                ctx.fillRect(0, 0, img.width, img.height);
-            }
-
-            ctx.drawImage(img, 0, 0);
-
-            canvas.toBlob(
-                (blob) => {
-                    URL.revokeObjectURL(url);
-                    if (blob) {
-                        resolve(blob);
-                    } else {
-                        reject(new Error('Failed to create blob'));
-                    }
-                },
-                `image/${format}`,
-                0.95
-            );
-        };
-
-        img.onerror = () => {
-            URL.revokeObjectURL(url);
-            reject(new Error('Failed to load image'));
-        };
-
-        img.src = url;
-    });
-}
-
-/**
- * Download as PNG
- */
-export async function download_as_png(
-    filename = 'logic-graph.png',
-    svg_element?: SVGSVGElement
-): Promise<void> {
-    const blob = await export_to_image('png', { svg_element, scale: 2 });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-
-    URL.revokeObjectURL(url);
-}
-
-/**
- * Download as JPEG
- */
-export async function download_as_jpeg(
-    filename = 'logic-graph.jpg',
-    svg_element?: SVGSVGElement
-): Promise<void> {
-    const blob = await export_to_image('jpeg', {
-        svg_element,
-        scale: 2,
-        background_color: '#1a1a1a'
-    });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-
-    URL.revokeObjectURL(url);
-}
+import { trigger_download } from './download';
 
 /**
  * Export as standalone HTML with full D3 visualization
+ *
+ * Creates a complete, self-contained HTML file that includes:
+ * - D3.js library from CDN
+ * - Full graph data embedded as JSON
+ * - Interactive force-directed visualization
+ * - Zoom and pan controls
+ * - Node dragging functionality
+ *
+ * The exported HTML file can be opened in any modern browser without
+ * requiring a web server or additional dependencies.
+ *
+ * @param graph - The graph to export
+ * @returns Complete HTML document as string
+ *
+ * @example
+ * ```ts
+ * const html = export_to_html(graph);
+ * // html is a complete standalone document
+ * ```
  */
 export function export_to_html(graph: LogicGraph): string {
     const graph_json = JSON.stringify(graph, null, 2);
@@ -470,16 +280,20 @@ export function export_to_html(graph: LogicGraph): string {
 
 /**
  * Download as HTML
+ *
+ * Exports the graph as a standalone HTML file and triggers a browser download.
+ * The exported file can be opened directly in a browser for viewing and interaction.
+ *
+ * @param graph - The graph to export
+ * @param filename - Name for the downloaded file (default: 'logic-graph.html')
+ *
+ * @example
+ * ```ts
+ * download_as_html(graph, 'my-graph.html');
+ * ```
  */
 export function download_as_html(graph: LogicGraph, filename = 'logic-graph.html'): void {
     const html_string = export_to_html(graph);
     const blob = new Blob([html_string], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-
-    URL.revokeObjectURL(url);
+    trigger_download(blob, filename);
 }

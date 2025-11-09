@@ -40,13 +40,6 @@
         )
     );
 
-    // Get selected option labels
-    let selected_labels = $derived(
-        selected
-            .map((value) => options.find((opt) => opt.value === value)?.label)
-            .filter(Boolean) as string[]
-    );
-
     function toggle_dropdown() {
         if (!disabled) {
             is_open = !is_open;
@@ -114,7 +107,7 @@
         <!-- Selected chips -->
         {#if selected.length > 0}
             <div class="flex flex-wrap gap-1.5">
-                {#each selected as value}
+                {#each selected as value (value)}
                     {@const option = options.find((opt) => opt.value === value)}
                     {#if option}
                         <div
@@ -141,7 +134,7 @@
         <!-- Dropdown trigger -->
         <button
             id={multiselect_id}
-            class="flex cursor-pointer items-center justify-between rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2 text-left font-sans text-sm text-white transition-all duration-200 {disabled
+            class="flex w-full cursor-pointer items-center rounded border border-neutral-700 bg-neutral-800 px-3 py-2 text-left text-sm text-neutral-300 transition-colors {disabled
                 ? 'cursor-not-allowed opacity-50'
                 : 'hover:border-neutral-600 focus:border-purple-600 focus:outline-none'} {selected.length >
             0
@@ -183,7 +176,7 @@
                     {#if filtered_options.length === 0}
                         <div class="p-4 text-center text-sm text-neutral-500">No options found</div>
                     {:else}
-                        {#each filtered_options as option}
+                        {#each filtered_options as option (option.value)}
                             {@const is_selected = selected.includes(option.value)}
                             {@const is_disabled =
                                 !!max_selections &&

@@ -60,7 +60,9 @@
                     break;
             }
 
-            toast_store.success(`Graph exported as ${export_format.toUpperCase()}: ${filename} (${node_count} statements, ${connection_count} connections)`);
+            toast_store.success(
+                `Graph exported as ${export_format.toUpperCase()}: ${filename} (${node_count} statements, ${connection_count} connections)`
+            );
             handle_close();
         } catch (error) {
             console.error('Export failed:', error);

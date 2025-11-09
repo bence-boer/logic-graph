@@ -51,7 +51,7 @@
 
             <div class="flex-1 overflow-y-auto p-6">
                 <div class="flex flex-col gap-2">
-                    {#each keyboard_shortcuts as shortcut}
+                    {#each keyboard_shortcuts as shortcut (shortcut.key)}
                         <div
                             class="grid grid-cols-[180px_1fr] items-center gap-6 rounded-md bg-neutral-800 px-4 py-2"
                         >

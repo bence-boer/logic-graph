@@ -1,38 +1,38 @@
 {
   "nodes": [
     {
-      "id": "1",
+      "id": "550e8400-e29b-41d4-a716-446655440001",
       "name": "All humans are mortal",
       "description": "Universal statement about human mortality"
     },
     {
-      "id": "2",
+      "id": "550e8400-e29b-41d4-a716-446655440002",
       "name": "Socrates is human",
       "description": "Particular statement about Socrates"
     },
     {
-      "id": "3",
+      "id": "550e8400-e29b-41d4-a716-446655440003",
       "name": "Socrates is mortal",
       "description": "Logical conclusion from premises"
     },
     {
-      "id": "4",
+      "id": "550e8400-e29b-41d4-a716-446655440004",
       "name": "Socrates is immortal",
       "description": "Contradicts the conclusion"
     }
   ],
   "connections": [
     {
-      "id": "c1",
+      "id": "550e8400-e29b-41d4-a716-446655440011",
       "type": "implication",
-      "sources": ["1", "2"],
-      "targets": ["3"]
+      "sources": ["550e8400-e29b-41d4-a716-446655440001", "550e8400-e29b-41d4-a716-446655440002"],
+      "targets": ["550e8400-e29b-41d4-a716-446655440003"]
     },
     {
-      "id": "c2",
+      "id": "550e8400-e29b-41d4-a716-446655440012",
       "type": "contradiction",
-      "sources": ["3"],
-      "targets": ["4"]
+      "sources": ["550e8400-e29b-41d4-a716-446655440003"],
+      "targets": ["550e8400-e29b-41d4-a716-446655440004"]
     }
   ],
   "metadata": {

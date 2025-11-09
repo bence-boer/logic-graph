@@ -25,8 +25,7 @@ export default defineConfig(
             // typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
             // see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
             'no-undef': 'off',
-            // Enforce 4 spaces for indentation
-            indent: ['error', 4, { SwitchCase: 1 }],
+            // Note: indent rule is disabled because Prettier handles formatting
             // Enforce snake_case naming convention
             '@typescript-eslint/naming-convention': [
                 'error',
