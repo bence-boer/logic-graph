@@ -66,11 +66,7 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
         ctrl: true,
         description: 'Add new node',
         action: () => {
-            const name = prompt('Enter node name:');
-            if (name) {
-                const description = prompt('Enter node description (optional):') || '';
-                graph_store.add_node({ name, description });
-            }
+            ui_store.open_create_node_form();
         }
     },
     {

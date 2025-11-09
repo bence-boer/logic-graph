@@ -36,50 +36,15 @@
     }
 
     function handle_add_node() {
-        const name = prompt('Enter node name:');
-        if (name && name.trim()) {
-            const description = prompt('Enter node description (optional):') || '';
-            graph_store.add_node({
-                name: name.trim(),
-                description: description.trim()
-            });
-        }
+        ui_store.open_create_node_form();
     }
 
     function handle_add_connection() {
-        const nodes = graph_store.nodes;
-        if (nodes.length < 2) {
+        if (graph_store.nodes.length < 2) {
             alert('You need at least 2 nodes to create a connection');
             return;
         }
-
-        // Simple prompt-based creation (will be replaced with proper UI later)
-        const type_str = prompt('Connection type (implication or contradiction):');
-        if (!type_str) return;
-
-        const type =
-            type_str.toLowerCase() === 'contradiction'
-                ? ConnectionType.CONTRADICTION
-                : ConnectionType.IMPLICATION;
-
-        const source_ids_str = prompt(
-            `Enter source node IDs (comma-separated):\n${nodes.map((n) => `${n.id}: ${n.name}`).join('\n')}`
-        );
-        if (!source_ids_str) return;
-
-        const target_ids_str = prompt(
-            `Enter target node IDs (comma-separated):\n${nodes.map((n) => `${n.id}: ${n.name}`).join('\n')}`
-        );
-        if (!target_ids_str) return;
-
-        const sources = source_ids_str.split(',').map((s) => s.trim());
-        const targets = target_ids_str.split(',').map((s) => s.trim());
-
-        graph_store.add_connection({
-            type,
-            sources,
-            targets
-        });
+        ui_store.open_create_connection_form();
     }
 
     function handle_delete_selected() {
