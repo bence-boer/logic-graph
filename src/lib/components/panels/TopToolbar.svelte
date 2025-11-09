@@ -1,6 +1,7 @@
 <script lang="ts">
     import { graph_store } from '$lib/stores/graph.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
     import { trigger_import_dialog } from '$lib/utils/import';
     import { validate_graph } from '$lib/utils/validation';
     import { ConnectionType } from '$lib/types/graph';
@@ -137,6 +138,14 @@
     <div class="toolbar-divider"></div>
 
     <div class="toolbar-section">
+        <button
+            class="toolbar-btn {ui_store.search_panel_open ? 'active' : ''}"
+            onclick={() => ui_store.toggle_search_panel()}
+            title="Search (Ctrl+F)"
+        >
+            <span class="icon">🔍</span>
+            <span class="label">Search</span>
+        </button>
         <button class="toolbar-btn" onclick={() => (show_help = true)} title="Help (?)">
             <span class="icon">❓</span>
             <span class="label">Help</span>

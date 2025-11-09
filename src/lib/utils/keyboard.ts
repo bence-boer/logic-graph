@@ -95,6 +95,14 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
         }
     },
     {
+        key: 'f',
+        ctrl: true,
+        description: 'Toggle search panel',
+        action: () => {
+            ui_store.toggle_search_panel();
+        }
+    },
+    {
         key: 'l',
         ctrl: true,
         description: 'Toggle left panel',

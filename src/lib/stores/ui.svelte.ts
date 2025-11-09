@@ -8,6 +8,7 @@ function create_ui_store() {
     let _right_panel_open = $state(false);
     let _show_labels = $state(true);
     let _show_descriptions = $state(false);
+    let _search_panel_open = $state(false);
 
     return {
         get left_panel_open() {
@@ -38,6 +39,13 @@ function create_ui_store() {
             _show_descriptions = value;
         },
 
+        get search_panel_open() {
+            return _search_panel_open;
+        },
+        set search_panel_open(value: boolean) {
+            _search_panel_open = value;
+        },
+
         toggle_left_panel(): void {
             _left_panel_open = !_left_panel_open;
         },
@@ -52,6 +60,10 @@ function create_ui_store() {
 
         close_right_panel(): void {
             _right_panel_open = false;
+        },
+
+        toggle_search_panel(): void {
+            _search_panel_open = !_search_panel_open;
         }
     };
 }
