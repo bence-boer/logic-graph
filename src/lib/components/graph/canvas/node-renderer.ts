@@ -32,6 +32,7 @@ const NODE_CONFIG = {
  * @param hovered_node_id - ID of currently hovered node, or null
  * @param connected_node_ids - Set of node IDs connected to hovered node
  * @param on_hover - Callback function when node hover state changes
+ * @param svg_element - The root SVG element to get zoom transform from
  * @returns Promise that resolves when node dimensions have been calculated
  */
 export function render_nodes(
@@ -53,7 +54,8 @@ export function render_nodes(
     },
     hovered_node_id: string | null,
     connected_node_ids: Set<string>,
-    on_hover: (node_id: string | null) => void
+    on_hover: (node_id: string | null) => void,
+    svg_element?: SVGSVGElement | null
 ): Promise<void> {
     const node_selection = container
         .select<SVGGElement>('g.nodes')
@@ -189,16 +191,28 @@ export function render_nodes(
     // Returns a promise that resolves when dimensions are calculated
     return new Promise<void>((resolve) => {
         requestAnimationFrame(() => {
+            // Get current zoom transform to correct for zoom scale
+            let zoom_scale = 1;
+            if (svg_element) {
+                const transform = d3.zoomTransform(svg_element);
+                zoom_scale = transform.k;
+            }
+
             merged_nodes.each(function (node) {
                 const node_group = d3.select(this);
                 const foreign_object = node_group.select('foreignObject');
-                const container_div = foreign_object.select('.node-container').node() as HTMLElement;
+                const container_div = foreign_object
+                    .select('.node-container')
+                    .node() as HTMLElement;
 
                 if (container_div) {
-                    // Get the actual rendered height
+                    // Get the actual rendered dimensions in screen pixels
                     const bbox = container_div.getBoundingClientRect();
-                    const height = Math.max(bbox.height, NODE_CONFIG.MIN_HEIGHT);
-                    const width = Math.min(bbox.width, NODE_CONFIG.MAX_WIDTH);
+
+                    // Convert to SVG coordinate space by dividing by zoom scale
+                    // This ensures dimensions remain constant regardless of zoom level
+                    const height = Math.max(bbox.height / zoom_scale, NODE_CONFIG.MIN_HEIGHT);
+                    const width = Math.min(bbox.width / zoom_scale, NODE_CONFIG.MAX_WIDTH);
 
                     // Update foreignObject dimensions and center it
                     foreign_object

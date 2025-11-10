@@ -1,14 +1,113 @@
 <script lang="ts">
     import { ui_store } from '$lib/stores/ui.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
+    import {
+        search_store,
+        SearchFilterType,
+        CONNECTION_TYPE_FILTER_VALUE
+    } from '$lib/stores/search.svelte';
+    import { selection_store } from '$lib/stores/selection.svelte';
+    import type { LogicNode, LogicConnection } from '$lib/types/graph';
+    import { search_graph } from '$lib/utils/search';
+    import { SearchInput, SearchFilters, SearchResults } from './SearchPanel';
 
     let is_open = $derived(ui_store.left_panel_open);
-    let node_count = $derived(graph_store.nodes.length);
-    let connection_count = $derived(graph_store.connections.length);
-    let graph_statement = $derived(graph_store.metadata.statement);
+
+    // Editable project name
+    let edit_name_value = $state(graph_store.metadata.statement);
+    let original_name_value = $state(graph_store.metadata.statement);
+
+    // Watch for external changes to metadata
+    $effect(() => {
+        const current_metadata = graph_store.metadata.statement;
+        if (current_metadata !== original_name_value) {
+            edit_name_value = current_metadata;
+            original_name_value = current_metadata;
+        }
+    });
+
+    // Search functionality
+    let search_results = $derived.by(() => {
+        return search_graph(
+            { nodes: graph_store.nodes, connections: graph_store.connections },
+            {
+                query: search_store.query,
+                filter_type: search_store.filter_type,
+                connection_type_filter: search_store.connection_type_filter
+            }
+        );
+    });
 
     function toggle_panel() {
         ui_store.toggle_left_panel();
+    }
+
+    function save_name() {
+        const trimmed = edit_name_value.trim();
+        if (trimmed && trimmed !== original_name_value) {
+            graph_store.metadata = {
+                ...graph_store.metadata,
+                statement: trimmed
+            };
+            graph_store.update_modified();
+            original_name_value = trimmed;
+        } else if (!trimmed) {
+            // If empty, restore original value
+            edit_name_value = original_name_value;
+        }
+    }
+
+    function cancel_editing() {
+        edit_name_value = original_name_value;
+    }
+
+    function handle_name_keydown(event: KeyboardEvent) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            (event.target as HTMLInputElement).blur();
+        } else if (event.key === 'Escape') {
+            event.preventDefault();
+            cancel_editing();
+            (event.target as HTMLInputElement).blur();
+        }
+    }
+
+    function handle_name_focus() {
+        // Store the current value as the original when focusing
+        original_name_value = edit_name_value;
+    }
+
+    function handle_name_blur() {
+        // Save on blur (unless Escape was pressed, which already restored)
+        save_name();
+    }
+
+    function handle_query_change(value: string) {
+        search_store.query = value;
+    }
+
+    function handle_clear() {
+        search_store.clear();
+    }
+
+    function handle_filter_change(filter: SearchFilterType) {
+        search_store.filter_type = filter;
+    }
+
+    function handle_connection_type_change(
+        type: (typeof CONNECTION_TYPE_FILTER_VALUE)[keyof typeof CONNECTION_TYPE_FILTER_VALUE]
+    ) {
+        search_store.connection_type_filter = type;
+    }
+
+    function handle_select_node(node: LogicNode) {
+        selection_store.select_node(node.id);
+    }
+
+    function handle_select_connection(conn: LogicConnection) {
+        if (conn.id) {
+            selection_store.select_connection(conn.id);
+        }
     }
 </script>
 
@@ -47,32 +146,46 @@
         <div
             class="flex flex-1 flex-col gap-4 overflow-y-auto p-3 max-md:p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:bg-(--border-default) [&::-webkit-scrollbar-thumb:hover]:bg-(--border-hover) [&::-webkit-scrollbar-track]:bg-transparent"
         >
-            <div class="flex flex-col gap-3">
-                <h2 class="m-0 text-base font-semibold text-(--text-primary)">Graph Info</h2>
+            <!-- Project Name Section (Editable) -->
+            <div class="flex flex-col gap-2">
+                <h2 class="m-0 text-base font-semibold text-(--text-primary)">Project</h2>
                 <div class="flex flex-col gap-2">
-                    <div
-                        class="flex items-center justify-between rounded-md bg-(--bg-secondary) p-2"
-                    >
-                        <span class="text-sm text-(--text-secondary)">Statement:</span>
-                        <span class="text-sm font-medium text-(--text-primary)"
-                            >{graph_statement}</span
-                        >
-                    </div>
-                    <div
-                        class="flex items-center justify-between rounded-md bg-(--bg-secondary) p-2"
-                    >
-                        <span class="text-sm text-(--text-secondary)">Statements:</span>
-                        <span class="text-sm font-medium text-(--text-primary)">{node_count}</span>
-                    </div>
-                    <div
-                        class="flex items-center justify-between rounded-md bg-(--bg-secondary) p-2"
-                    >
-                        <span class="text-sm text-(--text-secondary)">Connections:</span>
-                        <span class="text-sm font-medium text-(--text-primary)"
-                            >{connection_count}</span
-                        >
-                    </div>
+                    <input
+                        type="text"
+                        bind:value={edit_name_value}
+                        onfocus={handle_name_focus}
+                        onblur={handle_name_blur}
+                        onkeydown={handle_name_keydown}
+                        class="rounded-md border border-(--border-default) bg-(--bg-secondary) px-3 py-2 text-sm text-(--text-primary) transition-all duration-200 focus:border-(--accent-primary) focus:bg-(--bg-primary) focus:outline-none"
+                        placeholder="Project name"
+                    />
                 </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="flex flex-col gap-3">
+                <h2 class="m-0 text-base font-semibold text-(--text-primary)">Search</h2>
+
+                <SearchInput
+                    bind:value={search_store.query}
+                    onchange={handle_query_change}
+                    onclear={handle_clear}
+                />
+
+                <SearchFilters
+                    filter_type={search_store.filter_type}
+                    connection_type_filter={search_store.connection_type_filter}
+                    on_filter_change={handle_filter_change}
+                    on_connection_type_change={handle_connection_type_change}
+                />
+
+                <SearchResults
+                    nodes={search_results.nodes}
+                    connections={search_results.connections}
+                    query={search_store.query}
+                    on_select_node={handle_select_node}
+                    on_select_connection={handle_select_connection}
+                />
             </div>
         </div>
     {/if}

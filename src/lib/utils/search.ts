@@ -1,5 +1,5 @@
-import type { LogicNode, LogicConnection, ConnectionType } from '$lib/types/graph';
-import { SearchFilterType, CONNECTION_TYPE_FILTER_VALUE } from '$lib/stores/search.svelte';
+import { CONNECTION_TYPE_FILTER_VALUE, SearchFilterType } from '$lib/stores/search.svelte';
+import type { ConnectionType, LogicConnection, LogicNode } from '$lib/types/graph';
 
 /**
  * Options for searching the graph
@@ -53,7 +53,7 @@ export function search_graph(
             : graph.nodes.filter((node) => {
                   const matches_query =
                       node.statement.toLowerCase().includes(query) ||
-                      node.details.toLowerCase().includes(query) ||
+                      (node.details?.toLowerCase().includes(query) ?? false) ||
                       node.id.toLowerCase().includes(query);
                   return matches_query;
               });
@@ -72,7 +72,7 @@ export function search_graph(
                   }
 
                   // Match by connection ID
-                  const matches_query = conn.id.toLowerCase().includes(query);
+                  const matches_query = conn.id?.toLowerCase().includes(query) ?? false;
                   return matches_query;
               });
 

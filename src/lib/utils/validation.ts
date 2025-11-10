@@ -228,7 +228,9 @@ export function validate_graph(graph: LogicGraph): ValidationResult {
     }
 
     // Check for duplicate connection IDs (only check defined IDs)
-    const connection_ids = graph.connections.map((connection) => connection.id).filter((id): id is string => id !== undefined);
+    const connection_ids = graph.connections
+        .map((connection) => connection.id)
+        .filter((id): id is string => id !== undefined);
     const duplicate_connection_ids = connection_ids.filter(
         (id, index) => connection_ids.indexOf(id) !== index
     );

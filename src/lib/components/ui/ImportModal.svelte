@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { X, Upload, HelpCircle, FileText } from '@lucide/svelte';
     import type { LogicGraph } from '$lib/types/graph';
+    import { CircleQuestionMark, FileText, Upload, X } from '@lucide/svelte';
 
     interface Props {
         is_open: boolean;
@@ -122,7 +122,7 @@
                         aria-label={show_help ? 'Hide help' : 'Show help'}
                         title={show_help ? 'Hide help' : 'Show help'}
                     >
-                        <HelpCircle size={18} />
+                        <CircleQuestionMark size={18} />
                     </button>
                     <button
                         class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-white transition-all duration-200 hover:border-neutral-600 hover:bg-neutral-800 active:scale-98"
@@ -259,7 +259,7 @@
                 <button
                     class="flex cursor-pointer items-center justify-center rounded-md border p-2 text-white transition-all duration-200 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 {is_importing
                         ? 'border-transparent bg-transparent opacity-50'
-                        : 'border-(--accent-primary) bg-(--accent-primary) hover:border-[#6d28d9] hover:bg-[#6d28d9]'}"
+                        : 'border-(--accent-primary) bg-(--accent-primary) hover:border-accent-700 hover:bg-accent-700'}"
                     onclick={handle_import}
                     disabled={is_importing || !json_text.trim()}
                     title={is_importing ? 'Importing...' : 'Import'}

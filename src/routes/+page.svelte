@@ -3,7 +3,6 @@
     import FloatingToolbar from '$lib/components/panels/FloatingToolbar.svelte';
     import LeftPanel from '$lib/components/panels/LeftPanel.svelte';
     import RightPanel from '$lib/components/panels/RightPanel.svelte';
-    import SearchPanel from '$lib/components/panels/SearchPanel.svelte';
     import LoadingOverlay from '$lib/components/ui/LoadingOverlay.svelte';
     import ToastContainer from '$lib/components/ui/ToastContainer.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
@@ -18,9 +17,6 @@
     <LeftPanel />
     <RightPanel />
     <GraphCanvas bind:this={graph_canvas} />
-    {#if ui_store.search_panel_open}
-        <SearchPanel />
-    {/if}
 
     <!-- Mobile menu button -->
     <button

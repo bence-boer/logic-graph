@@ -107,11 +107,7 @@
 
     <div class="h-6 w-px bg-(--border-default) max-md:h-5"></div>
 
-    <UtilityActions
-        on_toggle_search={() => ui_store.toggle_search_panel()}
-        on_show_help={() => (show_help = true)}
-        search_panel_open={ui_store.search_panel_open}
-    />
+    <UtilityActions on_show_help={() => (show_help = true)} />
 </div>
 
 <HelpModal bind:is_open={show_help} onclose={() => (show_help = false)} />

@@ -35,7 +35,11 @@ export function get_node_reasons(
     connections: LogicConnection[]
 ): NodeConnectionRelation[] {
     return connections
-        .filter((connection) => connection.type === ConnectionType.IMPLICATION && connection.targets.includes(node_id))
+        .filter(
+            (connection) =>
+                connection.type === ConnectionType.IMPLICATION &&
+                connection.targets.includes(node_id)
+        )
         .flatMap((connection) =>
             connection.sources.map((source_id) => ({
                 node_id: source_id,
@@ -66,7 +70,11 @@ export function get_node_consequences(
     connections: LogicConnection[]
 ): NodeConnectionRelation[] {
     return connections
-        .filter((connection) => connection.type === ConnectionType.IMPLICATION && connection.sources.includes(node_id))
+        .filter(
+            (connection) =>
+                connection.type === ConnectionType.IMPLICATION &&
+                connection.sources.includes(node_id)
+        )
         .flatMap((connection) =>
             connection.targets.map((target_id) => ({
                 node_id: target_id,
@@ -103,7 +111,9 @@ export function get_node_contradictions(
         )
         .flatMap((connection) => {
             // Get the other nodes (not the current node)
-            const other_nodes = [...connection.sources, ...connection.targets].filter((id) => id !== node_id);
+            const other_nodes = [...connection.sources, ...connection.targets].filter(
+                (id) => id !== node_id
+            );
             return other_nodes.map((other_id) => ({
                 node_id: other_id,
                 connection_id: connection.id!, // ID will always exist at runtime (normalized during import)

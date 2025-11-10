@@ -56,7 +56,8 @@ function create_graph_store() {
             _nodes = _nodes.filter((node) => node.id !== node_id);
             // Also remove any connections involving this node
             _connections = _connections.filter(
-                (connection) => !connection.sources.includes(node_id) && !connection.targets.includes(node_id)
+                (connection) =>
+                    !connection.sources.includes(node_id) && !connection.targets.includes(node_id)
             );
             this.update_modified();
         },

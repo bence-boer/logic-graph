@@ -42,6 +42,10 @@
     // SVG container reference
     let svg_zoom_container: d3.Selection<SVGGElement, unknown, null, undefined> | null = null;
 
+    // Track last zoom scale to detect when to re-render
+    let last_zoom_scale = 1;
+    const ZOOM_THRESHOLD = 0.1; // Only re-render if zoom changes by more than 10%
+
     // Reactive references to store data
     let nodes = $derived(graph_store.nodes);
     let connections = $derived(graph_store.connections);
@@ -129,6 +133,16 @@
             .on('zoom', (event) => {
                 if (svg_zoom_container) {
                     svg_zoom_container.attr('transform', event.transform);
+
+                    // Only re-render nodes if zoom scale changed significantly
+                    // This avoids expensive re-renders during pan operations
+                    const scale_change = Math.abs(event.transform.k - last_zoom_scale);
+                    const relative_change = scale_change / last_zoom_scale;
+
+                    if (relative_change > ZOOM_THRESHOLD) {
+                        last_zoom_scale = event.transform.k;
+                        render_graph();
+                    }
                 }
             });
 
@@ -165,15 +179,17 @@
             hovered_node_id,
             is_link_connected_to_hovered
         );
-        
+
         // Render nodes and update collision radii when dimensions are calculated
+        // Pass svg_container so node renderer can account for zoom transform
         render_nodes(
             svg_zoom_container,
             simulation_nodes,
             drag_handlers,
             hovered_node_id,
             connected_node_ids,
-            handle_node_hover
+            handle_node_hover,
+            svg_container
         ).then(() => {
             // After node dimensions are calculated, update collision radii
             if (simulation) {

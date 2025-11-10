@@ -51,7 +51,9 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
                     selection_store.clear_selection();
                 }
             } else if (selected_type === 'connection') {
-                const connection = graph_store.connections.find((connection) => connection.id === selected_id);
+                const connection = graph_store.connections.find(
+                    (connection) => connection.id === selected_id
+                );
                 if (connection) {
                     const source_names = connection.sources
                         .map(
@@ -144,9 +146,9 @@ export const keyboard_shortcuts: KeyboardShortcut[] = [
     {
         key: 'f',
         ctrl: true,
-        description: 'Toggle search panel',
+        description: 'Toggle left panel (search)',
         action: () => {
-            ui_store.toggle_search_panel();
+            ui_store.toggle_left_panel();
         }
     },
     {

@@ -205,7 +205,9 @@ export function update_link_positions(
                 .filter((node) => node.id === source.id);
 
             source_width = parseFloat(source_node_group.attr('data-width') || String(source_width));
-            source_height = parseFloat(source_node_group.attr('data-height') || String(source_height));
+            source_height = parseFloat(
+                source_node_group.attr('data-height') || String(source_height)
+            );
         }
 
         if (!target.width || !target.height) {
@@ -214,7 +216,9 @@ export function update_link_positions(
                 .filter((node) => node.id === target.id);
 
             target_width = parseFloat(target_node_group.attr('data-width') || String(target_width));
-            target_height = parseFloat(target_node_group.attr('data-height') || String(target_height));
+            target_height = parseFloat(
+                target_node_group.attr('data-height') || String(target_height)
+            );
         }
 
         // Calculate intersection points at the edges of the rectangles

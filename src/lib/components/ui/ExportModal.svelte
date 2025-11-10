@@ -255,7 +255,7 @@
                 <button
                     class="flex cursor-pointer items-center justify-center rounded-md border p-2 text-white transition-all duration-200 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 {is_exporting
                         ? 'border-transparent bg-transparent opacity-50'
-                        : 'border-(--accent-primary) bg-(--accent-primary) hover:border-[#6d28d9] hover:bg-[#6d28d9]'}"
+                        : 'border-(--accent-primary) bg-(--accent-primary) hover:border-accent-700 hover:bg-accent-700'}"
                     onclick={handle_export}
                     disabled={is_exporting}
                     title={is_exporting ? 'Exporting...' : 'Export'}
