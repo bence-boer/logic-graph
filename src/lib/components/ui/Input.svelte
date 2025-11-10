@@ -2,40 +2,75 @@
     interface Props {
         value: string;
         onchange?: (value: string) => void;
+        oninput?: (value: string) => void;
+        onblur?: (value: string) => void;
         placeholder?: string;
         label?: string;
         type?: 'text' | 'number' | 'email';
         disabled?: boolean;
         required?: boolean;
+        maxlength?: number;
     }
 
     let {
         value = $bindable(''),
         onchange,
+        oninput,
+        onblur,
         placeholder = '',
         label,
         type = 'text',
         disabled = false,
-        required = false
+        required = false,
+        maxlength
     }: Props = $props();
 
     function handle_input(event: Event) {
         const target = event.target as HTMLInputElement;
         value = target.value;
+        oninput?.(target.value);
+    }
+
+    function handle_change(event: Event) {
+        const target = event.target as HTMLInputElement;
         onchange?.(target.value);
     }
 
+    function handle_blur(event: Event) {
+        const target = event.target as HTMLInputElement;
+        onblur?.(target.value);
+    }
+
+    function handle_keydown(event: KeyboardEvent) {
+        if (event.key === 'Enter') {
+            const target = event.target as HTMLInputElement;
+            onblur?.(target.value);
+        }
+    }
+
     const input_id = `input-${Math.random().toString(36).substring(2, 9)}`;
+    let char_count = $derived(maxlength ? value.length : null);
 </script>
 
 <div class="flex flex-col gap-1.5">
     {#if label}
-        <label class="text-sm font-medium text-neutral-400" for={input_id}>
-            {label}
-            {#if required}
-                <span class="text-red-500">*</span>
+        <div class="flex items-center justify-between">
+            <label class="text-sm font-medium text-neutral-400" for={input_id}>
+                {label}
+                {#if required}
+                    <span class="text-red-500">*</span>
+                {/if}
+            </label>
+            {#if maxlength}
+                <span
+                    class="text-xs {char_count && char_count > maxlength
+                        ? 'text-red-500'
+                        : 'text-neutral-500'}"
+                >
+                    {char_count}/{maxlength}
+                </span>
             {/if}
-        </label>
+        </div>
     {/if}
     <input
         id={input_id}
@@ -45,6 +80,10 @@
         {placeholder}
         {disabled}
         {required}
+        {maxlength}
         oninput={handle_input}
+        onchange={handle_change}
+        onblur={handle_blur}
+        onkeydown={handle_keydown}
     />
 </div>

@@ -26,6 +26,10 @@ export interface LogicNode {
     fy?: number | null;
     /** Node index (assigned by D3) */
     index?: number;
+    /** Rendered width (calculated during rendering) */
+    width?: number;
+    /** Rendered height (calculated during rendering) */
+    height?: number;
 }
 
 /**

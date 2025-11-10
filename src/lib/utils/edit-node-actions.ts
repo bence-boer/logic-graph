@@ -37,8 +37,6 @@ export function save_node_changes(node: LogicNode, statement: string, details: s
         statement: statement.trim(),
         details: details.trim()
     });
-
-    toast_store.success(`Statement "${statement.trim()}" updated successfully`);
 }
 
 /**

@@ -38,6 +38,7 @@
 
     let statement = $state('');
     let details = $state('');
+    let is_initialized = $state(false);
 
     // State for adding connections
     let is_adding_reason = $state(false);
@@ -50,11 +51,12 @@
     // Available nodes for connection (excluding current node)
     let available_nodes = $derived(get_available_nodes_for_connection(node_id, graph_store.nodes));
 
-    // Initialize form values when node loads
+    // Initialize form values when node loads (only once)
     $effect(() => {
-        if (node) {
+        if (node && !is_initialized) {
             statement = node.statement;
-            details = node.details;
+            details = node.details || '';
+            is_initialized = true;
         }
     });
 
@@ -129,7 +131,7 @@
         <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
             <QuickActionsBar {node} onpin_toggle={handle_pin_toggle} ondelete={handle_delete} />
 
-            <BasicNodeFields {node} bind:statement bind:details onsave={handle_save} />
+            <BasicNodeFields bind:statement bind:details onsave={handle_save} />
 
             <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 

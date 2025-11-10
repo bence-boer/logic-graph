@@ -114,7 +114,12 @@
 
     <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
         <FormField label="Statement" error={form.validation_errors.statement} required>
-            <Input bind:value={form.node_statement} placeholder="Enter statement..." required />
+            <Input
+                bind:value={form.node_statement}
+                placeholder="Enter statement..."
+                required
+                maxlength={100}
+            />
         </FormField>
 
         <FormField

@@ -57,7 +57,12 @@
             placeholder="Select a statement..."
         />
     {:else}
-        <Input bind:value={new_node_statement} placeholder="Enter statement..." required />
+        <Input
+            bind:value={new_node_statement}
+            placeholder="Enter statement..."
+            required
+            maxlength={100}
+        />
     {/if}
     <div class="flex gap-2">
         <button

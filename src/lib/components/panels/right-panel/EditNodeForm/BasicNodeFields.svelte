@@ -12,7 +12,7 @@
 </script>
 
 <div class="flex flex-col gap-3">
-    <Input bind:value={statement} label="Statement" required onchange={onsave} />
+    <Input bind:value={statement} label="Statement" required maxlength={100} onblur={onsave} />
 
     <Textarea
         bind:value={details}
@@ -20,5 +20,6 @@
         placeholder="Enter details..."
         maxlength={500}
         rows={4}
+        onblur={onsave}
     />
 </div>

@@ -17,7 +17,7 @@ export interface SimulationConfig {
     charge_strength: number;
     /** Desired distance between linked nodes */
     link_distance: number;
-    /** Radius for collision detection between nodes */
+    /** Base radius for collision detection between nodes (will be adjusted dynamically) */
     collision_radius: number;
     /** Center point [x, y] for the centering force */
     center_force: [number, number];
@@ -31,10 +31,28 @@ export interface SimulationConfig {
 export const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
     charge_strength: -300,
     link_distance: 225,
-    collision_radius: 40,
+    collision_radius: 50, // Base collision radius, will be adjusted per node
     center_force: [0, 0],
     link_strength: 0.7
 };
+
+/**
+ * Calculate dynamic collision radius for a node based on its dimensions.
+ *
+ * Uses the diagonal of the node's bounding box to ensure nodes don't overlap.
+ *
+ * @param node - The node to calculate collision radius for
+ * @param base_radius - Base collision radius as fallback
+ * @returns Collision radius in pixels
+ */
+function calculate_collision_radius(node: LogicNode, base_radius: number): number {
+    if (node.width && node.height) {
+        // Use the diagonal of the rectangle as the collision radius
+        // Add a small padding (5px) to prevent overlapping borders
+        return Math.sqrt(node.width * node.width + node.height * node.height) / 2 + 5;
+    }
+    return base_radius;
+}
 
 /**
  * Create a new D3 force simulation
@@ -70,7 +88,12 @@ export function create_simulation(
         .forceSimulation<LogicNode>(nodes)
         .force('charge', d3.forceManyBody<LogicNode>().strength(config.charge_strength))
         .force('center', d3.forceCenter(config.center_force[0], config.center_force[1]))
-        .force('collision', d3.forceCollide<LogicNode>().radius(config.collision_radius))
+        .force(
+            'collision',
+            d3
+                .forceCollide<LogicNode>()
+                .radius((node) => calculate_collision_radius(node, config.collision_radius))
+        )
         .force(
             'link',
             d3
@@ -136,6 +159,32 @@ export function update_simulation_center(
     const center_force = simulation.force<d3.ForceCenter<LogicNode>>('center');
     if (center_force) {
         center_force.x(center[0]).y(center[1]);
+    }
+}
+
+/**
+ * Update collision radii based on node dimensions
+ *
+ * Recalculates collision radii for all nodes based on their current dimensions.
+ * Should be called after node dimensions change (e.g., after text wrapping).
+ *
+ * @param simulation - The simulation to update
+ * @param base_radius - Base collision radius for nodes without dimensions
+ *
+ * @example
+ * ```ts
+ * // After node dimensions are calculated
+ * update_collision_radii(my_simulation, 50);
+ * simulation.alpha(0.3).restart();
+ * ```
+ */
+export function update_collision_radii(
+    simulation: Simulation<LogicNode, D3Link>,
+    base_radius: number
+): void {
+    const collision_force = simulation.force<d3.ForceCollide<LogicNode>>('collision');
+    if (collision_force) {
+        collision_force.radius((node) => calculate_collision_radius(node, base_radius));
     }
 }
 

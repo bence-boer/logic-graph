@@ -192,29 +192,29 @@ export function update_link_positions(
         const target_x = target.x!;
         const target_y = target.y!;
 
-        // Get the actual rectangle dimensions from the DOM
-        const source_node_group = nodes_container
-            .selectAll<SVGGElement, LogicNode>('g.node')
-            .filter((node) => node.id === source.id);
-        const target_node_group = nodes_container
-            .selectAll<SVGGElement, LogicNode>('g.node')
-            .filter((node) => node.id === target.id);
+        // Get dimensions from the node data (set during rendering)
+        let source_width = source.width || 80; // Default fallback
+        let source_height = source.height || 40;
+        let target_width = target.width || 80;
+        let target_height = target.height || 40;
 
-        const source_rect = source_node_group.select('rect').node() as SVGRectElement;
-        const target_rect = target_node_group.select('rect').node() as SVGRectElement;
+        // Also try to read from DOM if not in node data
+        if (!source.width || !source.height) {
+            const source_node_group = nodes_container
+                .selectAll<SVGGElement, LogicNode>('g.node')
+                .filter((node) => node.id === source.id);
 
-        let source_width = 60; // Default fallback
-        let source_height = 40;
-        let target_width = 60;
-        let target_height = 40;
-
-        if (source_rect) {
-            source_width = parseFloat(source_rect.getAttribute('width') || '60');
-            source_height = parseFloat(source_rect.getAttribute('height') || '40');
+            source_width = parseFloat(source_node_group.attr('data-width') || String(source_width));
+            source_height = parseFloat(source_node_group.attr('data-height') || String(source_height));
         }
-        if (target_rect) {
-            target_width = parseFloat(target_rect.getAttribute('width') || '60');
-            target_height = parseFloat(target_rect.getAttribute('height') || '40');
+
+        if (!target.width || !target.height) {
+            const target_node_group = nodes_container
+                .selectAll<SVGGElement, LogicNode>('g.node')
+                .filter((node) => node.id === target.id);
+
+            target_width = parseFloat(target_node_group.attr('data-width') || String(target_width));
+            target_height = parseFloat(target_node_group.attr('data-height') || String(target_height));
         }
 
         // Calculate intersection points at the edges of the rectangles

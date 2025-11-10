@@ -9,7 +9,8 @@
         create_simulation,
         DEFAULT_SIMULATION_CONFIG,
         sync_simulation_nodes,
-        update_simulation
+        update_simulation,
+        update_collision_radii
     } from '$lib/utils/d3/simulation';
     import { GraphTopology } from '$lib/utils/graph-algorithms';
     import type { Simulation } from 'd3';
@@ -164,6 +165,8 @@
             hovered_node_id,
             is_link_connected_to_hovered
         );
+        
+        // Render nodes and update collision radii when dimensions are calculated
         render_nodes(
             svg_zoom_container,
             simulation_nodes,
@@ -171,7 +174,14 @@
             hovered_node_id,
             connected_node_ids,
             handle_node_hover
-        );
+        ).then(() => {
+            // After node dimensions are calculated, update collision radii
+            if (simulation) {
+                update_collision_radii(simulation, DEFAULT_SIMULATION_CONFIG.collision_radius);
+                // Give the simulation a gentle nudge to adjust positions
+                simulation.alpha(0.1).restart();
+            }
+        });
     }
 
     function tick_handler() {

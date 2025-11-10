@@ -3,6 +3,7 @@
         value: string;
         onchange?: (value: string) => void;
         oninput?: (value: string) => void;
+        onblur?: (value: string) => void;
         placeholder?: string;
         label?: string;
         rows?: number;
@@ -15,6 +16,7 @@
         value = $bindable(''),
         onchange,
         oninput,
+        onblur,
         placeholder = '',
         label,
         rows = 4,
@@ -32,6 +34,18 @@
     function handle_change(event: Event) {
         const target = event.target as HTMLTextAreaElement;
         onchange?.(target.value);
+    }
+
+    function handle_blur(event: Event) {
+        const target = event.target as HTMLTextAreaElement;
+        onblur?.(target.value);
+    }
+
+    function handle_keydown(event: KeyboardEvent) {
+        if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+            const target = event.target as HTMLTextAreaElement;
+            onblur?.(target.value);
+        }
     }
 
     const textarea_id = `textarea-${Math.random().toString(36).substring(2, 9)}`;
@@ -69,5 +83,7 @@
         {maxlength}
         oninput={handle_input}
         onchange={handle_change}
+        onblur={handle_blur}
+        onkeydown={handle_keydown}
     ></textarea>
 </div>
