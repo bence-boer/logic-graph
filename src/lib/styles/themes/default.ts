@@ -151,8 +151,9 @@ export const DEFAULT_THEME: StyleTheme = {
             name: 'Active Question',
             description: 'Question node that needs an answer (undecided)',
             style: {
+                background: '#78350f', // amber-900 - Darker amber background
                 border_color: '{{colors.status.question_active}}', // Warm amber
-                border_width: '{{borders.width.emphasis}}', // Thicker for attention
+                border_width: '{{borders.width.default}}', // Thicker for attention
                 box_shadow: '{{shadows.glow_amber}}' // Subtle amber glow
             }
         },

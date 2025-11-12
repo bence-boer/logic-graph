@@ -7,6 +7,10 @@
         selected_node_id: string;
         new_node_statement: string;
         available_nodes: Array<{ value: string; label: string }>;
+        existing_label?: string;
+        new_label?: string;
+        select_placeholder?: string;
+        input_placeholder?: string;
         onmode_change: (mode: 'existing' | 'new') => void;
         onconfirm: () => void;
         oncancel: () => void;
@@ -17,6 +21,10 @@
         selected_node_id = $bindable(),
         new_node_statement = $bindable(),
         available_nodes,
+        existing_label = 'Existing Statement',
+        new_label = 'New Statement',
+        select_placeholder = 'Select a statement...',
+        input_placeholder = 'Enter statement...',
         onmode_change,
         onconfirm,
         oncancel
@@ -38,7 +46,7 @@
                 : 'border-(--border-default) bg-transparent text-(--text-primary) hover:bg-(--bg-tertiary)'}"
             onclick={() => onmode_change('existing')}
         >
-            Existing Statement
+            {existing_label}
         </button>
         <button
             class="flex-1 cursor-pointer rounded-md border px-3 py-1.5 text-sm transition-all duration-200 active:scale-98 {mode ===
@@ -47,19 +55,19 @@
                 : 'border-(--border-default) bg-transparent text-(--text-primary) hover:bg-(--bg-tertiary)'}"
             onclick={() => onmode_change('new')}
         >
-            New Statement
+            {new_label}
         </button>
     </div>
     {#if mode === 'existing'}
         <Select
             bind:value={selected_node_id}
             options={available_nodes}
-            placeholder="Select a statement..."
+            placeholder={select_placeholder}
         />
     {:else}
         <Input
             bind:value={new_node_statement}
-            placeholder="Enter statement..."
+            placeholder={input_placeholder}
             required
             maxlength={100}
         />

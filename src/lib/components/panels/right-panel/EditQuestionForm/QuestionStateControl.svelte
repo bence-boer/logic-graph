@@ -23,13 +23,13 @@
 
     let active_classes = $derived(
         current_state === QuestionState.ACTIVE
-            ? 'bg-amber-500/20 border-amber-500 text-amber-700 font-semibold'
+            ? 'bg-amber-500/20 border-amber-500 text-white font-semibold'
             : 'bg-transparent border-neutral-700 text-neutral-400 hover:border-neutral-600'
     );
 
     let resolved_classes = $derived(
         current_state === QuestionState.RESOLVED
-            ? 'bg-neutral-500/20 border-neutral-500 text-neutral-700 font-semibold'
+            ? 'bg-neutral-500/20 border-neutral-500 text-white font-semibold'
             : 'bg-transparent border-neutral-700 text-neutral-400 hover:border-neutral-600'
     );
 </script>

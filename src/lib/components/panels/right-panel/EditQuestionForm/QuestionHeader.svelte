@@ -16,8 +16,8 @@
 
     let badge_classes = $derived(
         node.question_state === QuestionState.ACTIVE
-            ? 'bg-amber-500/20 text-amber-700 border-amber-500/30'
-            : 'bg-neutral-500/20 text-neutral-700 border-neutral-500/30'
+            ? 'bg-amber-500/20 text-white border-amber-500/30'
+            : 'bg-neutral-500/20 text-white border-neutral-500/30'
     );
 </script>
 

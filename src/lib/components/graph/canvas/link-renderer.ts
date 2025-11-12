@@ -6,13 +6,25 @@
  */
 import * as d3 from 'd3';
 import type { LogicNode, D3Link } from '$lib/types/graph';
-import { ConnectionType } from '$lib/types/graph';
+import { ConnectionType, NodeType } from '$lib/types/graph';
 import { selection_store } from '$lib/stores/selection.svelte';
 import {
     get_arrow_marker_id,
     get_connection_class,
     get_connection_stroke_dasharray
 } from '$lib/utils/d3-helpers';
+
+/**
+ * Checks if a connection involves a question node (as source or target).
+ *
+ * @param link - D3 link object to check
+ * @returns True if either source or target is a question node
+ */
+function is_question_connection(link: D3Link): boolean {
+    const source = link.source as LogicNode;
+    const target = link.target as LogicNode;
+    return source.type === NodeType.QUESTION || target.type === NodeType.QUESTION;
+}
 
 /**
  * Calculates the intersection point between a line and a rectangle.
@@ -115,19 +127,33 @@ export function render_links(
         .enter()
         .append('line')
         .attr('class', (link) => `link ${get_connection_class(link.connection.type)}`)
-        .attr('stroke', (link) =>
-            link.connection.type === ConnectionType.IMPLICATION
+        .attr('stroke', (link) => {
+            // Use amber color for connections involving question nodes
+            if (is_question_connection(link)) {
+                return '#f59e0b'; // amber-500
+            }
+            return link.connection.type === ConnectionType.IMPLICATION
                 ? 'var(--link-implication)'
-                : 'var(--link-contradiction)'
-        )
+                : 'var(--link-contradiction)';
+        })
         .attr('stroke-width', 2)
         .attr('stroke-dasharray', (link) => get_connection_stroke_dasharray(link.connection.type))
-        .attr('marker-end', (link) => `url(#${get_arrow_marker_id(link.connection.type)})`)
-        .attr('marker-start', (link) =>
-            link.connection.type === ConnectionType.CONTRADICTION
+        .attr('marker-end', (link) => {
+            // Use amber arrow markers for question connections
+            if (is_question_connection(link)) {
+                return 'url(#arrow-question)';
+            }
+            return `url(#${get_arrow_marker_id(link.connection.type)})`;
+        })
+        .attr('marker-start', (link) => {
+            // Use amber arrow markers for question contradictions
+            if (is_question_connection(link) && link.connection.type === ConnectionType.CONTRADICTION) {
+                return 'url(#arrow-question-start)';
+            }
+            return link.connection.type === ConnectionType.CONTRADICTION
                 ? `url(#${get_arrow_marker_id(link.connection.type)}-start)`
-                : null
-        )
+                : null;
+        })
         .attr('cursor', 'pointer')
         .on('click', (event, link) => {
             event.stopPropagation();
@@ -148,6 +174,15 @@ export function render_links(
     // Update merged link selection
     link_selection
         .merge(link_enter)
+        .attr('stroke', (link) => {
+            // Use amber color for connections involving question nodes
+            if (is_question_connection(link)) {
+                return '#f59e0b'; // amber-500
+            }
+            return link.connection.type === ConnectionType.IMPLICATION
+                ? 'var(--link-implication)'
+                : 'var(--link-contradiction)';
+        })
         .attr('stroke-width', (link) => {
             const is_selected = selection_store.is_selected(link.connection.id!); // ID will always exist at runtime
             const is_connected = is_link_connected_to_hovered(link);

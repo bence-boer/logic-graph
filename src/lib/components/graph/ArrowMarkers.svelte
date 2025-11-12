@@ -42,4 +42,30 @@
     >
         <path d="M 10 0 L 0 5 L 10 10 z" fill="var(--link-contradiction)" />
     </marker>
+
+    <!-- Arrow marker for question connections (amber) -->
+    <marker
+        id="arrow-question"
+        viewBox="0 0 10 10"
+        refX="20"
+        refY="5"
+        markerWidth="9"
+        markerHeight="9"
+        orient="auto"
+    >
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b" />
+    </marker>
+
+    <!-- Additional marker for question contradictions (start marker, amber) -->
+    <marker
+        id="arrow-question-start"
+        viewBox="0 0 10 10"
+        refX="-10"
+        refY="5"
+        markerWidth="9"
+        markerHeight="9"
+        orient="auto"
+    >
+        <path d="M 10 0 L 0 5 L 10 10 z" fill="#f59e0b" />
+    </marker>
 </defs>
