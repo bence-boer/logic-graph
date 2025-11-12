@@ -61,9 +61,7 @@ export function validate_node(node: LogicNode): ValidationResult {
         errors.push({ field: 'statement', message: 'Node statement is required' });
     }
 
-    if (node.details === undefined || node.details === null) {
-        errors.push({ field: 'details', message: 'Node details is required' });
-    }
+    // Note: details field is optional, so no validation required
 
     // Validate node type if specified
     if (node.type !== undefined && !Object.values(NodeType).includes(node.type)) {
