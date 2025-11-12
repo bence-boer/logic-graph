@@ -2,39 +2,118 @@
  * Import utilities for loading graphs from various sources
  */
 
-import type { LogicGraph, LogicConnection } from '$lib/types/graph';
-import { NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import type { LogicGraph, LogicConnection, LogicNode } from '$lib/types/graph';
+import { NodeType, QuestionState, StatementState, ConnectionType } from '$lib/types/graph';
 
 /**
- * Ensures all connections have IDs, generating them if missing.
- * Also ensures all nodes have details fields (defaulting to empty string).
- * Normalizes node types to ensure backward compatibility.
- *
- * @param graph - The graph to normalize
- * @returns The normalized graph with all required fields
+ * Minimal import node structure (only id and statement are required)
  */
-function normalize_imported_graph(graph: LogicGraph): LogicGraph {
+export interface ImportNode {
+    /** Unique identifier for the node */
+    id: string;
+    /** The logical statement represented by this node */
+    statement: string;
+    /** Additional details about the statement */
+    details?: string;
+    /** Type of node */
+    type?: string;
+    /** State for question nodes */
+    question_state?: string;
+    /** State for statement nodes */
+    statement_state?: string;
+    /** ID of the answer node (for question nodes) */
+    answered_by?: string;
+    /** Whether question state was manually set */
+    manual_state_override?: boolean;
+}
+
+/**
+ * Minimal import connection structure
+ */
+export interface ImportConnection {
+    /** Unique identifier for the connection (generated if missing) */
+    id?: string;
+    /** Type of logical relationship */
+    type: string;
+    /** Array of source node IDs */
+    sources: string[];
+    /** Array of target node IDs */
+    targets: string[];
+}
+
+/**
+ * Import graph metadata
+ */
+export interface ImportMetadata {
+    /** Statement of the graph */
+    statement?: string;
+    /** Details of the graph */
+    details?: string;
+    /** Creation timestamp */
+    created?: string;
+    /** Last modified timestamp */
+    modified?: string;
+}
+
+/**
+ * Minimal import graph structure
+ */
+export interface ImportGraph {
+    /** Array of nodes in the graph */
+    nodes: ImportNode[];
+    /** Array of connections between nodes */
+    connections: ImportConnection[];
+    /** Optional metadata about the graph */
+    metadata?: ImportMetadata;
+}
+
+/**
+ * Convert imported graph to internal format with all required fields.
+ * Ensures all connections have IDs and all nodes have proper defaults.
+ *
+ * @param imported_graph - The imported graph data
+ * @returns The normalized graph with all required fields for internal use
+ */
+function convert_from_import_format(imported_graph: ImportGraph): LogicGraph {
     return {
-        ...graph,
-        nodes: graph.nodes.map((node) => ({
-            ...node,
-            details: node.details ?? '',
-            // Default to STATEMENT for backward compatibility
-            type: node.type ?? NodeType.STATEMENT,
-            // Set default states if not present
-            question_state:
-                node.type === NodeType.QUESTION
-                    ? (node.question_state ?? QuestionState.ACTIVE)
-                    : node.question_state,
-            statement_state:
-                node.type === NodeType.STATEMENT || node.type === undefined
-                    ? (node.statement_state ?? StatementState.DEBATED)
-                    : node.statement_state
-        })),
-        connections: graph.connections.map((connection) => ({
-            ...connection,
-            id: connection.id ?? crypto.randomUUID()
-        })) as LogicConnection[]
+        nodes: imported_graph.nodes.map((node): LogicNode => {
+            const logic_node: LogicNode = {
+                id: node.id,
+                statement: node.statement,
+                details: node.details ?? '',
+                type: (node.type as NodeType | undefined) ?? NodeType.STATEMENT
+            };
+
+            // Set state fields if present
+            if (node.question_state) {
+                logic_node.question_state = node.question_state as QuestionState;
+            } else if (logic_node.type === NodeType.QUESTION) {
+                logic_node.question_state = QuestionState.ACTIVE;
+            }
+
+            if (node.statement_state) {
+                logic_node.statement_state = node.statement_state as StatementState;
+            }
+
+            if (node.answered_by) {
+                logic_node.answered_by = node.answered_by;
+            }
+
+            if (node.manual_state_override) {
+                logic_node.manual_state_override = node.manual_state_override;
+            }
+
+            return logic_node;
+        }),
+        connections: imported_graph.connections.map(
+            (connection): LogicConnection => ({
+                id: connection.id ?? crypto.randomUUID(),
+                type: connection.type as ConnectionType,
+                sources: connection.sources,
+                targets: connection.targets
+            })
+        ),
+        metadata: imported_graph.metadata
     };
 }
 
@@ -43,11 +122,16 @@ function normalize_imported_graph(graph: LogicGraph): LogicGraph {
  *
  * @param file - The JSON file to import
  * @returns A promise that resolves to the imported graph with normalized fields
+ *
+ * @example
+ * ```ts
+ * const graph = await import_graph_from_file(file);
+ * ```
  */
 export async function import_graph_from_file(file: File): Promise<LogicGraph> {
     const text = await file.text();
-    const graph = JSON.parse(text) as LogicGraph;
-    return normalize_imported_graph(graph);
+    const imported_graph = JSON.parse(text) as ImportGraph;
+    return convert_from_import_format(imported_graph);
 }
 
 /**
@@ -55,14 +139,31 @@ export async function import_graph_from_file(file: File): Promise<LogicGraph> {
  *
  * @param json_string - The JSON string to parse
  * @returns The imported graph with normalized fields
+ *
+ * @example
+ * ```ts
+ * const graph = import_graph_from_json(json_data);
+ * ```
  */
 export function import_graph_from_json(json_string: string): LogicGraph {
-    const graph = JSON.parse(json_string) as LogicGraph;
-    return normalize_imported_graph(graph);
+    const imported_graph = JSON.parse(json_string) as ImportGraph;
+    return convert_from_import_format(imported_graph);
 }
 
 /**
  * Trigger a file picker dialog and import the selected graph
+ *
+ * Opens a browser file picker for selecting a JSON file to import.
+ *
+ * @returns Promise that resolves to the imported graph or null if cancelled
+ *
+ * @example
+ * ```ts
+ * const graph = await trigger_import_dialog();
+ * if (graph) {
+ *     // Use imported graph
+ * }
+ * ```
  */
 export function trigger_import_dialog(): Promise<LogicGraph | null> {
     return new Promise((resolve) => {

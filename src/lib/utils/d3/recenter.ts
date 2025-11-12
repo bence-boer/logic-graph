@@ -225,12 +225,7 @@ export function calculate_focus_transform(
     current_scale: number = 1.0
 ): d3.ZoomTransform | null {
     // Node must have valid position
-    if (
-        node.x === undefined ||
-        node.y === undefined ||
-        isNaN(node.x) ||
-        isNaN(node.y)
-    ) {
+    if (node.x === undefined || node.y === undefined || isNaN(node.x) || isNaN(node.y)) {
         return null;
     }
 

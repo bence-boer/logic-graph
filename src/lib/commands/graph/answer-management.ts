@@ -402,12 +402,8 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
         }
 
         try {
-            const {
-                question_id,
-                answer_id,
-                previous_question_state,
-                previous_manual_override
-            } = result.data;
+            const { question_id, answer_id, previous_question_state, previous_manual_override } =
+                result.data;
 
             // Recreate the answer connection
             const connection = graph_store.add_connection({

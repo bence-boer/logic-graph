@@ -1,0 +1,24 @@
+{
+  "nodes": [
+    {
+      "id": "node-1",
+      "statement": "If it rains, the ground gets wet"
+    },
+    {
+      "id": "node-2",
+      "statement": "It is raining"
+    },
+    {
+      "id": "node-3",
+      "statement": "The ground is wet"
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-1",
+      "type": "implication",
+      "sources": ["node-1", "node-2"],
+      "targets": ["node-3"]
+    }
+  ]
+}

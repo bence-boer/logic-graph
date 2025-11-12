@@ -273,7 +273,10 @@
 
         if (transform) {
             // Apply transform with smooth animation
-            svg.transition().duration(750).ease(d3.easeCubicInOut).call(zoom_behavior.transform, transform);
+            svg.transition()
+                .duration(750)
+                .ease(d3.easeCubicInOut)
+                .call(zoom_behavior.transform, transform);
         }
     }
 

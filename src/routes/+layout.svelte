@@ -10,14 +10,14 @@
     // Register all commands and interactions during app initialization
     onMount(() => {
         register_all_commands();
-        
+
         // Register all interaction definitions
         interaction_router.register_all(all_interactions);
-        
+
         // Initialize event listeners
         interaction_router.initialize();
     });
-    
+
     onDestroy(() => {
         // Clean up interaction listeners
         interaction_router.cleanup();

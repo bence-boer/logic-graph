@@ -259,9 +259,14 @@ describe('calculate_recenter_transform', () => {
             }
         ];
 
-        const transform = calculate_recenter_transform(small_nodes, viewport_width, viewport_height, {
-            max_scale: 2.0
-        });
+        const transform = calculate_recenter_transform(
+            small_nodes,
+            viewport_width,
+            viewport_height,
+            {
+                max_scale: 2.0
+            }
+        );
         expect(transform?.k).toBeLessThanOrEqual(2.0);
 
         // Very large bbox - would zoom out a lot

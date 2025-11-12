@@ -188,7 +188,10 @@ export function render_nodes(
         const container = node_group.select('.node-container');
         container
             .style('background', resolved_style.background)
-            .style('border', `${resolved_style.border_width}px solid ${resolved_style.border_color}`)
+            .style(
+                'border',
+                `${resolved_style.border_width}px solid ${resolved_style.border_color}`
+            )
             .style('border-radius', `${resolved_style.border_radius}px`)
             .style('color', resolved_style.text_color)
             .style('font-size', `${resolved_style.font_size}px`)
@@ -280,7 +283,12 @@ export function render_nodes(
 
                     // Render overlays using declarative system
                     render_overlays(
-                        node_group as unknown as d3.Selection<SVGGElement, unknown, SVGGElement, unknown>,
+                        node_group as unknown as d3.Selection<
+                            SVGGElement,
+                            unknown,
+                            SVGGElement,
+                            unknown
+                        >,
                         resolved_style.overlays
                     );
                 }

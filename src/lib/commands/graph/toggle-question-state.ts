@@ -76,10 +76,7 @@ export const toggle_question_state_command: Command<
         }
 
         // Validate target state if provided
-        if (
-            payload.target_state &&
-            !Object.values(QuestionState).includes(payload.target_state)
-        ) {
+        if (payload.target_state && !Object.values(QuestionState).includes(payload.target_state)) {
             return {
                 valid: false,
                 error: 'Invalid question state'

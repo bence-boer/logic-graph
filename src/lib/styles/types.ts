@@ -10,7 +10,13 @@
  * - Overlays (visual indicators like pins and checkmarks)
  */
 
-import type { LogicNode, LogicConnection, NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import type {
+    LogicNode,
+    LogicConnection,
+    NodeType,
+    QuestionState,
+    StatementState
+} from '$lib/types/graph';
 
 // ============================================================================
 // Design Tokens

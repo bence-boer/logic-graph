@@ -25,13 +25,15 @@ export interface ImageExportOptions {
  *
  * Converts the SVG visualization to a raster image format using an HTML canvas.
  * The scale parameter allows for higher resolution exports (e.g., scale=2 for 2x resolution).
+ * Uses data URI instead of blob URL to avoid tainted canvas security restrictions.
  *
  * @param format - Image format: 'png' or 'jpeg'
  * @param options - Export options including scale and background color
  * @returns Promise resolving to the image blob
  *
  * @throws {Error} If canvas context cannot be obtained
- * @throws {Error} If image fails to load
+ * @throws {Error} If SVG image fails to load
+ * @throws {Error} If canvas drawing fails
  * @throws {Error} If blob creation fails
  *
  * @example
@@ -55,47 +57,56 @@ export async function export_to_image(
     }
 
     const img = new Image();
-    const svg_blob = new Blob([svg_string], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(svg_blob);
+
+    // Use data URI instead of blob URL to avoid tainted canvas
+    // Encode the SVG string as a data URI with proper escaping
+    const encoded_svg = encodeURIComponent(svg_string)
+        .replace(/'/g, '%27')
+        .replace(/"/g, '%22');
+    const data_url = `data:image/svg+xml;charset=utf-8,${encoded_svg}`;
 
     return new Promise((resolve, reject) => {
         img.onload = () => {
-            // Apply scale for higher quality
-            canvas.width = img.width * scale;
-            canvas.height = img.height * scale;
+            try {
+                // Apply scale for higher quality
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
 
-            // Scale the context
-            ctx.scale(scale, scale);
+                // Scale the context
+                ctx.scale(scale, scale);
 
-            // Fill background
-            const bg_color = background_color || (format === 'jpeg' ? '#1a1a1a' : 'transparent');
-            if (bg_color !== 'transparent') {
-                ctx.fillStyle = bg_color;
-                ctx.fillRect(0, 0, img.width, img.height);
+                // Fill background
+                const bg_color = background_color || (format === 'jpeg' ? '#1a1a1a' : 'transparent');
+                if (bg_color !== 'transparent') {
+                    ctx.fillStyle = bg_color;
+                    ctx.fillRect(0, 0, img.width, img.height);
+                }
+
+                ctx.drawImage(img, 0, 0);
+
+                canvas.toBlob(
+                    (blob) => {
+                        if (blob) {
+                            resolve(blob);
+                        } else {
+                            reject(new Error('Failed to create blob from canvas'));
+                        }
+                    },
+                    `image/${format}`,
+                    0.95
+                );
+            } catch (error) {
+                reject(new Error(`Failed to draw image to canvas: ${error instanceof Error ? error.message : 'Unknown error'}`));
             }
-
-            ctx.drawImage(img, 0, 0);
-
-            canvas.toBlob(
-                (blob) => {
-                    URL.revokeObjectURL(url);
-                    if (blob) {
-                        resolve(blob);
-                    } else {
-                        reject(new Error('Failed to create blob'));
-                    }
-                },
-                `image/${format}`,
-                0.95
-            );
         };
 
-        img.onerror = () => {
-            URL.revokeObjectURL(url);
-            reject(new Error('Failed to load image'));
+        img.onerror = (error) => {
+            reject(new Error(`Failed to load SVG image: ${error instanceof Error ? error.message : 'Unknown error'}`));
         };
 
-        img.src = url;
+        // Set crossOrigin to anonymous to avoid CORS issues
+        img.crossOrigin = 'anonymous';
+        img.src = data_url;
     });
 }
 
