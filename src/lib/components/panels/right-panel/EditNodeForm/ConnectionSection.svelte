@@ -17,6 +17,10 @@
         connection_mode: 'existing' | 'new';
         selected_node_id: string;
         new_node_statement: string;
+        existing_label?: string;
+        new_label?: string;
+        select_placeholder?: string;
+        input_placeholder?: string;
         onadd_start: () => void;
         onadd_confirm: () => void;
         onadd_cancel: () => void;
@@ -37,6 +41,10 @@
         connection_mode = $bindable(),
         selected_node_id = $bindable(),
         new_node_statement = $bindable(),
+        existing_label,
+        new_label,
+        select_placeholder,
+        input_placeholder,
         onadd_start,
         onadd_confirm,
         onadd_cancel,
@@ -90,6 +98,10 @@
                 bind:selected_node_id
                 bind:new_node_statement
                 {available_nodes}
+                {existing_label}
+                {new_label}
+                {select_placeholder}
+                {input_placeholder}
                 {onmode_change}
                 onconfirm={onadd_confirm}
                 oncancel={onadd_cancel}
