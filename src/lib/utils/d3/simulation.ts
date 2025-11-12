@@ -23,6 +23,10 @@ export interface SimulationConfig {
     center_force: [number, number];
     /** Strength of the link force (0-1) */
     link_strength: number;
+    /** Strength of the centering force (higher = stronger pull to center) */
+    center_strength: number;
+    /** Maximum distance for charge force (beyond this, nodes don't repel each other) */
+    charge_max_distance: number;
 }
 
 /**
@@ -33,7 +37,9 @@ export const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
     link_distance: 225,
     collision_radius: 50, // Base collision radius, will be adjusted per node
     center_force: [0, 0],
-    link_strength: 0.7
+    link_strength: 0.7,
+    center_strength: 0.05, // Weak centering force to prevent nodes from drifting too far
+    charge_max_distance: 500 // Stop repelling beyond this distance
 };
 
 /**
@@ -86,8 +92,19 @@ export function create_simulation(
 ): Simulation<LogicNode, D3Link> {
     return d3
         .forceSimulation<LogicNode>(nodes)
-        .force('charge', d3.forceManyBody<LogicNode>().strength(config.charge_strength))
-        .force('center', d3.forceCenter(config.center_force[0], config.center_force[1]))
+        .force(
+            'charge',
+            d3
+                .forceManyBody<LogicNode>()
+                .strength(config.charge_strength)
+                .distanceMax(config.charge_max_distance)
+        )
+        .force(
+            'center',
+            d3
+                .forceCenter(config.center_force[0], config.center_force[1])
+                .strength(config.center_strength)
+        )
         .force(
             'collision',
             d3
@@ -215,10 +232,16 @@ export function sync_simulation_nodes(
     store_nodes.forEach((store_node) => {
         const sim_node = node_map.get(store_node.id);
         if (sim_node) {
-            // Update existing node properties (preserve D3 properties)
+            // Update existing node properties (preserve D3 physics properties: x, y, vx, vy, index)
+            // Sync all application properties that affect styling and behavior
             Object.assign(sim_node, {
                 statement: store_node.statement,
                 details: store_node.details,
+                type: store_node.type,
+                question_state: store_node.question_state,
+                statement_state: store_node.statement_state,
+                answered_by: store_node.answered_by,
+                manual_state_override: store_node.manual_state_override,
                 fx: store_node.fx,
                 fy: store_node.fy
             });
