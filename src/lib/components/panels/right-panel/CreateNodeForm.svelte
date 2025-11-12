@@ -2,7 +2,7 @@
     import { graph_store } from '$lib/stores/graph.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
-    import { toast_store } from '$lib/stores/toast.svelte';
+    import { notification_store } from '$lib/stores/notification.svelte';
     import { use_node_form } from '$lib/composables/use-node-form.svelte';
     import { ConnectionType } from '$lib/types/graph';
     import Input from '$lib/components/ui/Input.svelte';
@@ -41,7 +41,7 @@
 
         // Validate connection selection if needed
         if (connection_type !== 'none' && !selected_node_id) {
-            toast_store.error('Please select a statement to connect with');
+            notification_store.error('Please select a statement to connect with');
             return;
         }
 
@@ -85,18 +85,18 @@
                         : connection_type === 'consequence'
                           ? 'consequence'
                           : 'contradiction';
-                toast_store.success(
+                notification_store.success(
                     `Statement "${form.node_statement}" created with ${connection_label} "${connected_node?.statement}"`
                 );
             } else {
-                toast_store.success(`Statement "${form.node_statement}" created`);
+                notification_store.success(`Statement "${form.node_statement}" created`);
             }
 
             // Select the new node and switch to edit mode
             selection_store.select_node(new_node.id);
             ui_store.open_edit_node_form(new_node.id);
         } catch (error) {
-            toast_store.error('Failed to create statement');
+            notification_store.error('Failed to create statement');
             console.error(error);
         } finally {
             form.set_submitting(false);

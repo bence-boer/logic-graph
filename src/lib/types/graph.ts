@@ -3,6 +3,30 @@
  */
 
 /**
+ * Type of node in the logic graph
+ */
+export enum NodeType {
+    STATEMENT = 'statement',
+    QUESTION = 'question'
+}
+
+/**
+ * State of a question node
+ */
+export enum QuestionState {
+    ACTIVE = 'active',
+    RESOLVED = 'resolved'
+}
+
+/**
+ * State of a statement node (for axioms without reasons)
+ */
+export enum StatementState {
+    DEBATED = 'debated',
+    SETTLED = 'settled'
+}
+
+/**
  * Represents a single node in the logic graph
  */
 export interface LogicNode {
@@ -12,6 +36,16 @@ export interface LogicNode {
     statement: string;
     /** Additional details about the statement (optional, rendered in the UI) */
     details?: string;
+    /** Type of node (default: STATEMENT for backward compatibility) */
+    type?: NodeType;
+    /** State for question nodes (only applicable when type is QUESTION) */
+    question_state?: QuestionState;
+    /** State for statement nodes (only applicable when type is STATEMENT and node is an axiom) */
+    statement_state?: StatementState;
+    /** ID of the answer node (only applicable when type is QUESTION, enforces one answer per question) */
+    answered_by?: string;
+    /** Whether question state was manually set (prevents auto-changes from link/unlink operations) */
+    manual_state_override?: boolean;
     /** X position (managed by D3 force simulation) */
     x?: number;
     /** Y position (managed by D3 force simulation) */
@@ -37,7 +71,8 @@ export interface LogicNode {
  */
 export enum ConnectionType {
     IMPLICATION = 'implication',
-    CONTRADICTION = 'contradiction'
+    CONTRADICTION = 'contradiction',
+    ANSWER = 'answer'
 }
 
 /**
@@ -120,7 +155,9 @@ export enum RightPanelModeType {
     EDIT_NODE = 'edit-node',
     EDIT_CONNECTION = 'edit-connection',
     CREATE_NODE = 'create-node',
-    CREATE_CONNECTION = 'create-connection'
+    CREATE_CONNECTION = 'create-connection',
+    CREATE_QUESTION = 'create-question',
+    EDIT_QUESTION = 'edit-question'
 }
 
 export type RightPanelMode =
@@ -128,4 +165,6 @@ export type RightPanelMode =
     | { type: RightPanelModeType.EDIT_NODE; node_id: string }
     | { type: RightPanelModeType.EDIT_CONNECTION; connection_id: string }
     | { type: RightPanelModeType.CREATE_NODE }
-    | { type: RightPanelModeType.CREATE_CONNECTION };
+    | { type: RightPanelModeType.CREATE_CONNECTION }
+    | { type: RightPanelModeType.CREATE_QUESTION }
+    | { type: RightPanelModeType.EDIT_QUESTION; node_id: string };

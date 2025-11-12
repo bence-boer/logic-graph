@@ -3,10 +3,12 @@
  */
 
 import type { LogicGraph, LogicConnection } from '$lib/types/graph';
+import { NodeType, QuestionState, StatementState } from '$lib/types/graph';
 
 /**
  * Ensures all connections have IDs, generating them if missing.
  * Also ensures all nodes have details fields (defaulting to empty string).
+ * Normalizes node types to ensure backward compatibility.
  *
  * @param graph - The graph to normalize
  * @returns The normalized graph with all required fields
@@ -16,7 +18,18 @@ function normalize_imported_graph(graph: LogicGraph): LogicGraph {
         ...graph,
         nodes: graph.nodes.map((node) => ({
             ...node,
-            details: node.details ?? ''
+            details: node.details ?? '',
+            // Default to STATEMENT for backward compatibility
+            type: node.type ?? NodeType.STATEMENT,
+            // Set default states if not present
+            question_state:
+                node.type === NodeType.QUESTION
+                    ? (node.question_state ?? QuestionState.ACTIVE)
+                    : node.question_state,
+            statement_state:
+                node.type === NodeType.STATEMENT || node.type === undefined
+                    ? (node.statement_state ?? StatementState.DEBATED)
+                    : node.statement_state
         })),
         connections: graph.connections.map((connection) => ({
             ...connection,
