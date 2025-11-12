@@ -19,15 +19,13 @@
     let connection = $derived(
         graph_store.connections.find((connection) => connection.id === connection_id)
     );
-    
+
     let type = $state<ConnectionType>(ConnectionType.IMPLICATION);
     let sources = $state<string[]>([]);
     let targets = $state<string[]>([]);
 
     // Available nodes filtered by connection type
-    let available_nodes = $derived(
-        get_available_nodes_by_type('', graph_store.nodes, type)
-    );
+    let available_nodes = $derived(get_available_nodes_by_type('', graph_store.nodes, type));
 
     // Initialize form values when connection loads
     $effect(() => {
@@ -146,8 +144,14 @@
                     label="Type"
                     required
                     options={[
-                        { value: ConnectionType.IMPLICATION, label: '→ Implication (Reasons / Consequences)' },
-                        { value: ConnectionType.CONTRADICTION, label: '⟷ Contradiction (Mutual Exclusion)' }
+                        {
+                            value: ConnectionType.IMPLICATION,
+                            label: '→ Implication (Reasons / Consequences)'
+                        },
+                        {
+                            value: ConnectionType.CONTRADICTION,
+                            label: '⟷ Contradiction (Mutual Exclusion)'
+                        }
                     ]}
                     onchange={handle_save}
                 />
