@@ -162,12 +162,15 @@ function create_graph_store() {
 
         /**
          * Sets or clears the answer for a question node.
-         * Also manages the corresponding ANSWER connection.
+         * Also manages the corresponding ANSWER connection and updates question_state.
          *
          * @param question_node_id - The ID of the question node
          * @param answer_node_id - The ID of the answer node, or null to clear
          */
         set_answer(question_node_id: string, answer_node_id: string | null): void {
+            const question = _nodes.find((n) => n.id === question_node_id);
+            if (!question) return;
+
             // Remove any existing answer connections for this question
             const existing_answer_connections = _connections.filter(
                 (conn) =>
@@ -178,8 +181,20 @@ function create_graph_store() {
                 this.remove_connection(conn.id!);
             }
 
-            // Update the node's answered_by field
-            this.update_node(question_node_id, { answered_by: answer_node_id ?? undefined });
+            // Update the node's answered_by field and question_state
+            // Only auto-update question_state if not manually overridden
+            const updates: { answered_by?: string; question_state?: QuestionState } = {
+                answered_by: answer_node_id ?? undefined
+            };
+
+            if (!question.manual_state_override) {
+                // Set state based on whether we're adding or removing an answer
+                updates.question_state = answer_node_id
+                    ? QuestionState.RESOLVED
+                    : QuestionState.ACTIVE;
+            }
+
+            this.update_node(question_node_id, updates);
 
             // If a new answer is provided, create the connection
             if (answer_node_id) {

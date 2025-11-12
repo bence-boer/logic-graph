@@ -7,9 +7,11 @@
 import { selection_store } from '$lib/stores/selection.svelte';
 import type { DragTrackingNode } from '$lib/types/d3-extensions';
 import type { LogicConnection, LogicNode } from '$lib/types/graph';
-import { is_question_node } from '$lib/utils/node-classification';
-import { get_node_style } from '$lib/utils/node-styling';
+import { StyleEngine, DEFAULT_THEME, build_style_context, render_overlays } from '$lib/styles';
 import * as d3 from 'd3';
+
+// Create style engine instance with default theme
+const style_engine = new StyleEngine(DEFAULT_THEME);
 
 // Node dimensions configuration
 const NODE_CONFIG = {
@@ -159,37 +161,56 @@ export function render_nodes(
         const is_connected = hovered_node_id && connected_node_ids.has(node.id);
         const is_hovered = node.id === hovered_node_id;
 
-        // Get style from centralized styling utility
-        const style = get_node_style(
+        // Build style context for declarative styling
+        const context = build_style_context(
             node,
             connections,
-            is_selected,
-            is_pinned,
-            is_connected ? true : false,
-            is_hovered
+            {
+                selected: is_selected,
+                pinned: is_pinned,
+                hovered: is_hovered,
+                connected: is_connected ? true : false,
+                dragging: false
+            },
+            hovered_node_id !== null
         );
 
-        // Update box shadow
-        const box_shadow = is_selected ? '0 0 8px var(--accent-primary)' : 'none';
+        // Resolve style using declarative style engine
+        const resolved_style = style_engine.resolve_style(context);
 
-        // Update opacity
+        // Calculate dimming opacity
         let opacity = 1;
         if (hovered_node_id && !is_hovered && !is_connected) {
             opacity = 0.3;
         }
 
         // Apply styles to the HTML container
-        node_group
-            .select('.node-container')
-            .style('background', style.background)
-            .style('border', `${style.border_width}px solid ${style.border_color}`)
-            .style('color', style.text_color)
-            .style('box-shadow', box_shadow);
+        const container = node_group.select('.node-container');
+        container
+            .style('background', resolved_style.background)
+            .style('border', `${resolved_style.border_width}px solid ${resolved_style.border_color}`)
+            .style('border-radius', `${resolved_style.border_radius}px`)
+            .style('color', resolved_style.text_color)
+            .style('font-size', `${resolved_style.font_size}px`)
+            .style('font-weight', resolved_style.font_weight)
+            .style('padding', `${resolved_style.padding}px`)
+            .style('box-shadow', resolved_style.box_shadow)
+            .style('transition', resolved_style.transition)
+            .style('cursor', resolved_style.cursor)
+            .style('pointer-events', resolved_style.pointer_events);
 
+        if (resolved_style.filter) {
+            container.style('filter', resolved_style.filter);
+        }
+        if (resolved_style.transform) {
+            container.style('transform', resolved_style.transform);
+        }
+
+        // Apply opacity to the entire node group
         node_group.style('opacity', opacity);
 
         // Update text content
-        node_group.select('.node-container').text(node.statement);
+        container.text(node.statement);
     });
 
     // Measure and reposition foreignObjects after rendering
@@ -234,8 +255,34 @@ export function render_nodes(
                     node.width = width;
                     node.height = height;
 
-                    // Update overlays with correct dimensions
-                    update_overlays(node_group, node, width, height);
+                    // Build style context with dimensions for overlay rendering
+                    const is_selected = selection_store.is_selected(node.id);
+                    const is_pinned = node.fx !== null && node.fx !== undefined;
+                    const is_connected = hovered_node_id && connected_node_ids.has(node.id);
+                    const is_hovered = node.id === hovered_node_id;
+
+                    const context = build_style_context(
+                        node,
+                        connections,
+                        {
+                            selected: is_selected,
+                            pinned: is_pinned,
+                            hovered: is_hovered,
+                            connected: is_connected ? true : false,
+                            dragging: false
+                        },
+                        hovered_node_id !== null,
+                        { width, height }
+                    );
+
+                    // Resolve style with dimensions to get overlay configurations
+                    const resolved_style = style_engine.resolve_style(context);
+
+                    // Render overlays using declarative system
+                    render_overlays(
+                        node_group as unknown as d3.Selection<SVGGElement, unknown, SVGGElement, unknown>,
+                        resolved_style.overlays
+                    );
                 }
             });
             resolve();
@@ -249,159 +296,6 @@ export function render_nodes(
         }
         return node.statement;
     });
-}
-
-/**
- * Updates overlay indicators (pin, checkmark) based on node state.
- *
- * @param node_group - D3 selection of the node group element
- * @param node - The logic node data
- * @param width - Node width in pixels
- * @param height - Node height in pixels
- */
-function update_overlays(
-    node_group: d3.Selection<SVGGElement, LogicNode, d3.BaseType, unknown>,
-    node: LogicNode,
-    width: number,
-    height: number
-) {
-    const overlays_group = node_group.select<SVGGElement>('g.overlays');
-    const is_selected = selection_store.is_selected(node.id);
-
-    // Selection highlight (behind node)
-    const SELECTION_PADDING = 4;
-    const selection_x = -width / 2 - SELECTION_PADDING;
-    const selection_y = -height / 2 - SELECTION_PADDING;
-    const selection_width = width + SELECTION_PADDING * 2;
-    const selection_height = height + SELECTION_PADDING * 2;
-
-    if (is_selected) {
-        let selection_highlight = overlays_group.select<SVGRectElement>('rect.selection-highlight');
-
-        if (selection_highlight.empty()) {
-            selection_highlight = overlays_group
-                .insert('rect', ':first-child') // Insert as first child (behind everything)
-                .attr('class', 'selection-highlight')
-                .attr('rx', 6)
-                .attr('fill', 'none')
-                .attr('stroke', 'var(--accent-primary)')
-                .attr('stroke-width', 2)
-                .style('pointer-events', 'none')
-                .style('animation', 'pulse-selection 2s ease-in-out infinite')
-                .style('opacity', '0.8');
-        }
-
-        selection_highlight
-            .attr('x', selection_x)
-            .attr('y', selection_y)
-            .attr('width', selection_width)
-            .attr('height', selection_height);
-    } else {
-        overlays_group.select('rect.selection-highlight').remove();
-    }
-
-    // Pin indicator (top-right corner)
-    const is_pinned = node.fx !== null && node.fx !== undefined;
-    // Position with 4px padding from edges (circle radius is 10)
-    const pin_x = width / 2 - 4;
-    const pin_y = -height / 2 + 4;
-
-    if (is_pinned) {
-        let pin_indicator = overlays_group.select<SVGGElement>('g.pin-indicator');
-
-        if (pin_indicator.empty()) {
-            pin_indicator = overlays_group
-                .append('g')
-                .attr('class', 'pin-indicator')
-                .style('pointer-events', 'none')
-                .style('opacity', '0')
-                .style('animation', 'fade-in 0.3s ease forwards');
-
-            // Background circle - centered at origin
-            pin_indicator
-                .append('circle')
-                .attr('cx', pin_x)
-                .attr('cy', pin_y)
-                .attr('r', 10)
-                .attr('fill', 'var(--node-default)')
-                .attr('fill-opacity', 0.9);
-
-            // Pin icon - centered around origin
-            const pin_svg = pin_indicator
-                .append('svg')
-                .attr('x', pin_x - 6)
-                .attr('y', pin_y - 6)
-                .attr('width', 12)
-                .attr('height', 12)
-                .attr('viewBox', '0 0 24 24')
-                .attr('fill', 'none')
-                .attr('stroke', '#8b5cf6')
-                .attr('stroke-width', '2.5')
-                .attr('stroke-linecap', 'round')
-                .attr('stroke-linejoin', 'round');
-
-            pin_svg.append('path').attr('d', 'M12 17v5');
-            pin_svg
-                .append('path')
-                .attr(
-                    'd',
-                    'M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z'
-                );
-        }
-
-    } else {
-        overlays_group.select('g.pin-indicator').remove();
-    }
-
-    // Answer checkmark (top-right corner)
-    const has_answer = is_question_node(node) && node.answered_by !== undefined;
-    // Position with 4px padding from edges (circle radius is 10)
-    const checkmark_x = width / 2 - 4;
-    const checkmark_y = -height / 2 + 4;
-
-    if (has_answer) {
-        let answer_checkmark = overlays_group.select<SVGGElement>('g.answer-checkmark');
-
-        if (answer_checkmark.empty()) {
-            answer_checkmark = overlays_group
-                .append('g')
-                .attr('class', 'answer-checkmark')
-                .style('pointer-events', 'none')
-                .style(
-                    'animation',
-                    'scale-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards'
-                );
-
-            // Background circle - centered at origin
-            answer_checkmark
-                .append('circle')
-                .attr('cx', checkmark_x)
-                .attr('cy', checkmark_y)
-                .attr('r', 10)
-                .attr('fill', '#10b981')
-                .attr('fill-opacity', 0.95);
-
-            // Checkmark icon - centered around origin
-            const check_svg = answer_checkmark
-                .append('svg')
-                .attr('x', checkmark_x - 6)
-                .attr('y', checkmark_y - 6)
-                .attr('width', 12)
-                .attr('height', 12)
-                .attr('viewBox', '0 0 24 24')
-                .attr('fill', 'none')
-                .attr('stroke', 'white')
-                .attr('stroke-width', '3')
-                .attr('stroke-linecap', 'round')
-                .attr('stroke-linejoin', 'round');
-
-            check_svg.append('polyline').attr('points', '20 6 9 17 4 12');
-        }
-
-        answer_checkmark.attr('transform', `translate(${checkmark_x}, ${checkmark_y})`);
-    } else {
-        overlays_group.select('g.answer-checkmark').remove();
-    }
 }
 
 /**
