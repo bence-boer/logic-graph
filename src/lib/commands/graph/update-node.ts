@@ -9,7 +9,7 @@ import type { Command, CommandResult, ValidationResult } from '$lib/commands/typ
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
 import type { LogicNode } from '$lib/types/graph';
-import { NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import { NodeType, StatementState } from '$lib/types/graph';
 import { AnimationType, EasingType } from '$lib/types/animations';
 
 /**
@@ -24,8 +24,6 @@ export interface UpdateNodePayload {
     details?: string;
     /** Updated type */
     type?: NodeType;
-    /** Updated question state */
-    question_state?: QuestionState;
     /** Updated statement state */
     statement_state?: StatementState;
 }
@@ -108,17 +106,6 @@ export const update_node_command: Command<UpdateNodePayload, UpdateNodeResult> =
             };
         }
 
-        // Validate question state if provided
-        if (
-            payload.question_state &&
-            !Object.values(QuestionState).includes(payload.question_state)
-        ) {
-            return {
-                valid: false,
-                error: 'Invalid question state'
-            };
-        }
-
         // Validate statement state if provided
         if (
             payload.statement_state &&
@@ -149,8 +136,6 @@ export const update_node_command: Command<UpdateNodePayload, UpdateNodeResult> =
             if (payload.statement !== undefined) previous_state.statement = node.statement;
             if (payload.details !== undefined) previous_state.details = node.details;
             if (payload.type !== undefined) previous_state.type = node.type;
-            if (payload.question_state !== undefined)
-                previous_state.question_state = node.question_state;
             if (payload.statement_state !== undefined)
                 previous_state.statement_state = node.statement_state;
 
@@ -159,8 +144,6 @@ export const update_node_command: Command<UpdateNodePayload, UpdateNodeResult> =
             if (payload.statement !== undefined) updates.statement = payload.statement.trim();
             if (payload.details !== undefined) updates.details = payload.details.trim();
             if (payload.type !== undefined) updates.type = payload.type;
-            if (payload.question_state !== undefined)
-                updates.question_state = payload.question_state;
             if (payload.statement_state !== undefined)
                 updates.statement_state = payload.statement_state;
 

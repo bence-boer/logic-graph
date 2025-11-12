@@ -1,20 +1,18 @@
 <script lang="ts">
     import { graph_store } from '$lib/stores/graph.svelte';
-    import { selection_store } from '$lib/stores/selection.svelte';
-    import { ui_store } from '$lib/stores/ui.svelte';
     import type { D3Link, LogicNode } from '$lib/types/graph';
     import { convert_connections_to_d3_links } from '$lib/utils/d3-helpers';
     import { create_drag_handlers } from '$lib/utils/d3/interactions';
     import {
-        calculate_recenter_transform,
-        calculate_focus_transform
+        calculate_focus_transform,
+        calculate_recenter_transform
     } from '$lib/utils/d3/recenter';
     import {
         create_simulation,
         DEFAULT_SIMULATION_CONFIG,
         sync_simulation_nodes,
-        update_simulation,
-        update_collision_radii
+        update_collision_radii,
+        update_simulation
     } from '$lib/utils/d3/simulation';
     import { GraphTopology } from '$lib/utils/graph-algorithms';
     import type { Simulation } from 'd3';
@@ -408,6 +406,7 @@
             stroke-width 0.2s ease,
             opacity 0.2s ease,
             stroke 0.2s ease;
+        /* No transition on position attributes (x1, y1, x2, y2) to prevent floating effect */
     }
 
     :global(.link:hover) {
@@ -423,9 +422,7 @@
     }
 
     :global(.node) {
-        transition:
-            opacity 0.2s ease,
-            transform 0.2s ease;
+        transition: opacity 0.2s ease;
     }
 
     :global(.node rect) {
@@ -439,9 +436,7 @@
     }
 
     :global(.node .node-container) {
-        transition:
-            all 0.2s ease,
-            border-width 0.1s ease;
+        transition: all 0.2s ease;
     }
 
     /* Global keyframe animations for overlays */

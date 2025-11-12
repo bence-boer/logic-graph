@@ -3,7 +3,7 @@
  */
 
 import type { LogicGraph, LogicConnection, LogicNode } from '$lib/types/graph';
-import { NodeType, QuestionState, StatementState, ConnectionType } from '$lib/types/graph';
+import { NodeType, StatementState, ConnectionType } from '$lib/types/graph';
 
 /**
  * Minimal import node structure (only id and statement are required)
@@ -84,23 +84,14 @@ function convert_from_import_format(imported_graph: ImportGraph): LogicGraph {
                 type: (node.type as NodeType | undefined) ?? NodeType.STATEMENT
             };
 
-            // Set state fields if present
-            if (node.question_state) {
-                logic_node.question_state = node.question_state as QuestionState;
-            } else if (logic_node.type === NodeType.QUESTION) {
-                logic_node.question_state = QuestionState.ACTIVE;
-            }
-
+            // Set state fields if present (for statement nodes only)
             if (node.statement_state) {
                 logic_node.statement_state = node.statement_state as StatementState;
             }
 
+            // Set answered_by if present (question state is derived from this)
             if (node.answered_by) {
                 logic_node.answered_by = node.answered_by;
-            }
-
-            if (node.manual_state_override) {
-                logic_node.manual_state_override = node.manual_state_override;
             }
 
             return logic_node;

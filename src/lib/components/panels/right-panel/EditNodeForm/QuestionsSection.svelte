@@ -31,7 +31,7 @@
 
     {#if question_nodes.length > 0}
         <div class="flex flex-col gap-2">
-            {#each question_nodes as question_node}
+            {#each question_nodes as question_node (question_node.id)}
                 <button
                     class="flex cursor-pointer items-start gap-2 rounded-md border border-(--border-default) bg-(--bg-secondary) p-2.5 text-left transition-colors hover:border-(--border-hover) hover:bg-(--bg-tertiary)"
                     onclick={() => navigate_to_question(question_node.id)}

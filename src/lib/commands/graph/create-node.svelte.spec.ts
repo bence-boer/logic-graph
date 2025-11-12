@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { create_node_command, type CreateNodePayload } from './create-node';
 import { graph_store } from '$lib/stores/graph.svelte';
-import { NodeType, QuestionState } from '$lib/types/graph';
+import { NodeType } from '$lib/types/graph';
 import { CommandEffectType } from '$lib/commands/types';
 
 const TEST_CONTEXT = { timestamp: Date.now() };
@@ -82,8 +82,7 @@ describe('create_node_command', () => {
         it('should accept valid question node payload', () => {
             const payload: CreateNodePayload = {
                 statement: 'Test question?',
-                type: NodeType.QUESTION,
-                question_state: QuestionState.ACTIVE
+                type: NodeType.QUESTION
             };
 
             const result = create_node_command.validate(payload, TEST_CONTEXT);
@@ -115,8 +114,7 @@ describe('create_node_command', () => {
         it('should create a question node', async () => {
             const payload: CreateNodePayload = {
                 statement: 'Is this a test?',
-                type: NodeType.QUESTION,
-                question_state: QuestionState.ACTIVE
+                type: NodeType.QUESTION
             };
 
             const result = await create_node_command.execute(payload, TEST_CONTEXT);
@@ -126,7 +124,7 @@ describe('create_node_command', () => {
 
             const created_node = graph_store.nodes[0];
             expect(created_node.type).toBe(NodeType.QUESTION);
-            expect(created_node.question_state).toBe(QuestionState.ACTIVE);
+            expect(created_node.answered_by).toBeUndefined(); // Question starts without an answer
         });
 
         it('should trim whitespace from statement and details', async () => {

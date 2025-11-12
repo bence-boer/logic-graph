@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { validate_node, validate_connection, validate_graph } from './validation';
-import { NodeType, ConnectionType, QuestionState, StatementState } from '$lib/types/graph';
+import { NodeType, ConnectionType, StatementState } from '$lib/types/graph';
 import type { LogicNode, LogicConnection, LogicGraph } from '$lib/types/graph';
 
 describe('validate_node', () => {
@@ -93,12 +93,12 @@ describe('validate_node', () => {
         expect(result.errors.some((e) => e.field === 'statement')).toBe(true);
     });
 
-    it('should validate question node with valid state', () => {
+    it('should validate question node with answered_by field', () => {
         const node: LogicNode = {
             id: 'node-1',
             statement: 'Is this valid?',
             type: NodeType.QUESTION,
-            question_state: QuestionState.ACTIVE
+            answered_by: 'answer-id'
         };
 
         const result = validate_node(node);
@@ -106,18 +106,16 @@ describe('validate_node', () => {
         expect(result.valid).toBe(true);
     });
 
-    it('should reject question node with invalid state', () => {
+    it('should validate question node without answered_by field', () => {
         const node: LogicNode = {
             id: 'node-1',
             statement: 'Is this valid?',
-            type: NodeType.QUESTION,
-            question_state: 'invalid' as QuestionState
+            type: NodeType.QUESTION
         };
 
         const result = validate_node(node);
 
-        expect(result.valid).toBe(false);
-        expect(result.errors.some((e) => e.field === 'question_state')).toBe(true);
+        expect(result.valid).toBe(true);
     });
 
     it('should validate statement node with valid state', () => {

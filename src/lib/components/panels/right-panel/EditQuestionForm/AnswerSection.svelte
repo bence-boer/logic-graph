@@ -6,7 +6,7 @@
     import Select from '$lib/components/ui/Select.svelte';
     import Input from '$lib/components/ui/Input.svelte';
     import type { LogicNode } from '$lib/types/graph';
-    import { NodeType } from '$lib/types/graph';
+    import { NodeType, ConnectionType } from '$lib/types/graph';
     import { is_statement_node } from '$lib/utils/node-classification';
     import { can_link_as_answer } from '$lib/utils/answer-management';
     import { CheckCircle2, X, Link, Plus } from '@lucide/svelte';
@@ -62,8 +62,25 @@
     }
 
     function link_answer(answer_id: string) {
+        // Ensure an ANSWER connection exists (question -> statement)
+        const existing = graph_store.connections.find(
+            (c) =>
+                c.type === ConnectionType.ANSWER &&
+                c.sources.includes(node.id) &&
+                c.targets.includes(answer_id)
+        );
+
+        if (!existing) {
+            graph_store.add_connection({
+                type: ConnectionType.ANSWER,
+                sources: [node.id],
+                targets: [answer_id]
+            });
+        }
+
+        // Mark as accepted answer
         graph_store.set_answer(node.id, answer_id);
-        notification_store.success('Answer linked successfully');
+        notification_store.success('Answer accepted');
         cancel_linking();
         show_replace_confirmation = false;
         pending_answer_id = null;
@@ -82,7 +99,7 @@
 
     function unlink_answer() {
         graph_store.set_answer(node.id, null);
-        notification_store.success('Answer unlinked');
+        notification_store.success('Accepted answer cleared');
     }
 
     function start_creating() {
@@ -107,9 +124,16 @@
             type: NodeType.STATEMENT
         });
 
-        // Link as answer
+        // Create ANSWER connection (question -> statement)
+        graph_store.add_connection({
+            type: ConnectionType.ANSWER,
+            sources: [node.id],
+            targets: [new_node.id]
+        });
+
+        // Mark as accepted answer
         graph_store.set_answer(node.id, new_node.id);
-        notification_store.success('Answer created and linked');
+        notification_store.success('Answer created and accepted');
 
         cancel_creating();
     }
@@ -127,10 +151,10 @@
 </script>
 
 <div class="flex flex-col gap-3">
-    <h4 class="m-0 text-sm font-semibold text-(--text-secondary)">Answer</h4>
+    <h4 class="m-0 text-sm font-semibold text-(--text-secondary)">Accepted Answer</h4>
 
     {#if current_answer_node}
-        <!-- Current answer display -->
+        <!-- Current accepted answer display -->
         <div
             class="flex items-start gap-2 rounded-md border border-green-500/30 bg-green-500/10 p-3"
         >
@@ -152,16 +176,16 @@
             <button
                 class="shrink-0 rounded p-1 text-neutral-400 transition-colors hover:bg-neutral-700 hover:text-white"
                 onclick={unlink_answer}
-                title="Unlink answer"
+                title="Clear accepted answer"
                 type="button"
             >
                 <X size={14} />
             </button>
         </div>
     {:else}
-        <!-- No answer yet -->
+        <!-- No accepted answer yet -->
         <div class="rounded-md border border-(--border-default) bg-(--bg-secondary) p-3">
-            <p class="m-0 text-sm text-(--text-tertiary)">No answer linked yet</p>
+            <p class="m-0 text-sm text-(--text-tertiary)">No accepted answer yet</p>
         </div>
     {/if}
 
@@ -175,15 +199,9 @@
             />
             <div class="flex gap-2">
                 <Button onclick={handle_quick_answer} variant="primary" size="sm">
-                    {#snippet children()}
-                        Create & Link
-                    {/snippet}
+                    Create & Link
                 </Button>
-                <Button onclick={cancel_creating} variant="secondary" size="sm">
-                    {#snippet children()}
-                        Cancel
-                    {/snippet}
-                </Button>
+                <Button onclick={cancel_creating} variant="secondary" size="sm">Cancel</Button>
             </div>
         </div>
     {:else if is_linking}
@@ -201,31 +219,21 @@
                     size="sm"
                     disabled={!selected_statement_id}
                 >
-                    {#snippet children()}
-                        Link Answer
-                    {/snippet}
+                    Link Answer
                 </Button>
-                <Button onclick={cancel_linking} variant="secondary" size="sm">
-                    {#snippet children()}
-                        Cancel
-                    {/snippet}
-                </Button>
+                <Button onclick={cancel_linking} variant="secondary" size="sm">Cancel</Button>
             </div>
         </div>
     {:else}
         <!-- Action buttons -->
         <div class="flex gap-2">
             <Button onclick={start_linking} variant="secondary" size="sm">
-                {#snippet children()}
-                    <Link size={14} />
-                    Link Answer
-                {/snippet}
+                <Link size={14} />
+                Link Statement
             </Button>
             <Button onclick={start_creating} variant="secondary" size="sm">
-                {#snippet children()}
-                    <Plus size={14} />
-                    Quick Answer
-                {/snippet}
+                <Plus size={14} />
+                Create Statement
             </Button>
         </div>
     {/if}
@@ -238,35 +246,34 @@
             class="w-full max-w-md rounded-lg border border-(--border-default) bg-(--bg-elevated) p-6 shadow-lg"
         >
             <h3 class="mb-4 text-lg font-semibold text-(--text-primary)">
-                Replace existing answer?
+                Replace accepted answer?
             </h3>
 
             <div class="mb-4 space-y-3">
                 <div>
-                    <p class="mb-1 text-xs font-medium text-(--text-tertiary)">Current answer:</p>
+                    <p class="mb-1 text-xs font-medium text-(--text-tertiary)">
+                        Current accepted answer:
+                    </p>
                     <p class="text-sm text-(--text-secondary)">{current_answer_node.statement}</p>
                 </div>
 
                 <div>
-                    <p class="mb-1 text-xs font-medium text-(--text-tertiary)">New answer:</p>
+                    <p class="mb-1 text-xs font-medium text-(--text-tertiary)">
+                        New accepted answer:
+                    </p>
                     <p class="text-sm text-(--text-secondary)">{pending_answer_node.statement}</p>
                 </div>
             </div>
 
             <p class="mb-6 text-sm text-(--text-tertiary)">
-                The current answer will be unlinked. The statement will remain in the graph.
+                The current accepted answer will be cleared. Both statements will remain linked to
+                the question.
             </p>
 
             <div class="flex justify-end gap-2">
-                <Button onclick={cancel_replace} variant="secondary" size="sm">
-                    {#snippet children()}
-                        Cancel
-                    {/snippet}
-                </Button>
+                <Button onclick={cancel_replace} variant="secondary" size="sm">Cancel</Button>
                 <Button onclick={confirm_replace} variant="primary" size="sm">
-                    {#snippet children()}
-                        Replace Answer
-                    {/snippet}
+                    Accept This Answer
                 </Button>
             </div>
         </div>

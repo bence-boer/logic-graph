@@ -4,7 +4,6 @@
       "id": "node-1",
       "statement": "Is the earth flat or spherical?",
       "type": "question",
-      "question_state": "resolved",
       "answered_by": "node-2"
     },
     {

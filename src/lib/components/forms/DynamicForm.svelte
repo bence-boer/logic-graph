@@ -142,10 +142,11 @@
     <div
         class="flex items-center justify-end gap-2 border-t border-(--border-default) bg-(--bg-subtle) p-3"
     >
-        {#each definition.actions as action}
+        {#each definition.actions as action (action)}
             {#if is_action_visible(action)}
                 <Button
                     variant={get_button_variant(action)}
+                    size="sm"
                     disabled={is_action_disabled(action) || form.state.submitting}
                     onclick={() => handle_action(action)}
                 >

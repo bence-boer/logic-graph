@@ -4,7 +4,7 @@
  * Maintains a stack of executed commands and provides undo/redo operations.
  */
 
-import type { CommandHistoryEntry, CommandPayload } from '$lib/commands/types';
+import type { CommandHistoryEntry } from '$lib/commands/types';
 
 /**
  * Maximum number of commands to keep in history.

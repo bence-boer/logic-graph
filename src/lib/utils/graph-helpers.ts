@@ -7,7 +7,7 @@
  */
 
 import type { LogicConnection, LogicNode } from '$lib/types/graph';
-import { ConnectionType } from '$lib/types/graph';
+import { ConnectionType, NodeType } from '$lib/types/graph';
 
 /**
  * Get a node's statement by ID, with fallback
@@ -28,6 +28,28 @@ import { ConnectionType } from '$lib/types/graph';
  */
 export function get_node_name(node_id: string, nodes: LogicNode[]): string {
     return nodes.find((node) => node.id === node_id)?.statement ?? 'Unknown';
+}
+
+/**
+ * Check if a question node is resolved
+ *
+ * A question is considered resolved if it has an accepted answer linked to it.
+ * This is determined by checking if the node has an `answered_by` field set.
+ *
+ * @param node - The node to check
+ * @returns True if the question has an accepted answer, false otherwise
+ *
+ * @example
+ * ```ts
+ * const active_question = { id: '1', type: NodeType.QUESTION, statement: 'Question?', details: '' };
+ * const resolved_question = { id: '2', type: NodeType.QUESTION, statement: 'Answered?', answered_by: 'answer-id' };
+ *
+ * is_question_resolved(active_question); // Returns: false
+ * is_question_resolved(resolved_question); // Returns: true
+ * ```
+ */
+export function is_question_resolved(node: LogicNode): boolean {
+    return node.type === NodeType.QUESTION && node.answered_by !== undefined;
 }
 
 /**

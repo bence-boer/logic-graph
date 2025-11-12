@@ -60,9 +60,7 @@ export async function export_to_image(
 
     // Use data URI instead of blob URL to avoid tainted canvas
     // Encode the SVG string as a data URI with proper escaping
-    const encoded_svg = encodeURIComponent(svg_string)
-        .replace(/'/g, '%27')
-        .replace(/"/g, '%22');
+    const encoded_svg = encodeURIComponent(svg_string).replace(/'/g, '%27').replace(/"/g, '%22');
     const data_url = `data:image/svg+xml;charset=utf-8,${encoded_svg}`;
 
     return new Promise((resolve, reject) => {
@@ -76,7 +74,8 @@ export async function export_to_image(
                 ctx.scale(scale, scale);
 
                 // Fill background
-                const bg_color = background_color || (format === 'jpeg' ? '#1a1a1a' : 'transparent');
+                const bg_color =
+                    background_color || (format === 'jpeg' ? '#1a1a1a' : 'transparent');
                 if (bg_color !== 'transparent') {
                     ctx.fillStyle = bg_color;
                     ctx.fillRect(0, 0, img.width, img.height);
@@ -96,12 +95,20 @@ export async function export_to_image(
                     0.95
                 );
             } catch (error) {
-                reject(new Error(`Failed to draw image to canvas: ${error instanceof Error ? error.message : 'Unknown error'}`));
+                reject(
+                    new Error(
+                        `Failed to draw image to canvas: ${error instanceof Error ? error.message : 'Unknown error'}`
+                    )
+                );
             }
         };
 
         img.onerror = (error) => {
-            reject(new Error(`Failed to load SVG image: ${error instanceof Error ? error.message : 'Unknown error'}`));
+            reject(
+                new Error(
+                    `Failed to load SVG image: ${error instanceof Error ? error.message : 'Unknown error'}`
+                )
+            );
         };
 
         // Set crossOrigin to anonymous to avoid CORS issues

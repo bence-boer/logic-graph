@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { import_graph_from_json } from './import';
-import { NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import { NodeType, StatementState } from '$lib/types/graph';
 
 describe('import_graph_from_json', () => {
     it('should import minimal graph with only required fields', () => {
@@ -35,9 +35,7 @@ describe('import_graph_from_json', () => {
                     statement: 'Question',
                     details: 'Details here',
                     type: 'question',
-                    question_state: 'resolved',
-                    answered_by: 'node-2',
-                    manual_state_override: true
+                    answered_by: 'node-2'
                 }
             ],
             connections: []
@@ -50,13 +48,11 @@ describe('import_graph_from_json', () => {
             statement: 'Question',
             details: 'Details here',
             type: NodeType.QUESTION,
-            question_state: QuestionState.RESOLVED,
-            answered_by: 'node-2',
-            manual_state_override: true
+            answered_by: 'node-2'
         });
     });
 
-    it('should set default question state for question nodes without explicit state', () => {
+    it('should import question nodes without answered_by', () => {
         const json = JSON.stringify({
             nodes: [
                 {
@@ -71,7 +67,7 @@ describe('import_graph_from_json', () => {
         const graph = import_graph_from_json(json);
 
         expect(graph.nodes[0].type).toBe(NodeType.QUESTION);
-        expect(graph.nodes[0].question_state).toBe(QuestionState.ACTIVE);
+        expect(graph.nodes[0].answered_by).toBeUndefined();
     });
 
     it('should generate connection IDs if missing', () => {

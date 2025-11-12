@@ -1,14 +1,14 @@
 <script lang="ts">
     import { graph_store } from '$lib/stores/graph.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
-    import { ui_store } from '$lib/stores/ui.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
-    import Button from '$lib/components/ui/Button.svelte';
-    import QuestionHeader from './QuestionHeader.svelte';
-    import BasicQuestionFields from './BasicQuestionFields.svelte';
-    import QuestionStateControl from './QuestionStateControl.svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
+    import { toggle_node_pin } from '$lib/utils/edit-node-actions';
+    import QuickActionsBar from '../EditNodeForm/QuickActionsBar.svelte';
     import AnswerSection from './AnswerSection.svelte';
+    import BasicQuestionFields from './BasicQuestionFields.svelte';
     import LinkedStatementsSection from './LinkedStatementsSection.svelte';
+    import QuestionHeader from './QuestionHeader.svelte';
 
     interface Props {
         node_id: string;
@@ -36,22 +36,6 @@
         selection_store.clear_selection();
     }
 
-    function save_changes() {
-        if (!node) return;
-
-        if (statement.trim().length === 0) {
-            notification_store.error('Question cannot be empty');
-            return;
-        }
-
-        graph_store.update_node(node.id, {
-            statement: statement.trim(),
-            details: details.trim() || undefined
-        });
-
-        notification_store.success('Question updated');
-    }
-
     function delete_node() {
         if (!node) return;
 
@@ -65,6 +49,10 @@
         notification_store.success('Question deleted');
         close_form();
     }
+
+    function handle_pin_toggle() {
+        toggle_node_pin(node_id);
+    }
 </script>
 
 {#if node}
@@ -72,11 +60,9 @@
         <QuestionHeader {node} onclose={close_form} />
 
         <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
-            <BasicQuestionFields bind:statement bind:details onsave={save_changes} />
+            <QuickActionsBar {node} onpin_toggle={handle_pin_toggle} ondelete={delete_node} />
 
-            <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
-
-            <QuestionStateControl {node} />
+            <BasicQuestionFields bind:statement bind:details />
 
             <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
@@ -87,20 +73,6 @@
             <LinkedStatementsSection {node} />
 
             <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
-
-            <!-- Form actions -->
-            <div class="flex gap-2">
-                <Button onclick={save_changes} variant="primary">
-                    {#snippet children()}
-                        Save Changes
-                    {/snippet}
-                </Button>
-                <Button onclick={delete_node} variant="danger">
-                    {#snippet children()}
-                        Delete Question
-                    {/snippet}
-                </Button>
-            </div>
         </div>
     </div>
 {:else}

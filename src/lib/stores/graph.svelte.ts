@@ -4,7 +4,7 @@
  */
 
 import type { LogicGraph, LogicNode, LogicConnection } from '$lib/types/graph';
-import { ConnectionType, NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import { ConnectionType, NodeType, StatementState } from '$lib/types/graph';
 
 function create_graph_store() {
     let _nodes = $state<LogicNode[]>([]);
@@ -124,16 +124,6 @@ function create_graph_store() {
         },
 
         /**
-         * Sets the question state for a question node.
-         *
-         * @param node_id - The ID of the question node
-         * @param state - The new question state
-         */
-        set_question_state(node_id: string, state: QuestionState): void {
-            this.update_node(node_id, { question_state: state });
-        },
-
-        /**
          * Sets the statement state for a statement node.
          *
          * @param node_id - The ID of the statement node
@@ -161,49 +151,23 @@ function create_graph_store() {
         },
 
         /**
-         * Sets or clears the answer for a question node.
-         * Also manages the corresponding ANSWER connection and updates question_state.
+         * Sets or clears the accepted answer for a question node.
+         *
+         * This updates the answered_by field to mark which statement is the accepted answer.
+         * The question can have multiple ANSWER connections (linked statements), but only one
+         * can be marked as the accepted answer via answered_by.
          *
          * @param question_node_id - The ID of the question node
-         * @param answer_node_id - The ID of the answer node, or null to clear
+         * @param answer_node_id - The ID of the answer node to mark as accepted, or null to clear
          */
         set_answer(question_node_id: string, answer_node_id: string | null): void {
             const question = _nodes.find((n) => n.id === question_node_id);
             if (!question) return;
 
-            // Remove any existing answer connections for this question
-            const existing_answer_connections = _connections.filter(
-                (conn) =>
-                    conn.type === ConnectionType.ANSWER && conn.sources.includes(question_node_id)
-            );
-
-            for (const conn of existing_answer_connections) {
-                this.remove_connection(conn.id!);
-            }
-
-            // Update the node's answered_by field and question_state
-            // Only auto-update question_state if not manually overridden
-            const updates: { answered_by?: string; question_state?: QuestionState } = {
+            // Update the node's answered_by field
+            this.update_node(question_node_id, {
                 answered_by: answer_node_id ?? undefined
-            };
-
-            if (!question.manual_state_override) {
-                // Set state based on whether we're adding or removing an answer
-                updates.question_state = answer_node_id
-                    ? QuestionState.RESOLVED
-                    : QuestionState.ACTIVE;
-            }
-
-            this.update_node(question_node_id, updates);
-
-            // If a new answer is provided, create the connection
-            if (answer_node_id) {
-                this.add_connection({
-                    type: ConnectionType.ANSWER,
-                    sources: [question_node_id],
-                    targets: [answer_node_id]
-                });
-            }
+            });
         },
 
         update_modified(): void {
@@ -239,29 +203,26 @@ function create_graph_store() {
                     details: 'Derived conclusion from the axiom of objective truth',
                     type: NodeType.STATEMENT
                 },
-                // 4. ACTIVE QUESTION WITH ANSWER - Amber border
+                // 4. ACTIVE QUESTION - Amber border, lower opacity (no accepted answer)
                 {
                     id: crypto.randomUUID(),
                     statement: 'What is the nature of truth?',
                     details: 'Fundamental epistemological question about truth itself',
-                    type: NodeType.QUESTION,
-                    question_state: QuestionState.ACTIVE
+                    type: NodeType.QUESTION
                 },
-                // 5. RESOLVED QUESTION WITH ANSWER - Light background, black text
+                // 5. RESOLVED QUESTION - White border, full opacity (has accepted answer)
                 {
                     id: crypto.randomUUID(),
                     statement: 'Can we trust our senses?',
                     details: 'Question about the reliability of sensory perception',
-                    type: NodeType.QUESTION,
-                    question_state: QuestionState.RESOLVED
+                    type: NodeType.QUESTION
                 },
-                // 6. ACTIVE QUESTION WITHOUT ANSWER - Amber border, no answer yet
+                // 6. ACTIVE QUESTION - Amber border, lower opacity (no accepted answer)
                 {
                     id: crypto.randomUUID(),
                     statement: 'How do we verify knowledge claims?',
                     details: 'Methodological question about epistemology',
-                    type: NodeType.QUESTION,
-                    question_state: QuestionState.ACTIVE
+                    type: NodeType.QUESTION
                 }
             ];
 

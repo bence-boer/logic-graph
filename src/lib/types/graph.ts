@@ -11,19 +11,19 @@ export enum NodeType {
 }
 
 /**
- * State of a question node
- */
-export enum QuestionState {
-    ACTIVE = 'active',
-    RESOLVED = 'resolved'
-}
-
-/**
  * State of a statement node (for axioms without reasons)
  */
 export enum StatementState {
     DEBATED = 'debated',
     SETTLED = 'settled'
+}
+
+/**
+ * State of a question node
+ */
+export enum QuestionState {
+    ACTIVE = 'active',
+    RESOLVED = 'resolved'
 }
 
 /**
@@ -38,14 +38,10 @@ export interface LogicNode {
     details?: string;
     /** Type of node (default: STATEMENT for backward compatibility) */
     type?: NodeType;
-    /** State for question nodes (only applicable when type is QUESTION) */
-    question_state?: QuestionState;
     /** State for statement nodes (only applicable when type is STATEMENT and node is an axiom) */
     statement_state?: StatementState;
-    /** ID of the answer node (only applicable when type is QUESTION, enforces one answer per question) */
+    /** ID of the answer node (only applicable when type is QUESTION, marks the accepted answer) */
     answered_by?: string;
-    /** Whether question state was manually set (prevents auto-changes from link/unlink operations) */
-    manual_state_override?: boolean;
     /** X position (managed by D3 force simulation) */
     x?: number;
     /** Y position (managed by D3 force simulation) */

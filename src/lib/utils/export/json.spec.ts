@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { export_graph_to_json } from './json';
 import type { LogicGraph } from '$lib/types/graph';
-import { NodeType, ConnectionType, QuestionState, StatementState } from '$lib/types/graph';
+import { NodeType, ConnectionType, StatementState } from '$lib/types/graph';
 
 describe('export_graph_to_json', () => {
     it('should export only semantic data without visual properties', () => {
@@ -87,7 +87,7 @@ describe('export_graph_to_json', () => {
         // Optional fields should not be present when empty/undefined
         expect(parsed.nodes[0]).not.toHaveProperty('details');
         expect(parsed.nodes[0]).not.toHaveProperty('type');
-        expect(parsed.nodes[0]).not.toHaveProperty('question_state');
+        expect(parsed.nodes[0]).not.toHaveProperty('answered_by');
         expect(parsed.nodes[0]).not.toHaveProperty('statement_state');
     });
 
@@ -99,9 +99,7 @@ describe('export_graph_to_json', () => {
                     statement: 'Question node',
                     details: 'A question',
                     type: NodeType.QUESTION,
-                    question_state: QuestionState.RESOLVED,
-                    answered_by: 'node-2',
-                    manual_state_override: true
+                    answered_by: 'node-2'
                 }
             ],
             connections: []
@@ -112,9 +110,7 @@ describe('export_graph_to_json', () => {
 
         expect(parsed.nodes[0]).toHaveProperty('details', 'A question');
         expect(parsed.nodes[0]).toHaveProperty('type', 'question');
-        expect(parsed.nodes[0]).toHaveProperty('question_state', 'resolved');
         expect(parsed.nodes[0]).toHaveProperty('answered_by', 'node-2');
-        expect(parsed.nodes[0]).toHaveProperty('manual_state_override', true);
     });
 
     it('should generate connection IDs if missing', () => {

@@ -21,7 +21,6 @@ import { pin_node_command } from './graph/pin-node';
 import { create_connection_command } from './graph/create-connection';
 import { delete_connection_command } from './graph/delete-connection';
 import { link_answer_command, unlink_answer_command } from './graph/answer-management';
-import { toggle_question_state_command } from './graph/toggle-question-state';
 
 // Navigation commands
 import {
@@ -67,7 +66,6 @@ export {
     delete_connection_command,
     link_answer_command,
     unlink_answer_command,
-    toggle_question_state_command,
     pan_command,
     zoom_command,
     zoom_in_command,
@@ -105,10 +103,6 @@ export type {
     UnlinkAnswerPayload,
     UnlinkAnswerResult
 } from './graph/answer-management';
-export type {
-    ToggleQuestionStatePayload,
-    ToggleQuestionStateResult
-} from './graph/toggle-question-state';
 export type { PanPayload, ZoomPayload, FocusNodePayload } from './navigation/index';
 export type {
     SelectNodePayload,
@@ -143,7 +137,6 @@ export function register_all_commands(): void {
     command_executor.register(delete_connection_command);
     command_executor.register(link_answer_command);
     command_executor.register(unlink_answer_command);
-    command_executor.register(toggle_question_state_command);
 
     // Navigation commands
     command_executor.register(pan_command);

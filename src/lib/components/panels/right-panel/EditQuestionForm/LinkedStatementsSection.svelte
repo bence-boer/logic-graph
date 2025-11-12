@@ -3,7 +3,7 @@
     import { notification_store } from '$lib/stores/notification.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
     import Button from '$lib/components/ui/Button.svelte';
-    import type { LogicNode, LogicConnection } from '$lib/types/graph';
+    import type { LogicNode } from '$lib/types/graph';
     import { ConnectionType } from '$lib/types/graph';
     import { is_statement_node } from '$lib/utils/node-classification';
     import { can_link_as_answer } from '$lib/utils/answer-management';
@@ -19,14 +19,22 @@
     let linked_statements = $derived(
         graph_store.connections
             .filter((conn) => {
+                // Include ANSWER connections now (they represent linked statements)
+                if (conn.type === ConnectionType.ANSWER && conn.sources.includes(node.id)) {
+                    return true;
+                }
+                // Also include IMPLICATION and CONTRADICTION connections
                 if (conn.type === ConnectionType.ANSWER) return false;
                 return conn.sources.includes(node.id) || conn.targets.includes(node.id);
             })
             .map((conn) => {
                 // Find the other node in the connection
-                const other_node_id = conn.sources.includes(node.id)
-                    ? conn.targets[0]
-                    : conn.sources[0];
+                const other_node_id =
+                    conn.type === ConnectionType.ANSWER
+                        ? conn.targets[0] // For ANSWER, target is the statement
+                        : conn.sources.includes(node.id)
+                          ? conn.targets[0]
+                          : conn.sources[0];
                 const other_node = graph_store.nodes.find((n) => n.id === other_node_id);
 
                 return {
@@ -49,7 +57,7 @@
                 graph_store.nodes.find((n) => n.id === statement_id)
             )
         ) {
-            notification_store.error('Cannot link this node as answer');
+            notification_store.error('Cannot mark this node as answer');
             return;
         }
 
@@ -62,8 +70,24 @@
     }
 
     function link_answer(answer_id: string) {
+        // Ensure an ANSWER connection exists (sources: question id, targets: answer statement id)
+        const existing = graph_store.connections.find(
+            (c) =>
+                c.type === ConnectionType.ANSWER &&
+                c.sources.includes(node.id) &&
+                c.targets.includes(answer_id)
+        );
+
+        if (!existing) {
+            graph_store.add_connection({
+                type: ConnectionType.ANSWER,
+                sources: [node.id],
+                targets: [answer_id]
+            });
+        }
+
         graph_store.set_answer(node.id, answer_id);
-        notification_store.success('Marked as answer');
+        notification_store.success('Answer accepted');
         show_replace_confirmation = false;
         pending_answer_id = null;
     }
@@ -107,16 +131,21 @@
 
     {#if linked_statements.length > 0}
         <div class="flex flex-col gap-2">
-            {#each linked_statements as { connection, node: stmt_node }}
+            {#each linked_statements as { connection, node: stmt_node } (connection.id)}
                 {#if stmt_node}
                     <div
-                        class="flex items-start gap-2 rounded-md border border-(--border-default) bg-(--bg-secondary) p-2.5"
+                        class="flex items-start gap-2 rounded-md border border-(--border-default) bg-(--bg-secondary) p-2.5 {node.answered_by ===
+                        stmt_node.id
+                            ? 'border-green-500/30 bg-green-500/5'
+                            : ''}"
                     >
                         {#if connection.type === ConnectionType.CONTRADICTION}
                             <Zap
                                 size={14}
                                 class="mt-0.5 shrink-0 {get_connection_color(connection.type)}"
                             />
+                        {:else if connection.type === ConnectionType.ANSWER}
+                            <ArrowRight size={14} class="mt-0.5 shrink-0 text-amber-500" />
                         {:else}
                             <ArrowRight
                                 size={14}
@@ -131,16 +160,45 @@
                             <p class="m-0 text-sm wrap-break-word text-(--text-secondary)">
                                 {stmt_node.statement}
                             </p>
+                            {#if node.answered_by === stmt_node.id}
+                                <span
+                                    class="mt-1 inline-block rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400"
+                                >
+                                    Accepted Answer
+                                </span>
+                            {/if}
                         </button>
-                        <div class="flex shrink-0 gap-1">
-                            <button
-                                class="rounded p-1.5 text-green-500 transition-colors hover:bg-green-500/10"
-                                onclick={() => mark_as_answer(stmt_node.id)}
-                                title="Mark as answer"
-                                type="button"
-                            >
-                                <CheckCircle2 size={14} />
-                            </button>
+                        <div class="flex shrink-0 items-center gap-1">
+                            {#if node.answered_by === stmt_node.id}
+                                <!-- This statement is the currently accepted answer -->
+                                <button
+                                    class="flex items-center justify-center rounded bg-green-500 p-1.5 text-white transition-colors hover:bg-green-600"
+                                    onclick={() => {
+                                        if (
+                                            confirm(
+                                                `Clear accepted answer "${stmt_node.statement}" for question "${node.statement}"?`
+                                            )
+                                        ) {
+                                            graph_store.set_answer(node.id, null);
+                                            notification_store.success('Accepted answer cleared');
+                                        }
+                                    }}
+                                    title="Clear accepted answer"
+                                    type="button"
+                                >
+                                    <CheckCircle2 size={14} />
+                                </button>
+                            {:else}
+                                <button
+                                    class="rounded p-1.5 text-green-500 transition-colors hover:bg-green-500/10"
+                                    onclick={() => mark_as_answer(stmt_node.id)}
+                                    title="Accept as answer"
+                                    type="button"
+                                >
+                                    <CheckCircle2 size={14} />
+                                </button>
+                            {/if}
+
                             <button
                                 class="rounded p-1.5 text-red-500 transition-colors hover:bg-red-500/10"
                                 onclick={() => remove_connection(connection.id!)}
@@ -168,35 +226,34 @@
             class="w-full max-w-md rounded-lg border border-(--border-default) bg-(--bg-elevated) p-6 shadow-lg"
         >
             <h3 class="mb-4 text-lg font-semibold text-(--text-primary)">
-                Replace existing answer?
+                Replace accepted answer?
             </h3>
 
             <div class="mb-4 space-y-3">
                 <div>
-                    <p class="mb-1 text-xs font-medium text-(--text-tertiary)">Current answer:</p>
+                    <p class="mb-1 text-xs font-medium text-(--text-tertiary)">
+                        Current accepted answer:
+                    </p>
                     <p class="text-sm text-(--text-secondary)">{current_answer_node.statement}</p>
                 </div>
 
                 <div>
-                    <p class="mb-1 text-xs font-medium text-(--text-tertiary)">New answer:</p>
+                    <p class="mb-1 text-xs font-medium text-(--text-tertiary)">
+                        New accepted answer:
+                    </p>
                     <p class="text-sm text-(--text-secondary)">{pending_answer_node.statement}</p>
                 </div>
             </div>
 
             <p class="mb-6 text-sm text-(--text-tertiary)">
-                The current answer will be unlinked. The statement will remain in the graph.
+                The current accepted answer will be cleared. Both statements will remain linked to
+                the question.
             </p>
 
             <div class="flex justify-end gap-2">
-                <Button onclick={cancel_replace} variant="secondary" size="sm">
-                    {#snippet children()}
-                        Cancel
-                    {/snippet}
-                </Button>
+                <Button onclick={cancel_replace} variant="secondary" size="sm">Cancel</Button>
                 <Button onclick={confirm_replace} variant="primary" size="sm">
-                    {#snippet children()}
-                        Replace Answer
-                    {/snippet}
+                    Accept This Answer
                 </Button>
             </div>
         </div>

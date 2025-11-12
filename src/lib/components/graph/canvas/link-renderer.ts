@@ -147,7 +147,10 @@ export function render_links(
         })
         .attr('marker-start', (link) => {
             // Use amber arrow markers for question contradictions
-            if (is_question_connection(link) && link.connection.type === ConnectionType.CONTRADICTION) {
+            if (
+                is_question_connection(link) &&
+                link.connection.type === ConnectionType.CONTRADICTION
+            ) {
                 return 'url(#arrow-question-start)';
             }
             return link.connection.type === ConnectionType.CONTRADICTION

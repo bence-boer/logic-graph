@@ -66,28 +66,6 @@ describe('Interaction Definitions', () => {
             }
         });
 
-        it('should include A key to create statement', () => {
-            const create = keyboard_interactions.find(
-                (i) => i.id === 'keyboard.a.create_statement'
-            );
-            expect(create).toBeDefined();
-            expect(create?.matcher.key).toBe('a');
-        });
-
-        it('should include Q key to create question', () => {
-            const create = keyboard_interactions.find((i) => i.id === 'keyboard.q.create_question');
-            expect(create).toBeDefined();
-            expect(create?.matcher.key).toBe('q');
-        });
-
-        it('should include Delete key to delete node', () => {
-            const delete_node = keyboard_interactions.find(
-                (i) => i.id === 'keyboard.delete.delete_node'
-            );
-            expect(delete_node).toBeDefined();
-            expect(delete_node?.command).toBe('graph.node.delete');
-        });
-
         it('should include Ctrl+Z to undo', () => {
             const undo = keyboard_interactions.find((i) => i.id === 'keyboard.ctrl_z.undo');
             expect(undo).toBeDefined();

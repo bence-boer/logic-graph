@@ -90,7 +90,7 @@ export const NOTIFICATION_PRESETS: Record<string, NotificationPreset> = {
         },
         type: 'success',
         duration: 4000,
-        actions: (data: CommandPayload) => [
+        actions: () => [
             {
                 label: 'Undo',
                 command: 'history.undo',

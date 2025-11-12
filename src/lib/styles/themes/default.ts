@@ -7,7 +7,8 @@
 
 import type { StyleTheme } from '../types';
 import { OverlayType, OverlayPosition, AnimationType, InteractionType } from '../types';
-import { NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import { NodeType, StatementState } from '$lib/types/graph';
+import { is_question_resolved } from '$lib/utils/graph-helpers';
 
 /**
  * Default dark theme definition
@@ -169,6 +170,7 @@ export const DEFAULT_THEME: StyleTheme = {
                 border_width: '{{borders.width.emphasis}}', // Thicker for visibility
                 text_color: '{{colors.text.inverse}}', // Dark text on light
                 box_shadow: '{{shadows.medium}}' // Lift it slightly
+                // opacity: 0.6 // De-emphasize slightly
             }
         },
 
@@ -274,31 +276,6 @@ export const DEFAULT_THEME: StyleTheme = {
             style: {
                 opacity: 0.3
             }
-        },
-
-        // Answered question (checkmark overlay)
-        answered: {
-            id: 'answered',
-            name: 'Answered Question',
-            description: 'Question node has an answer linked',
-            style: {},
-            overlays: [
-                {
-                    type: OverlayType.CHECKMARK,
-                    position: OverlayPosition.TOP_RIGHT,
-                    style: {
-                        size: 20,
-                        background: '{{colors.overlay.answer_bg}}', // Green success
-                        color: '{{colors.overlay.answer_icon}}', // White checkmark
-                        opacity: 0.95
-                    },
-                    animation: {
-                        type: AnimationType.SCALE_IN,
-                        duration: 400,
-                        easing: '{{animations.easing.bounce}}'
-                    }
-                }
-            ]
         }
     },
 
@@ -382,24 +359,10 @@ export const DEFAULT_THEME: StyleTheme = {
         },
 
         // ------------------------------------------------------------------------
-        // Overlay Priority: Answered (500)
-        // ------------------------------------------------------------------------
-        {
-            id: 'rule_answered',
-            priority: 500,
-            condition: {
-                type: 'custom',
-                evaluate: (ctx) => ctx.graph_state?.has_answer === true
-            },
-            variant: 'answered',
-            terminal: false
-        },
-
-        // ------------------------------------------------------------------------
         // Low Priority: Node Type and State Specific (200)
         // ------------------------------------------------------------------------
 
-        // Resolved question
+        // Resolved question (has accepted answer)
         {
             id: 'rule_question_resolved',
             priority: 200,
@@ -409,9 +372,8 @@ export const DEFAULT_THEME: StyleTheme = {
                 conditions: [
                     { type: 'node_type', node_type: NodeType.QUESTION },
                     {
-                        type: 'node_state',
-                        state_type: 'question_state',
-                        state_value: QuestionState.RESOLVED
+                        type: 'custom',
+                        evaluate: (ctx) => is_question_resolved(ctx.node)
                     }
                 ]
             },
@@ -419,7 +381,7 @@ export const DEFAULT_THEME: StyleTheme = {
             terminal: false
         },
 
-        // Active question
+        // Active question (no accepted answer)
         {
             id: 'rule_question_active',
             priority: 200,
@@ -429,19 +391,8 @@ export const DEFAULT_THEME: StyleTheme = {
                 conditions: [
                     { type: 'node_type', node_type: NodeType.QUESTION },
                     {
-                        type: 'composite',
-                        operator: 'OR',
-                        conditions: [
-                            {
-                                type: 'node_state',
-                                state_type: 'question_state',
-                                state_value: QuestionState.ACTIVE
-                            },
-                            {
-                                type: 'custom',
-                                evaluate: (ctx) => ctx.node.question_state === undefined
-                            }
-                        ]
+                        type: 'custom',
+                        evaluate: (ctx) => !is_question_resolved(ctx.node)
                     }
                 ]
             },

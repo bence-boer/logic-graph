@@ -7,7 +7,7 @@
  */
 
 import type { LogicConnection, LogicGraph, LogicNode } from '$lib/types/graph';
-import { ConnectionType, NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import { ConnectionType, NodeType, StatementState } from '$lib/types/graph';
 import { is_question_node, is_statement_node } from './node-classification';
 
 /**
@@ -106,14 +106,6 @@ export function validate_node(node: LogicNode): ValidationResult {
  */
 export function validate_question_node(node: LogicNode): ValidationResult {
     const errors: ValidationError[] = [];
-
-    // Validate question state if present
-    if (
-        node.question_state !== undefined &&
-        !Object.values(QuestionState).includes(node.question_state)
-    ) {
-        errors.push({ field: 'question_state', message: 'Invalid question state' });
-    }
 
     // Validate answered_by if present
     if (node.answered_by !== undefined) {
