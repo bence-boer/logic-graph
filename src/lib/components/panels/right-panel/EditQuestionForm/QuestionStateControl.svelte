@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { graph_store } from '$lib/stores/graph.svelte';
+    import { command_executor } from '$lib/commands';
+    import { toggle_question_state_command } from '$lib/commands/graph/toggle-question-state';
     import FormField from '$lib/components/ui/FormField.svelte';
     import type { LogicNode } from '$lib/types/graph';
     import { QuestionState } from '$lib/types/graph';
@@ -12,8 +13,12 @@
 
     let current_state = $derived(node.question_state || QuestionState.ACTIVE);
 
-    function set_state(state: QuestionState) {
-        graph_store.set_question_state(node.id, state);
+    async function set_state(state: QuestionState) {
+        // Use command to ensure manual_state_override is set
+        await command_executor.execute(toggle_question_state_command.id, {
+            question_id: node.id,
+            target_state: state
+        });
     }
 
     let active_classes = $derived(
