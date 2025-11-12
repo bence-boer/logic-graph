@@ -1,7 +1,7 @@
 <script lang="ts">
     import { graph_store } from '$lib/stores/graph.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
-    import { ConnectionType, NodeType, QuestionState } from '$lib/types/graph';
+    import { ConnectionType, NodeType } from '$lib/types/graph';
     import {
         close_edit_form,
         create_node_connection,
@@ -60,7 +60,7 @@
     let available_nodes_contradiction = $derived(
         get_available_nodes_by_type(node_id, graph_store.nodes, ConnectionType.CONTRADICTION)
     );
-    
+
     // Available question nodes for linking as answers
     let available_questions = $derived(
         graph_store.nodes
@@ -135,7 +135,7 @@
 
         cancel_adding();
     }
-    
+
     function add_question() {
         if (!node) return;
 
@@ -145,19 +145,25 @@
                 notification_store.error('Question is required');
                 return;
             }
-            
-            const new_question = graph_store.add_node({
+
+            const new_node = graph_store.add_node({
                 statement: new_node_statement.trim(),
                 details: '',
-                type: NodeType.QUESTION,
-                question_state: QuestionState.ACTIVE
+                type: NodeType.QUESTION
             });
-            
-            // Link the question to this statement as an answer
-            graph_store.set_answer(new_question.id, node.id);
-            
+
+            // Create an ANSWER connection (question -> statement) so the link is visible in graphs
+            graph_store.add_connection({
+                type: ConnectionType.ANSWER,
+                sources: [new_node.id],
+                targets: [node.id]
+            });
+
+            // Mark the created statement as the agreed-upon answer for the question
+            graph_store.set_answer(new_node.id, node.id);
+
             notification_store.success(
-                `Question "${new_question.statement}" created and linked to "${node.statement}"`
+                `Question "${new_node.statement}" created and linked to "${node.statement}"`
             );
         } else {
             // Link an existing question to this statement
@@ -165,30 +171,53 @@
                 notification_store.error('No question selected');
                 return;
             }
-            
-            const question_node = graph_store.nodes.find((n) => n.id === selected_node_for_connection);
+
+            const question_node = graph_store.nodes.find(
+                (n) => n.id === selected_node_for_connection
+            );
             if (!question_node) {
                 notification_store.error('Question not found');
                 return;
             }
-            
+
             // Check if question already has an answer
             if (question_node.answered_by) {
-                const current_answer = graph_store.nodes.find((n) => n.id === question_node.answered_by);
-                if (current_answer && !confirm(
-                    `This question is already answered by "${current_answer.statement}". Replace it with "${node.statement}"?`
-                )) {
+                const current_answer = graph_store.nodes.find(
+                    (n) => n.id === question_node.answered_by
+                );
+                if (
+                    current_answer &&
+                    !confirm(
+                        `This question is already answered by "${current_answer.statement}". Replace it with "${node.statement}"?`
+                    )
+                ) {
                     return;
                 }
             }
-            
+
+            // Ensure an ANSWER connection exists (question -> statement)
+            const existing = graph_store.connections.find(
+                (c) =>
+                    c.type === ConnectionType.ANSWER &&
+                    c.sources.includes(selected_node_for_connection) &&
+                    c.targets.includes(node.id)
+            );
+
+            if (!existing) {
+                graph_store.add_connection({
+                    type: ConnectionType.ANSWER,
+                    sources: [selected_node_for_connection],
+                    targets: [node.id]
+                });
+            }
+
             graph_store.set_answer(selected_node_for_connection, node.id);
-            
+
             notification_store.success(
                 `Question "${question_node.statement}" linked to "${node.statement}"`
             );
         }
-        
+
         cancel_adding();
     }
 
@@ -200,7 +229,7 @@
             connected_node_statement
         );
     }
-    
+
     function handle_question_delete(connection_id: string, question_statement: string) {
         if (!node) return;
         if (confirm(`Unlink question "${question_statement}" from "${node.statement}"?`)) {

@@ -6,10 +6,9 @@
     interface Props {
         statement: string;
         details: string;
-        onsave: () => void;
     }
 
-    let { statement = $bindable(), details = $bindable(), onsave }: Props = $props();
+    let { statement = $bindable(), details = $bindable() }: Props = $props();
 
     const MAX_STATEMENT_LENGTH = 100;
     const MAX_DETAILS_LENGTH = 500;

@@ -10,13 +10,7 @@
  * - Overlays (visual indicators like pins and checkmarks)
  */
 
-import type {
-    LogicNode,
-    LogicConnection,
-    NodeType,
-    QuestionState,
-    StatementState
-} from '$lib/types/graph';
+import type { LogicNode, LogicConnection, NodeType, StatementState } from '$lib/types/graph';
 
 // ============================================================================
 // Design Tokens
@@ -352,8 +346,8 @@ export interface NodeTypeCondition {
 
 export interface NodeStateCondition {
     type: 'node_state';
-    state_type: 'question_state' | 'statement_state';
-    state_value: QuestionState | StatementState;
+    state_type: 'statement_state';
+    state_value: StatementState;
 }
 
 export interface InteractionCondition {

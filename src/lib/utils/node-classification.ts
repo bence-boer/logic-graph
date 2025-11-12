@@ -7,7 +7,8 @@
  */
 
 import type { LogicNode, LogicConnection } from '$lib/types/graph';
-import { NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import { NodeType, StatementState, QuestionState } from '$lib/types/graph';
+import { is_question_resolved } from './graph-helpers';
 
 // ============================================================================
 // Type Guards
@@ -51,7 +52,7 @@ export function is_statement_node(node: LogicNode): boolean {
 // ============================================================================
 
 /**
- * Checks if a question node is in the active state.
+ * Checks if a question node is in the active state (no accepted answer).
  *
  * @param node - The node to check
  * @returns True if the node is an active question, false otherwise
@@ -61,21 +62,17 @@ export function is_statement_node(node: LogicNode): boolean {
  * const node = {
  *   id: '1',
  *   statement: 'What is truth?',
- *   type: NodeType.QUESTION,
- *   question_state: QuestionState.ACTIVE
+ *   type: NodeType.QUESTION
  * };
  * console.log(is_active_question(node)); // true
  * ```
  */
 export function is_active_question(node: LogicNode): boolean {
-    return (
-        is_question_node(node) &&
-        (node.question_state === QuestionState.ACTIVE || node.question_state === undefined)
-    );
+    return is_question_node(node) && !is_question_resolved(node);
 }
 
 /**
- * Checks if a question node is in the resolved state.
+ * Checks if a question node is in the resolved state (has accepted answer).
  *
  * @param node - The node to check
  * @returns True if the node is a resolved question, false otherwise
@@ -86,38 +83,48 @@ export function is_active_question(node: LogicNode): boolean {
  *   id: '1',
  *   statement: 'What is truth?',
  *   type: NodeType.QUESTION,
- *   question_state: QuestionState.RESOLVED
+ *   answered_by: 'answer-id'
  * };
  * console.log(is_resolved_question(node)); // true
  * ```
  */
 export function is_resolved_question(node: LogicNode): boolean {
-    return is_question_node(node) && node.question_state === QuestionState.RESOLVED;
+    return is_question_resolved(node);
 }
 
 /**
- * Gets the question state of a node.
+ * Checks if a statement node is debated.
+
+/**
+ * Gets the derived question state of a node based on whether it has an accepted answer.
  *
  * @param node - The node to check
- * @returns The question state, or undefined if not a question node
+ * @returns The derived question state, or undefined if not a question node
  *
  * @example
  * ```ts
- * const node = {
+ * const active_node = {
  *   id: '1',
  *   statement: 'What is truth?',
- *   type: NodeType.QUESTION,
- *   question_state: QuestionState.ACTIVE
+ *   type: NodeType.QUESTION
  * };
- * console.log(get_question_state(node)); // QuestionState.ACTIVE
+ * console.log(get_question_state(active_node)); // QuestionState.ACTIVE
+ *
+ * const resolved_node = {
+ *   id: '2',
+ *   statement: 'What is truth?',
+ *   type: NodeType.QUESTION,
+ *   answered_by: 'answer-id'
+ * };
+ * console.log(get_question_state(resolved_node)); // QuestionState.RESOLVED
  * ```
  */
 export function get_question_state(node: LogicNode): QuestionState | undefined {
     if (!is_question_node(node)) {
         return undefined;
     }
-    // Default to ACTIVE if not specified
-    return node.question_state ?? QuestionState.ACTIVE;
+    // Derive state from whether the question has an accepted answer
+    return is_question_resolved(node) ? QuestionState.RESOLVED : QuestionState.ACTIVE;
 }
 
 // ============================================================================

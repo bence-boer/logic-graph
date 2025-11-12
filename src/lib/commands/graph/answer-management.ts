@@ -8,7 +8,7 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
-import { NodeType, QuestionState, ConnectionType } from '$lib/types/graph';
+import { NodeType, ConnectionType } from '$lib/types/graph';
 
 /**
  * Payload for linking an answer to a question.
@@ -30,10 +30,6 @@ export interface LinkAnswerResult {
     answer_id: string;
     /** Previous answer ID (if any) */
     previous_answer_id?: string;
-    /** Previous question state */
-    previous_question_state?: QuestionState;
-    /** Previous manual state override flag */
-    previous_manual_override?: boolean;
     /** ID of the created connection */
     connection_id: string;
 }
@@ -124,8 +120,6 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
 
             // Store previous answer if exists
             const previous_answer_id = question.answered_by;
-            const previous_question_state = question.question_state;
-            const previous_manual_override = question.manual_state_override;
 
             // Create answer connection
             const connection = graph_store.add_connection({
@@ -134,17 +128,10 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
                 targets: [payload.question_id]
             });
 
-            // Update question with answer
-            // Only auto-set state to RESOLVED if not manually overridden
-            const updates: { answered_by: string; question_state?: QuestionState } = {
+            // Update question with answer (answer_id represents the accepted answer)
+            graph_store.update_node(payload.question_id, {
                 answered_by: payload.answer_id
-            };
-
-            if (!question.manual_state_override) {
-                updates.question_state = QuestionState.RESOLVED;
-            }
-
-            graph_store.update_node(payload.question_id, updates);
+            });
 
             return {
                 success: true,
@@ -152,8 +139,6 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
                     question_id: payload.question_id,
                     answer_id: payload.answer_id,
                     previous_answer_id,
-                    previous_question_state,
-                    previous_manual_override,
                     connection_id: connection.id!
                 },
                 effects: [
@@ -199,24 +184,14 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
         }
 
         try {
-            const {
-                question_id,
-                previous_answer_id,
-                previous_question_state,
-                previous_manual_override,
-                connection_id
-            } = result.data;
+            const { question_id, previous_answer_id, connection_id } = result.data;
 
             // Remove the connection
             graph_store.remove_connection(connection_id);
 
-            // Restore previous state
+            // Restore previous answer state
             graph_store.update_node(question_id, {
-                answered_by: previous_answer_id,
-                question_state:
-                    previous_question_state ||
-                    (previous_answer_id ? QuestionState.RESOLVED : QuestionState.ACTIVE),
-                manual_state_override: previous_manual_override
+                answered_by: previous_answer_id
             });
 
             return {
@@ -256,10 +231,6 @@ export interface UnlinkAnswerResult {
     question_id: string;
     /** Unlinked answer ID */
     answer_id: string;
-    /** Previous question state */
-    previous_question_state?: QuestionState;
-    /** Previous manual state override flag */
-    previous_manual_override?: boolean;
     /** ID of the deleted connection */
     connection_id: string;
 }
@@ -325,8 +296,6 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
             }
 
             const answer_id = question.answered_by;
-            const previous_question_state = question.question_state;
-            const previous_manual_override = question.manual_state_override;
 
             // Find and remove the answer connection
             const connection = graph_store.connections.find(
@@ -346,25 +315,16 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
             const connection_id = connection.id!;
             graph_store.remove_connection(connection_id);
 
-            // Update question to remove answer
-            // Only auto-set state to ACTIVE if not manually overridden
-            const updates: { answered_by: undefined; question_state?: QuestionState } = {
+            // Update question to remove accepted answer
+            graph_store.update_node(payload.question_id, {
                 answered_by: undefined
-            };
-
-            if (!question.manual_state_override) {
-                updates.question_state = QuestionState.ACTIVE;
-            }
-
-            graph_store.update_node(payload.question_id, updates);
+            });
 
             return {
                 success: true,
                 data: {
                     question_id: payload.question_id,
                     answer_id,
-                    previous_question_state,
-                    previous_manual_override,
                     connection_id
                 },
                 effects: [
@@ -402,8 +362,7 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
         }
 
         try {
-            const { question_id, answer_id, previous_question_state, previous_manual_override } =
-                result.data;
+            const { question_id, answer_id } = result.data;
 
             // Recreate the answer connection
             const connection = graph_store.add_connection({
@@ -412,11 +371,9 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
                 targets: [question_id]
             });
 
-            // Restore answer link and previous state
+            // Restore accepted answer link
             graph_store.update_node(question_id, {
-                answered_by: answer_id,
-                question_state: previous_question_state || QuestionState.RESOLVED,
-                manual_state_override: previous_manual_override
+                answered_by: answer_id
             });
 
             return {

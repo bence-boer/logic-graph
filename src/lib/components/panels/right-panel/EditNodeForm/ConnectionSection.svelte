@@ -72,15 +72,10 @@
             {/if}
             <h3 class="m-0 text-sm font-semibold tracking-wide text-(--text-secondary) uppercase">
                 {title}
+                {#if connection_count > 0}
+                    <span class="text-(--text-tertiary)">({connection_count})</span>
+                {/if}
             </h3>
-            {#if connection_count > 0}
-                <span
-                    class="rounded-full px-2 py-0.5 text-xs font-medium {symbol_color} bg-opacity-20"
-                    style="background-color: currentColor; opacity: 0.2;"
-                >
-                    {connection_count}
-                </span>
-            {/if}
         </button>
         <button
             class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-1 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"

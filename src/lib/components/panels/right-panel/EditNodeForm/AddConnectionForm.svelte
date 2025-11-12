@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Button from '$lib/components/ui/Button.svelte';
     import Input from '$lib/components/ui/Input.svelte';
     import Select from '$lib/components/ui/Select.svelte';
 
@@ -73,18 +74,7 @@
         />
     {/if}
     <div class="flex gap-2">
-        <button
-            class="flex-1 cursor-pointer rounded-md border border-(--accent-primary) bg-(--accent-primary) px-3 py-1.5 text-sm text-white transition-all duration-200 hover:bg-accent-700 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
-            onclick={onconfirm}
-            disabled={is_disabled}
-        >
-            Add
-        </button>
-        <button
-            class="cursor-pointer rounded-md border border-(--border-default) bg-transparent px-3 py-1.5 text-sm text-(--text-primary) transition-all duration-200 hover:bg-(--bg-tertiary) active:scale-98"
-            onclick={oncancel}
-        >
-            Cancel
-        </button>
+        <Button variant="primary" size="sm" onclick={onconfirm} disabled={is_disabled}>Add</Button>
+        <Button variant="secondary" size="sm" onclick={oncancel}>Cancel</Button>
     </div>
 </div>

@@ -9,7 +9,7 @@ import type { Command, CommandResult, ValidationResult } from '$lib/commands/typ
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
 import type { LogicNode } from '$lib/types/graph';
-import { NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import { NodeType, StatementState } from '$lib/types/graph';
 import { AnimationType, EasingType } from '$lib/types/animations';
 
 /**
@@ -22,8 +22,6 @@ export interface CreateNodePayload {
     details?: string;
     /** Type of node (default: STATEMENT) */
     type?: NodeType;
-    /** Question state (for question nodes) */
-    question_state?: QuestionState;
     /** Statement state (for statement nodes) */
     statement_state?: StatementState;
     /** Initial X position */
@@ -91,17 +89,6 @@ export const create_node_command: Command<CreateNodePayload, CreateNodeResult> =
             };
         }
 
-        // Validate question state if provided
-        if (
-            payload.question_state &&
-            !Object.values(QuestionState).includes(payload.question_state)
-        ) {
-            return {
-                valid: false,
-                error: 'Invalid question state'
-            };
-        }
-
         // Validate statement state if provided
         if (
             payload.statement_state &&
@@ -128,9 +115,7 @@ export const create_node_command: Command<CreateNodePayload, CreateNodeResult> =
             };
 
             // Add type-specific properties
-            if (node_data.type === NodeType.QUESTION) {
-                node_data.question_state = payload.question_state ?? QuestionState.ACTIVE;
-            } else if (node_data.type === NodeType.STATEMENT) {
+            if (node_data.type === NodeType.STATEMENT) {
                 // Only set statement_state if provided (not all statements need it)
                 if (payload.statement_state) {
                     node_data.statement_state = payload.statement_state;

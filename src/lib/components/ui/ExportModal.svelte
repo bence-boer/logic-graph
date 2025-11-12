@@ -66,7 +66,7 @@
             handle_close();
         } catch (error) {
             console.error('Export failed:', error);
-            
+
             // Extract meaningful error message
             let error_message = 'Unknown error';
             if (error instanceof Error) {
@@ -74,9 +74,11 @@
             } else if (typeof error === 'string') {
                 error_message = error;
             }
-            
+
             // Show user-friendly error notification
-            notification_store.error(`Failed to export as ${export_format.toUpperCase()}: ${error_message}`);
+            notification_store.error(
+                `Failed to export as ${export_format.toUpperCase()}: ${error_message}`
+            );
         } finally {
             is_exporting = false;
             loading_store.stop();

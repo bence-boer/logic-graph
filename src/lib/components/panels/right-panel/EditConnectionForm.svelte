@@ -2,6 +2,7 @@
     import FormField from '$lib/components/ui/FormField.svelte';
     import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
     import Select from '$lib/components/ui/Select.svelte';
+    import Button from '$lib/components/ui/Button.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
@@ -119,14 +120,9 @@
     <div class="flex h-full flex-col">
         <div class="flex items-center justify-between border-b border-(--border-default) p-3">
             <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Edit Connection</h3>
-            <button
-                class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--text-primary) transition-all duration-200 hover:border-(--border-hover) hover:bg-(--bg-secondary) active:scale-98"
-                onclick={close_panel}
-                aria-label="Close"
-                title="Close"
-            >
-                <X size={18} />
-            </button>
+            <Button size="sm" icon onclick={close_panel}>
+                <X size={14} />
+            </Button>
         </div>
 
         <div class="flex flex-1 flex-col gap-4 overflow-y-auto p-3">
@@ -178,14 +174,9 @@
             <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
             <div class="flex gap-1">
-                <button
-                    class="flex cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-2 text-(--accent-secondary) transition-all duration-200 hover:border-(--accent-secondary) hover:bg-[rgba(239,68,68,0.1)] active:scale-98"
-                    onclick={handle_delete}
-                    title="Delete Connection"
-                    aria-label="Delete Connection"
-                >
-                    <Trash2 size={18} />
-                </button>
+                <Button variant="danger" size="sm" onclick={handle_delete}>
+                    <Trash2 size={14} />
+                </Button>
             </div>
         </div>
     </div>

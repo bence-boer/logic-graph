@@ -105,11 +105,7 @@ export class StyleEngine {
 
             case 'node_state': {
                 const node_state_condition = condition as NodeStateCondition;
-                if (node_state_condition.state_type === 'question_state') {
-                    return context.node.question_state === node_state_condition.state_value;
-                } else {
-                    return context.node.statement_state === node_state_condition.state_value;
-                }
+                return context.node.statement_state === node_state_condition.state_value;
             }
 
             case 'interaction': {

@@ -5,9 +5,9 @@
  * Provides drag behavior, selection handling, and visual feedback.
  */
 import { selection_store } from '$lib/stores/selection.svelte';
+import { DEFAULT_THEME, StyleEngine, build_style_context, render_overlays } from '$lib/styles';
 import type { DragTrackingNode } from '$lib/types/d3-extensions';
 import type { LogicConnection, LogicNode } from '$lib/types/graph';
-import { StyleEngine, DEFAULT_THEME, build_style_context, render_overlays } from '$lib/styles';
 import * as d3 from 'd3';
 
 // Create style engine instance with default theme
@@ -135,7 +135,6 @@ export function render_nodes(
         .style('display', 'flex')
         .style('align-items', 'center')
         .style('justify-content', 'center')
-        .style('transition', 'all 0.2s ease')
         .style('pointer-events', 'none')
         .text((d) => d.statement);
 

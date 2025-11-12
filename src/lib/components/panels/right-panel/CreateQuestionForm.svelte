@@ -4,7 +4,7 @@
     import { selection_store } from '$lib/stores/selection.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
     import { use_node_form } from '$lib/composables/use-node-form.svelte';
-    import { NodeType, QuestionState } from '$lib/types/graph';
+    import { NodeType, ConnectionType } from '$lib/types/graph';
     import { is_statement_node } from '$lib/utils/node-classification';
     import Input from '$lib/components/ui/Input.svelte';
     import Textarea from '$lib/components/ui/Textarea.svelte';
@@ -16,7 +16,6 @@
     const form = use_node_form();
 
     // Question-specific state
-    let initial_state = $state<QuestionState>(QuestionState.ACTIVE);
     let link_answer = $state<boolean>(false);
     let selected_answer_id = $state<string>('');
 
@@ -29,12 +28,6 @@
                 label: node.statement
             }))
     );
-
-    // Question state options
-    const state_options = [
-        { value: QuestionState.ACTIVE, label: 'Active' },
-        { value: QuestionState.RESOLVED, label: 'Resolved' }
-    ];
 
     function handle_create() {
         if (!form.validate()) {
@@ -54,16 +47,23 @@
                 statement: form.node_statement.trim(),
                 details: form.node_details.trim(),
                 type: NodeType.QUESTION,
-                question_state: initial_state,
                 answered_by: link_answer ? selected_answer_id : undefined
             });
 
             // Create answer connection if specified
             if (link_answer && selected_answer_id) {
+                // Create ANSWER connection (question -> statement)
+                graph_store.add_connection({
+                    type: ConnectionType.ANSWER,
+                    sources: [new_node.id],
+                    targets: [selected_answer_id]
+                });
+
+                // Set as accepted answer
                 graph_store.set_answer(new_node.id, selected_answer_id);
                 const answer_node = graph_store.nodes.find((n) => n.id === selected_answer_id);
                 notification_store.success(
-                    `Question "${form.node_statement}" created with answer "${answer_node?.statement}"`
+                    `Question "${form.node_statement}" created with accepted answer "${answer_node?.statement}"`
                 );
             } else {
                 notification_store.success(`Question "${form.node_statement}" created`);
@@ -112,29 +112,21 @@
             />
         </FormField>
 
-        <FormField label="Initial State" hint="Questions start as active by default">
-            <Select
-                bind:value={initial_state}
-                options={state_options}
-                placeholder="Select initial state..."
-            />
-        </FormField>
-
         <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
-        <FormField label="Link answer immediately" hint="Optional">
+        <FormField label="Link accepted answer immediately" hint="Optional">
             <label class="flex cursor-pointer items-center gap-2">
                 <input
                     type="checkbox"
                     bind:checked={link_answer}
                     class="h-4 w-4 rounded border-gray-300"
                 />
-                <span class="text-sm">Link to an existing statement as the answer</span>
+                <span class="text-sm">Link to an existing statement as the accepted answer</span>
             </label>
         </FormField>
 
         {#if link_answer && available_statements.length > 0}
-            <FormField label="Select answer statement" required>
+            <FormField label="Select accepted answer statement" required>
                 <Select
                     bind:value={selected_answer_id}
                     options={available_statements}
@@ -146,8 +138,8 @@
 
         {#if link_answer && available_statements.length === 0}
             <p class="text-sm text-(--text-tertiary)">
-                No statements available to link as answer. Create this question first, then add an
-                answer from the edit view.
+                No statements available to link as accepted answer. Create this question first, then
+                add an answer from the edit view.
             </p>
         {/if}
     </div>

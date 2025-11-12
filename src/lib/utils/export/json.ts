@@ -17,14 +17,10 @@ export interface ExportNode {
     details?: string;
     /** Type of node */
     type?: string;
-    /** State for question nodes */
-    question_state?: string;
     /** State for statement nodes */
     statement_state?: string;
     /** ID of the answer node (for question nodes) */
     answered_by?: string;
-    /** Whether question state was manually set */
-    manual_state_override?: boolean;
 }
 
 /**
@@ -91,17 +87,11 @@ function convert_to_export_format(graph: LogicGraph): ExportGraph {
             if (node.type) {
                 export_node.type = node.type;
             }
-            if (node.question_state) {
-                export_node.question_state = node.question_state;
-            }
             if (node.statement_state) {
                 export_node.statement_state = node.statement_state;
             }
             if (node.answered_by) {
                 export_node.answered_by = node.answered_by;
-            }
-            if (node.manual_state_override) {
-                export_node.manual_state_override = node.manual_state_override;
             }
 
             return export_node;
