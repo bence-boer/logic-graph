@@ -2,8 +2,9 @@
     import { graph_store } from '$lib/stores/graph.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
-    import { toast_store } from '$lib/stores/toast.svelte';
+    import { notification_store } from '$lib/stores/notification.svelte';
     import { ConnectionType } from '$lib/types/graph';
+    import { get_available_nodes_by_type } from '$lib/utils/node-connections';
     import Select from '$lib/components/ui/Select.svelte';
     import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
     import FormField from '$lib/components/ui/FormField.svelte';
@@ -15,16 +16,27 @@
     let validation_errors = $state<Record<string, string>>({});
     let is_submitting = $state(false);
 
-    // Computed options for multi-select
+    // Computed options for multi-select, filtered by connection type
     let node_options = $derived(
-        graph_store.nodes.map((node) => ({
-            value: node.id,
-            label: node.statement,
-            description: node.details
-        }))
+        get_available_nodes_by_type('', graph_store.nodes, connection_type).map((opt) => {
+            const node = graph_store.nodes.find((n) => n.id === opt.value);
+            return {
+                value: opt.value,
+                label: opt.label,
+                description: node?.details
+            };
+        })
     );
 
     let has_enough_nodes = $derived(graph_store.nodes.length >= 2);
+
+    // Reset selections when connection type changes
+    $effect(() => {
+        // Watch connection_type and clear selections if they become invalid
+        const valid_ids = new Set(node_options.map((opt) => opt.value));
+        source_ids = source_ids.filter((id) => valid_ids.has(id));
+        target_ids = target_ids.filter((id) => valid_ids.has(id));
+    });
 
     function validate_form(): boolean {
         validation_errors = {};
@@ -69,7 +81,7 @@
             const connection_type_label =
                 connection_type === ConnectionType.IMPLICATION ? 'Implication' : 'Contradiction';
 
-            toast_store.success(
+            notification_store.success(
                 `${connection_type_label} connection created: [${source_names}] → [${target_names}]`
             );
 
@@ -77,7 +89,7 @@
             selection_store.select_connection(new_connection.id);
             ui_store.open_edit_connection_form(new_connection.id);
         } catch (error) {
-            toast_store.error('Failed to create connection');
+            notification_store.error('Failed to create connection');
             console.error(error);
         } finally {
             is_submitting = false;
@@ -115,8 +127,8 @@
                 <Select
                     bind:value={connection_type}
                     options={[
-                        { value: ConnectionType.IMPLICATION, label: '→ Implication' },
-                        { value: ConnectionType.CONTRADICTION, label: '⟷ Contradiction' }
+                        { value: ConnectionType.IMPLICATION, label: '→ Implication (Reasons / Consequences)' },
+                        { value: ConnectionType.CONTRADICTION, label: '⟷ Contradiction (Mutual Exclusion)' }
                     ]}
                 />
             </FormField>

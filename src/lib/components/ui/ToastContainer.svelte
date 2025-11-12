@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { toast_store } from '$lib/stores/toast.svelte';
+    import { notification_store } from '$lib/stores/notification.svelte';
 
     function handle_close(id: string) {
-        toast_store.remove(id);
+        notification_store.remove(id);
     }
 
     function get_icon(type: string) {
@@ -35,7 +35,7 @@
 </script>
 
 <div class="pointer-events-none fixed right-6 bottom-6 z-10000 flex flex-col gap-2">
-    {#each toast_store.toasts as toast (toast.id)}
+    {#each notification_store.toasts as toast (toast.id)}
         <div
             class="pointer-events-auto flex max-w-[400px] min-w-[300px] animate-[slide-in_0.3s_ease] items-center gap-4 rounded-lg border border-neutral-700 bg-neutral-800/80 px-6 py-4 shadow-[0_10px_15px_rgba(0,0,0,0.5)] backdrop-blur-md {toast_border_classes[
                 toast.type

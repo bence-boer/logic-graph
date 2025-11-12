@@ -1,6 +1,6 @@
 <script lang="ts">
     import { graph_store } from '$lib/stores/graph.svelte';
-    import { toast_store } from '$lib/stores/toast.svelte';
+    import { notification_store } from '$lib/stores/notification.svelte';
     import { ConnectionType } from '$lib/types/graph';
     import {
         close_edit_form,
@@ -12,16 +12,19 @@
         toggle_node_pin
     } from '$lib/utils/edit-node-actions';
     import {
-        get_available_nodes_for_connection,
+        get_available_nodes_by_type,
         get_node_consequences,
         get_node_contradictions,
         get_node_reasons
     } from '$lib/utils/node-connections';
+    import { is_axiom_node } from '$lib/utils/node-classification';
     import BasicNodeFields from './BasicNodeFields.svelte';
     import ConnectionSection from './ConnectionSection.svelte';
     import EditNodeFormHeader from './EditNodeFormHeader.svelte';
     import FormalizedStatement from './FormalizedStatement.svelte';
     import QuickActionsBar from './QuickActionsBar.svelte';
+    import StatementStateControl from './StatementStateControl.svelte';
+    import QuestionsSection from './QuestionsSection.svelte';
 
     interface Props {
         node_id: string;
@@ -48,8 +51,16 @@
     let connection_mode = $state<'existing' | 'new'>('existing');
     let new_node_statement = $state('');
 
-    // Available nodes for connection (excluding current node)
-    let available_nodes = $derived(get_available_nodes_for_connection(node_id, graph_store.nodes));
+    // Available nodes for connection (excluding current node), filtered by type
+    let available_nodes_implication = $derived(
+        get_available_nodes_by_type(node_id, graph_store.nodes, ConnectionType.IMPLICATION)
+    );
+    let available_nodes_contradiction = $derived(
+        get_available_nodes_by_type(node_id, graph_store.nodes, ConnectionType.CONTRADICTION)
+    );
+
+    // Check if this node is an axiom (for statement state control)
+    let is_axiom = $derived(is_axiom_node(node_id, graph_store.connections));
 
     // Initialize form values when node loads (only once)
     $effect(() => {
@@ -107,7 +118,7 @@
         );
 
         if (result.error) {
-            toast_store.error(result.error);
+            notification_store.error(result.error);
             return;
         }
 
@@ -133,6 +144,11 @@
 
             <BasicNodeFields bind:statement bind:details onsave={handle_save} />
 
+            {#if is_axiom}
+                <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
+                <StatementStateControl {node} />
+            {/if}
+
             <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
             <FormalizedStatement
@@ -151,7 +167,7 @@
                 symbol_color="text-(--link-implication)"
                 connections={reasons}
                 all_nodes={graph_store.nodes}
-                {available_nodes}
+                available_nodes={available_nodes_implication}
                 empty_message="This is an axiom of the system"
                 bind:is_adding={is_adding_reason}
                 bind:connection_mode
@@ -174,7 +190,7 @@
                 symbol_color="text-(--link-implication)"
                 connections={consequences}
                 all_nodes={graph_store.nodes}
-                {available_nodes}
+                available_nodes={available_nodes_implication}
                 empty_message="No consequences"
                 bind:is_adding={is_adding_consequence}
                 bind:connection_mode
@@ -197,7 +213,7 @@
                 symbol_color="text-(--link-contradiction)"
                 connections={contradictions}
                 all_nodes={graph_store.nodes}
-                {available_nodes}
+                available_nodes={available_nodes_contradiction}
                 empty_message="No contradictions"
                 bind:is_adding={is_adding_contradiction}
                 bind:connection_mode
@@ -211,6 +227,10 @@
                 onconnection_click={navigate_to_node}
                 onconnection_delete={handle_connection_delete}
             />
+
+            <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
+
+            <QuestionsSection {node} />
         </div>
     </div>
 {:else}

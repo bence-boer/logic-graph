@@ -3,7 +3,7 @@
     import type { LogicGraph } from '$lib/types/graph';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
-    import { toast_store } from '$lib/stores/toast.svelte';
+    import { notification_store } from '$lib/stores/notification.svelte';
     import { validate_graph } from '$lib/utils/validation';
     import HelpModal from '$lib/components/ui/HelpModal.svelte';
     import ExportModal from '$lib/components/ui/ExportModal.svelte';
@@ -25,7 +25,7 @@
             graph_store.load_graph(graph);
             const node_count = graph.nodes?.length || 0;
             const connection_count = graph.connections?.length || 0;
-            toast_store.success(
+            notification_store.success(
                 `Graph imported: ${node_count} statements, ${connection_count} connections`
             );
         } else {
@@ -33,7 +33,7 @@
                 .slice(0, 3)
                 .map((e) => e.message)
                 .join('; ');
-            toast_store.error(
+            notification_store.error(
                 `Invalid graph: ${error_summary}${validation.errors.length > 3 ? '...' : ''}`
             );
             alert(`Invalid graph:\n${validation.errors.map((e) => `- ${e.message}`).join('\n')}`);
@@ -46,7 +46,7 @@
 
         if (confirm('Create a new graph? This will clear the current graph.')) {
             graph_store.clear();
-            toast_store.info(
+            notification_store.info(
                 `New graph created (cleared ${node_count} statements, ${connection_count} connections)`
             );
         }
@@ -54,7 +54,7 @@
 
     function handle_load_sample() {
         graph_store.load_sample_data();
-        toast_store.success('Sample graph loaded: "Socrates is mortal" syllogism');
+        notification_store.success('Sample graph loaded: "Socrates is mortal" syllogism');
     }
 
     function handle_clear() {
@@ -63,7 +63,7 @@
 
         if (confirm('Clear the entire graph? This will delete all statements and connections.')) {
             graph_store.clear();
-            toast_store.info(
+            notification_store.info(
                 `Graph cleared (${node_count} statements, ${connection_count} connections removed)`
             );
         }
@@ -73,9 +73,13 @@
         ui_store.open_create_node_form();
     }
 
+    function handle_add_question() {
+        ui_store.open_create_question_form();
+    }
+
     function handle_add_connection() {
         if (graph_store.nodes.length < 2) {
-            toast_store.error('You need at least 2 statements to create a connection');
+            notification_store.error('You need at least 2 statements to create a connection');
             return;
         }
         ui_store.open_create_connection_form();
@@ -101,6 +105,7 @@
 
     <EditActions
         on_add_node={handle_add_node}
+        on_add_question={handle_add_question}
         on_add_connection={handle_add_connection}
         on_recenter={handle_recenter}
     />

@@ -1,22 +1,31 @@
 <script lang="ts">
     import { ui_store } from '$lib/stores/ui.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
+    import { graph_store } from '$lib/stores/graph.svelte';
     import { RightPanelModeType, SelectionTypeEnum } from '$lib/types/graph';
+    import { is_question_node } from '$lib/utils/node-classification';
     import CreateNodeForm from './right-panel/CreateNodeForm.svelte';
+    import CreateQuestionForm from './right-panel/CreateQuestionForm.svelte';
     import CreateConnectionForm from './right-panel/CreateConnectionForm.svelte';
     import EditNodeForm from './right-panel/EditNodeForm';
+    import EditQuestionForm from './right-panel/EditQuestionForm';
     import EditConnectionForm from './right-panel/EditConnectionForm.svelte';
 
     let mode = $derived(ui_store.right_panel_mode);
     let is_open = $derived(mode.type !== RightPanelModeType.CLOSED);
 
-    // Watch for selection changes to open edit forms
+    // Watch for selection changes to open appropriate edit forms
     $effect(() => {
         const selected_type = selection_store.type;
         const selected_id = selection_store.id;
 
         if (selected_type === SelectionTypeEnum.NODE && selected_id) {
-            ui_store.open_edit_node_form(selected_id);
+            const node = graph_store.nodes.find((n) => n.id === selected_id);
+            if (node && is_question_node(node)) {
+                ui_store.open_edit_question_form(selected_id);
+            } else {
+                ui_store.open_edit_node_form(selected_id);
+            }
         } else if (selected_type === SelectionTypeEnum.CONNECTION && selected_id) {
             ui_store.open_edit_connection_form(selected_id);
         }
@@ -36,10 +45,14 @@
     >
         {#if mode.type === RightPanelModeType.CREATE_NODE}
             <CreateNodeForm />
+        {:else if mode.type === RightPanelModeType.CREATE_QUESTION}
+            <CreateQuestionForm />
         {:else if mode.type === RightPanelModeType.CREATE_CONNECTION}
             <CreateConnectionForm />
         {:else if mode.type === RightPanelModeType.EDIT_NODE}
             <EditNodeForm node_id={mode.node_id} />
+        {:else if mode.type === RightPanelModeType.EDIT_QUESTION}
+            <EditQuestionForm node_id={mode.node_id} />
         {:else if mode.type === RightPanelModeType.EDIT_CONNECTION}
             <EditConnectionForm connection_id={mode.connection_id} />
         {/if}

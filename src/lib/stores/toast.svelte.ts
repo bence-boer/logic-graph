@@ -9,7 +9,7 @@ export interface Toast {
     duration?: number;
 }
 
-export const toast_store = (() => {
+export const notification_store = (() => {
     let _toasts = $state<Toast[]>([]);
     let _id_counter = 0;
 

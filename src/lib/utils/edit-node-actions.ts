@@ -1,9 +1,11 @@
 import { graph_store } from '$lib/stores/graph.svelte';
-import { toast_store } from '$lib/stores/toast.svelte';
+import { notification_store } from '$lib/stores/notification.svelte';
 import { ui_store } from '$lib/stores/ui.svelte';
 import { selection_store } from '$lib/stores/selection.svelte';
+import { animation_store } from '$lib/stores/animation.svelte';
 import { ConnectionType } from '$lib/types/graph';
 import type { LogicNode } from '$lib/types/graph';
+import { AnimationType, EasingType } from '$lib/types/animations';
 
 /**
  * Validates and saves node statement and details updates.
@@ -19,17 +21,17 @@ import type { LogicNode } from '$lib/types/graph';
  */
 export function save_node_changes(node: LogicNode, statement: string, details: string): void {
     if (!statement.trim()) {
-        toast_store.error('Statement is required');
+        notification_store.error('Statement is required');
         return;
     }
 
     if (statement.length > 100) {
-        toast_store.error('Statement must be 100 characters or less');
+        notification_store.error('Statement must be 100 characters or less');
         return;
     }
 
     if (details.length > 500) {
-        toast_store.error('Statement details must be 500 characters or less');
+        notification_store.error('Statement details must be 500 characters or less');
         return;
     }
 
@@ -55,14 +57,14 @@ export function save_node_changes(node: LogicNode, statement: string, details: s
 export function toggle_node_pin(node_id: string): void {
     const node = graph_store.nodes.find((n) => n.id === node_id);
     if (!node) {
-        toast_store.error('Statement not found');
+        notification_store.error('Statement not found');
         return;
     }
 
     if (node.fx !== null && node.fx !== undefined) {
         // Unpin: remove fixed position
         graph_store.update_node(node.id, { fx: null, fy: null });
-        toast_store.info(`Statement "${node.statement}" unpinned`);
+        notification_store.info(`Statement "${node.statement}" unpinned`);
     } else {
         // Pin: set fixed position to current position
         // Note: x and y should be set by the simulation sync process
@@ -75,13 +77,13 @@ export function toggle_node_pin(node_id: string): void {
             Number.isNaN(node.y)
         ) {
             // This should rarely happen now that we sync positions periodically
-            toast_store.warning(
+            notification_store.warning(
                 'Node position not yet available. Please wait a moment and try again.'
             );
             return;
         }
         graph_store.update_node(node.id, { fx: node.x, fy: node.y });
-        toast_store.info(`Statement "${node.statement}" pinned`);
+        notification_store.info(`Statement "${node.statement}" pinned`);
     }
 }
 
@@ -99,7 +101,7 @@ export function toggle_node_pin(node_id: string): void {
 export function delete_node_with_confirmation(node: LogicNode, on_deleted: () => void): void {
     if (confirm(`Delete statement "${node.statement}"?`)) {
         graph_store.remove_node(node.id);
-        toast_store.success(`Statement "${node.statement}" deleted`);
+        notification_store.success(`Statement "${node.statement}" deleted`);
         on_deleted();
     }
 }
@@ -157,6 +159,16 @@ export function create_node_connection(
         });
         target_node_id = new_node.id;
         target_statement = new_node_statement.trim();
+
+        // Animate the new node appearing
+        animation_store.start(AnimationType.FADE_IN, `#node-${new_node.id}`, {
+            duration: 300,
+            easing: EasingType.EASE_OUT
+        });
+        animation_store.start(AnimationType.GROW_IN, `#node-${new_node.id}`, {
+            duration: 300,
+            easing: EasingType.EASE_OUT
+        });
     } else {
         if (!selected_node_id) {
             return { success: false, error: 'No node selected' };
@@ -186,7 +198,9 @@ export function create_node_connection(
                 : 'Consequence'
             : 'Contradiction';
 
-    toast_store.success(`${type_name} "${target_statement}" added to "${current_node.statement}"`);
+    notification_store.success(
+        `${type_name} "${target_statement}" added to "${current_node.statement}"`
+    );
 
     return { success: true, target_statement };
 }
@@ -225,7 +239,7 @@ export function delete_connection_with_confirmation(
 ): void {
     if (confirm(`Delete connection between "${current_node_name}" and "${connected_node_name}"?`)) {
         graph_store.remove_connection(connection_id);
-        toast_store.success(`Connection to "${connected_node_name}" deleted`);
+        notification_store.success(`Connection to "${connected_node_name}" deleted`);
     }
 }
 

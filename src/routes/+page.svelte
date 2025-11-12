@@ -4,7 +4,7 @@
     import LeftPanel from '$lib/components/panels/LeftPanel.svelte';
     import RightPanel from '$lib/components/panels/RightPanel.svelte';
     import LoadingOverlay from '$lib/components/ui/LoadingOverlay.svelte';
-    import ToastContainer from '$lib/components/ui/ToastContainer.svelte';
+    import NotificationContainer from '$lib/components/ui/NotificationContainer.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
     import { loading_store } from '$lib/stores/loading.svelte';
     import { Menu } from '@lucide/svelte';
@@ -29,5 +29,5 @@
     </button>
 
     <LoadingOverlay is_loading={loading_store.is_loading} message={loading_store.message} />
-    <ToastContainer />
+    <NotificationContainer />
 </div>

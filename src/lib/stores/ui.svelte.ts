@@ -51,12 +51,20 @@ function create_ui_store() {
             _right_panel_mode = { type: RightPanelModeType.CREATE_NODE };
         },
 
+        open_create_question_form(): void {
+            _right_panel_mode = { type: RightPanelModeType.CREATE_QUESTION };
+        },
+
         open_create_connection_form(): void {
             _right_panel_mode = { type: RightPanelModeType.CREATE_CONNECTION };
         },
 
         open_edit_node_form(node_id: string): void {
             _right_panel_mode = { type: RightPanelModeType.EDIT_NODE, node_id };
+        },
+
+        open_edit_question_form(node_id: string): void {
+            _right_panel_mode = { type: RightPanelModeType.EDIT_QUESTION, node_id };
         },
 
         open_edit_connection_form(connection_id: string): void {

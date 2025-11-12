@@ -1,7 +1,7 @@
 <script lang="ts">
     import { graph_store } from '$lib/stores/graph.svelte';
     import { loading_store } from '$lib/stores/loading.svelte';
-    import { toast_store } from '$lib/stores/toast.svelte';
+    import { notification_store } from '$lib/stores/notification.svelte';
     import {
         download_graph_as_json,
         download_as_svg,
@@ -60,14 +60,14 @@
                     break;
             }
 
-            toast_store.success(
+            notification_store.success(
                 `Graph exported as ${export_format.toUpperCase()}: ${filename} (${node_count} statements, ${connection_count} connections)`
             );
             handle_close();
         } catch (error) {
             console.error('Export failed:', error);
             const error_message = error instanceof Error ? error.message : 'Unknown error';
-            toast_store.error(`Export failed: ${error_message}`);
+            notification_store.error(`Export failed: ${error_message}`);
         } finally {
             is_exporting = false;
             loading_store.stop();

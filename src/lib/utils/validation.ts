@@ -7,7 +7,8 @@
  */
 
 import type { LogicConnection, LogicGraph, LogicNode } from '$lib/types/graph';
-import { ConnectionType } from '$lib/types/graph';
+import { ConnectionType, NodeType, QuestionState, StatementState } from '$lib/types/graph';
+import { is_question_node, is_statement_node } from './node-classification';
 
 /**
  * Represents a single validation error
@@ -64,6 +65,105 @@ export function validate_node(node: LogicNode): ValidationResult {
         errors.push({ field: 'details', message: 'Node details is required' });
     }
 
+    // Validate node type if specified
+    if (node.type !== undefined && !Object.values(NodeType).includes(node.type)) {
+        errors.push({ field: 'type', message: 'Invalid node type' });
+    }
+
+    // Type-specific validation
+    if (is_question_node(node)) {
+        const question_result = validate_question_node(node);
+        errors.push(...question_result.errors);
+    } else if (is_statement_node(node)) {
+        const statement_result = validate_statement_node(node);
+        errors.push(...statement_result.errors);
+    }
+
+    return {
+        valid: errors.length === 0,
+        errors
+    };
+}
+
+/**
+ * Validate a question node
+ *
+ * Checks question-specific fields:
+ * - Question state is valid if present
+ * - Answer reference points to a valid node if present
+ *
+ * @param node - The question node to validate
+ * @returns Validation result with any errors found
+ *
+ * @example
+ * ```ts
+ * const question = {
+ *   id: '1',
+ *   statement: 'What is truth?',
+ *   type: NodeType.QUESTION,
+ *   question_state: QuestionState.ACTIVE
+ * };
+ * const result = validate_question_node(question);
+ * ```
+ */
+export function validate_question_node(node: LogicNode): ValidationResult {
+    const errors: ValidationError[] = [];
+
+    // Validate question state if present
+    if (
+        node.question_state !== undefined &&
+        !Object.values(QuestionState).includes(node.question_state)
+    ) {
+        errors.push({ field: 'question_state', message: 'Invalid question state' });
+    }
+
+    // Validate answered_by if present
+    if (node.answered_by !== undefined) {
+        if (typeof node.answered_by !== 'string' || node.answered_by.trim() === '') {
+            errors.push({
+                field: 'answered_by',
+                message: 'Answer node ID must be a non-empty string'
+            });
+        }
+    }
+
+    return {
+        valid: errors.length === 0,
+        errors
+    };
+}
+
+/**
+ * Validate a statement node
+ *
+ * Checks statement-specific fields:
+ * - Statement state is valid if present
+ *
+ * @param node - The statement node to validate
+ * @returns Validation result with any errors found
+ *
+ * @example
+ * ```ts
+ * const statement = {
+ *   id: '1',
+ *   statement: 'Truth exists',
+ *   type: NodeType.STATEMENT,
+ *   statement_state: StatementState.SETTLED
+ * };
+ * const result = validate_statement_node(statement);
+ * ```
+ */
+export function validate_statement_node(node: LogicNode): ValidationResult {
+    const errors: ValidationError[] = [];
+
+    // Validate statement state if present
+    if (
+        node.statement_state !== undefined &&
+        !Object.values(StatementState).includes(node.statement_state)
+    ) {
+        errors.push({ field: 'statement_state', message: 'Invalid statement state' });
+    }
+
     return {
         valid: errors.length === 0,
         errors
@@ -75,6 +175,7 @@ export function validate_node(node: LogicNode): ValidationResult {
  *
  * Checks that a connection has all required fields, valid connection type,
  * and that all referenced nodes exist in the provided node array.
+ * For ANSWER connections, validates that sources are questions and targets are statements.
  *
  * @param connection - The connection to validate
  * @param nodes - Array of all nodes in the graph (for reference checking)
@@ -104,6 +205,7 @@ export function validate_connection(
 ): ValidationResult {
     const errors: ValidationError[] = [];
     const node_ids = new Set(nodes.map((n) => n.id));
+    const nodes_by_id = new Map(nodes.map((n) => [n.id, n]));
 
     // Note: ID is optional during import (will be generated), but should be present after normalization
     if (connection.id !== undefined && connection.id.trim() === '') {
@@ -135,6 +237,31 @@ export function validate_connection(
                 errors.push({
                     field: 'targets',
                     message: `Target node ${target_id} does not exist`
+                });
+            }
+        }
+    }
+
+    // Additional validation for ANSWER connections
+    if (connection.type === ConnectionType.ANSWER) {
+        // Validate source nodes are questions
+        for (const source_id of connection.sources) {
+            const source_node = nodes_by_id.get(source_id);
+            if (source_node && !is_question_node(source_node)) {
+                errors.push({
+                    field: 'sources',
+                    message: `Source node ${source_id} must be a question for ANSWER connections`
+                });
+            }
+        }
+
+        // Validate target nodes are statements
+        for (const target_id of connection.targets) {
+            const target_node = nodes_by_id.get(target_id);
+            if (target_node && !is_statement_node(target_node)) {
+                errors.push({
+                    field: 'targets',
+                    message: `Target node ${target_id} must be a statement for ANSWER connections`
                 });
             }
         }
