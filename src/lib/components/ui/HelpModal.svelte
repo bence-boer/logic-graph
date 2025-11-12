@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { keyboard_shortcuts, get_shortcut_display } from '$lib/utils/keyboard';
+    import { keyboard_interactions } from '$lib/interactions/definitions/keyboard';
+    import { KeyModifier, EventMatcherType, type InteractionDefinition } from '$lib/interactions/types';
     import Button from '$lib/components/ui/Button.svelte';
     import { X } from '@lucide/svelte';
 
@@ -9,6 +10,44 @@
     }
 
     let { is_open = $bindable(false), onclose }: Props = $props();
+
+    /**
+     * Get keyboard shortcut display string from interaction definition.
+     * 
+     * @param interaction - Interaction definition
+     * @returns Keyboard shortcut display string (e.g., "Ctrl+S", "A", "Ctrl+Shift+Z")
+     */
+    function get_shortcut_display(interaction: InteractionDefinition): string {
+        const matcher = interaction.matcher;
+        const parts: string[] = [];
+
+        // Add modifiers if present
+        if (matcher.type === EventMatcherType.KEY_COMBO && matcher.modifiers) {
+            for (const modifier of matcher.modifiers) {
+                switch (modifier) {
+                    case KeyModifier.CTRL:
+                        parts.push('Ctrl');
+                        break;
+                    case KeyModifier.ALT:
+                        parts.push('Alt');
+                        break;
+                    case KeyModifier.SHIFT:
+                        parts.push('Shift');
+                        break;
+                    case KeyModifier.META:
+                        parts.push('Cmd');
+                        break;
+                }
+            }
+        }
+
+        // Add key
+        if (matcher.key) {
+            parts.push(matcher.key);
+        }
+
+        return parts.join('+');
+    }
 
     function handle_close() {
         is_open = false;
@@ -51,17 +90,17 @@
 
             <div class="flex-1 overflow-y-auto p-6">
                 <div class="flex flex-col gap-2">
-                    {#each keyboard_shortcuts as shortcut (shortcut.key)}
+                    {#each keyboard_interactions as interaction (interaction.id)}
                         <div
                             class="grid grid-cols-[180px_1fr] items-center gap-6 rounded-md bg-neutral-800 px-4 py-2"
                         >
                             <div
                                 class="rounded border border-neutral-700 bg-neutral-900 px-2 py-1.5 text-center font-['Monaco','Courier_New',monospace] text-sm font-semibold text-accent-600"
                             >
-                                {get_shortcut_display(shortcut)}
+                                {get_shortcut_display(interaction)}
                             </div>
                             <div class="text-sm text-neutral-400">
-                                {shortcut.description}
+                                {interaction.description}
                             </div>
                         </div>
                     {/each}

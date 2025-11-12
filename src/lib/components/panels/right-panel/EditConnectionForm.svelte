@@ -4,9 +4,10 @@
     import Select from '$lib/components/ui/Select.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
-    import { toast_store } from '$lib/stores/toast.svelte';
+    import { notification_store } from '$lib/stores/notification.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
     import { ConnectionType } from '$lib/types/graph';
+    import { get_available_nodes_by_type } from '$lib/utils/node-connections';
     import { Trash2, X } from '@lucide/svelte';
 
     interface Props {
@@ -18,13 +19,15 @@
     let connection = $derived(
         graph_store.connections.find((connection) => connection.id === connection_id)
     );
-    let available_nodes = $derived(
-        graph_store.nodes.map((node) => ({ value: node.id, label: node.statement }))
-    );
-
+    
     let type = $state<ConnectionType>(ConnectionType.IMPLICATION);
     let sources = $state<string[]>([]);
     let targets = $state<string[]>([]);
+
+    // Available nodes filtered by connection type
+    let available_nodes = $derived(
+        get_available_nodes_by_type('', graph_store.nodes, type)
+    );
 
     // Initialize form values when connection loads
     $effect(() => {
@@ -33,6 +36,13 @@
             sources = [...connection.sources];
             targets = [...connection.targets];
         }
+    });
+
+    // Filter selections when type changes
+    $effect(() => {
+        const valid_ids = new Set(available_nodes.map((opt) => opt.value));
+        sources = sources.filter((id) => valid_ids.has(id));
+        targets = targets.filter((id) => valid_ids.has(id));
     });
 
     function close_panel() {
@@ -46,18 +56,18 @@
         // Validate no overlap
         const overlap = sources.filter((s) => targets.includes(s));
         if (overlap.length > 0) {
-            toast_store.error('Sources and targets cannot overlap');
+            notification_store.error('Sources and targets cannot overlap');
             return;
         }
 
         // Validate at least one source and target
         if (sources.length === 0) {
-            toast_store.error('At least one source is required');
+            notification_store.error('At least one source is required');
             return;
         }
 
         if (targets.length === 0) {
-            toast_store.error('At least one target is required');
+            notification_store.error('At least one target is required');
             return;
         }
 
@@ -76,7 +86,7 @@
         const connection_type_label =
             type === ConnectionType.IMPLICATION ? 'implication' : 'contradiction';
 
-        toast_store.success(
+        notification_store.success(
             `${connection_type_label} connection updated: [${source_names}] → [${target_names}]`
         );
     }
@@ -99,7 +109,7 @@
             )
         ) {
             graph_store.remove_connection(connection.id!);
-            toast_store.success(
+            notification_store.success(
                 `${connection_type_label} connection deleted: [${source_statements}] → [${target_statements}]`
             );
             close_panel();
@@ -136,8 +146,8 @@
                     label="Type"
                     required
                     options={[
-                        { value: ConnectionType.IMPLICATION, label: 'Implication' },
-                        { value: ConnectionType.CONTRADICTION, label: 'Contradiction' }
+                        { value: ConnectionType.IMPLICATION, label: '→ Implication (Reasons / Consequences)' },
+                        { value: ConnectionType.CONTRADICTION, label: '⟷ Contradiction (Mutual Exclusion)' }
                     ]}
                     onchange={handle_save}
                 />
