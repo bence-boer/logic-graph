@@ -6,12 +6,7 @@
  */
 
 import type { StyleTheme } from '../types';
-import {
-    OverlayType,
-    OverlayPosition,
-    AnimationType,
-    InteractionType
-} from '../types';
+import { OverlayType, OverlayPosition, AnimationType, InteractionType } from '../types';
 import { NodeType, QuestionState, StatementState } from '$lib/types/graph';
 
 /**
@@ -140,7 +135,8 @@ export const DEFAULT_THEME: StyleTheme = {
                 padding: '{{spacing.node_padding}}',
                 opacity: 1,
                 box_shadow: '{{shadows.subtle}}',
-                transition: 'all {{animations.duration.normal}}ms {{animations.easing.ease_in_out}}',
+                transition:
+                    'all {{animations.duration.normal}}ms {{animations.easing.ease_in_out}}',
                 cursor: 'pointer',
                 pointer_events: 'auto',
                 min_width: 80,

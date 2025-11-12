@@ -127,8 +127,14 @@
                 <Select
                     bind:value={connection_type}
                     options={[
-                        { value: ConnectionType.IMPLICATION, label: '→ Implication (Reasons / Consequences)' },
-                        { value: ConnectionType.CONTRADICTION, label: '⟷ Contradiction (Mutual Exclusion)' }
+                        {
+                            value: ConnectionType.IMPLICATION,
+                            label: '→ Implication (Reasons / Consequences)'
+                        },
+                        {
+                            value: ConnectionType.CONTRADICTION,
+                            label: '⟷ Contradiction (Mutual Exclusion)'
+                        }
                     ]}
                 />
             </FormField>

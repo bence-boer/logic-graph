@@ -1,6 +1,10 @@
 <script lang="ts">
     import { keyboard_interactions } from '$lib/interactions/definitions/keyboard';
-    import { KeyModifier, EventMatcherType, type InteractionDefinition } from '$lib/interactions/types';
+    import {
+        KeyModifier,
+        EventMatcherType,
+        type InteractionDefinition
+    } from '$lib/interactions/types';
     import Button from '$lib/components/ui/Button.svelte';
     import { X } from '@lucide/svelte';
 
@@ -13,7 +17,7 @@
 
     /**
      * Get keyboard shortcut display string from interaction definition.
-     * 
+     *
      * @param interaction - Interaction definition
      * @returns Keyboard shortcut display string (e.g., "Ctrl+S", "A", "Ctrl+Shift+Z")
      */

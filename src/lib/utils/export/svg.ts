@@ -60,7 +60,7 @@ export function export_to_svg(svg_element?: SVGSVGElement): string {
             opacity: 0.8;
         }
         .link-implication {
-            stroke: #eda312;
+            stroke: #10b981;
         }
         .link-contradiction {
             stroke: #ef4444;
@@ -76,6 +76,16 @@ export function export_to_svg(svg_element?: SVGSVGElement): string {
             font-size: 12px;
             text-anchor: middle;
             user-select: none;
+        }
+        /* Arrow marker fills */
+        marker#arrow-implication path {
+            fill: #10b981;
+        }
+        marker#arrow-contradiction path {
+            fill: #ef4444;
+        }
+        marker#arrow-contradiction-start path {
+            fill: #ef4444;
         }
     `;
     svg_clone.insertBefore(style, svg_clone.firstChild);

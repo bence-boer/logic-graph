@@ -14,7 +14,7 @@ import {
 
 /**
  * Keyboard shortcut interactions.
- * 
+ *
  * Only Ctrl/Cmd combinations to avoid interfering with typing.
  */
 export const keyboard_interactions: InteractionDefinition[] = [

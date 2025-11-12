@@ -1,0 +1,55 @@
+{
+  "nodes": [
+    {
+      "id": "node-1",
+      "statement": "Is the earth flat or spherical?",
+      "type": "question",
+      "question_state": "resolved",
+      "answered_by": "node-2"
+    },
+    {
+      "id": "node-2",
+      "statement": "The earth is approximately spherical",
+      "details": "Scientific consensus based on multiple observations"
+    },
+    {
+      "id": "node-3",
+      "statement": "Ships disappear hull-first over the horizon",
+      "details": "Observable phenomenon that supports spherical earth"
+    },
+    {
+      "id": "node-4",
+      "statement": "Earth's shadow on moon during lunar eclipse is round",
+      "details": "Only a sphere casts a circular shadow from all angles"
+    },
+    {
+      "id": "node-5",
+      "statement": "The earth is flat",
+      "details": "Alternative hypothesis"
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-1",
+      "type": "answer",
+      "sources": ["node-2"],
+      "targets": ["node-1"]
+    },
+    {
+      "id": "conn-2",
+      "type": "implication",
+      "sources": ["node-3", "node-4"],
+      "targets": ["node-2"]
+    },
+    {
+      "id": "conn-3",
+      "type": "contradiction",
+      "sources": ["node-2"],
+      "targets": ["node-5"]
+    }
+  ],
+  "metadata": {
+    "statement": "Earth's Shape",
+    "details": "A logic graph examining the evidence for the earth's spherical shape"
+  }
+}
