@@ -11,7 +11,7 @@
 </script>
 
 <div class="flex items-center gap-1.5 max-md:gap-0.5">
-    <Button size="sm" icon onclick={on_show_help}>
+    <Button size="sm" icon on_click={on_show_help}>
         <CircleQuestionMark size={icon_size} />
     </Button>
 </div>

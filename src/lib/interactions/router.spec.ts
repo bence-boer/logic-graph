@@ -1,18 +1,27 @@
-/**
- * Tests for interaction router.
- */
-
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { InteractionRouter } from './router';
 import { InteractionContext, EventMatcherType } from './types';
 import type { InteractionDefinition } from './types';
-import { command_executor } from '$lib/commands/executor';
+import type { InteractionRouter } from './router';
+
+// Avoid importing './router' at module-eval time because that module pulls in
+// stores which may use Svelte runes at import-time. Import lazily in beforeEach
+// after the global test setup has run.
 
 describe('InteractionRouter', () => {
     let router: InteractionRouter;
+    let command_executor: { clear: () => void };
 
-    beforeEach(() => {
-        router = new InteractionRouter();
+    beforeEach(async () => {
+        // Ensure Svelte rune shims are present in the global scope before
+        // importing modules that may evaluate stores at import-time.
+        (globalThis as unknown as { $state?: <T>(v: T) => T }).$state = <T>(v: T) => v;
+
+        const mod = await import('./router');
+        router = new mod.InteractionRouter();
+
+        const exec = await import('$lib/commands/executor');
+        // only rely on the clear method here
+        command_executor = exec.command_executor;
         command_executor.clear();
     });
 

@@ -1,16 +1,16 @@
 <script lang="ts">
-    import { graph_store } from '$lib/stores/graph.svelte';
-    import { ui_store } from '$lib/stores/ui.svelte';
-    import { selection_store } from '$lib/stores/selection.svelte';
-    import { notification_store } from '$lib/stores/notification.svelte';
-    import { use_node_form } from '$lib/composables/use-node-form.svelte';
-    import { ConnectionType } from '$lib/types/graph';
-    import Input from '$lib/components/ui/Input.svelte';
-    import Textarea from '$lib/components/ui/Textarea.svelte';
     import FormField from '$lib/components/ui/FormField.svelte';
+    import Input from '$lib/components/ui/Input.svelte';
     import Select from '$lib/components/ui/Select.svelte';
-    import { FormHeader, FormActions } from './shared';
+    import Textarea from '$lib/components/ui/Textarea.svelte';
+    import { use_node_form } from '$lib/composables/use-node-form.svelte';
+    import { graph_store } from '$lib/stores/graph.svelte';
+    import { notification_store } from '$lib/stores/notification.svelte';
+    import { selection_store } from '$lib/stores/selection.svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
+    import { ConnectionType } from '$lib/types/graph';
     import { CirclePlus } from '@lucide/svelte';
+    import { FormActions, FormHeader } from './shared';
 
     const form = use_node_form();
 
@@ -166,9 +166,8 @@
 
     <FormActions
         primary_icon={CirclePlus}
-        primary_label={form.is_submitting ? 'Creating Statement...' : 'Create Statement'}
         primary_disabled={form.is_submitting}
-        onprimary={handle_create}
-        oncancel={handle_cancel}
+        on_primary={handle_create}
+        on_cancel={handle_cancel}
     />
 </div>

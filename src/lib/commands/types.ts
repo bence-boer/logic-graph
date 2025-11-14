@@ -5,7 +5,8 @@
  * and potentially undone. All state changes should go through commands.
  */
 
-import type { AnimationType, AnimationConfig } from '$lib/types/animations';
+import type { Notification } from '$lib/stores/notification.svelte';
+import type { AnimationConfig, AnimationType } from '$lib/types/animations';
 
 /**
  * Category classification for commands.
@@ -70,12 +71,51 @@ export enum CommandEffectType {
 }
 
 /**
- * A side effect produced by command execution.
+ * Payload for sound effects.
  */
-export interface CommandEffect<PayloadData = Record<string, unknown>> {
-    type: CommandEffectType;
-    payload: PayloadData;
+export interface SoundEffectPayload {
+    /** URL or identifier of the sound resource */
+    src: string;
+    /** Volume between 0 and 1 */
+    volume?: number;
+    /** Whether to loop the sound */
+    loop?: boolean;
 }
+
+/**
+ * Payload for navigation effects.
+ */
+export interface NavigationEffectPayload {
+    /** Path or route to navigate to */
+    href: string;
+    /** Replace current history entry instead of pushing */
+    replace?: boolean;
+    /** Optional query params */
+    params?: Record<string, string | number | boolean>;
+}
+
+/**
+ * Mapping from CommandEffectType to concrete payload shapes.
+ * Indexing this map with a `CommandEffectType` yields the exact payload type
+ * expected for that effect. This enables type-safe handling of `effects`.
+ */
+export interface CommandEffectMap {
+    [CommandEffectType.TOAST]: Pick<
+        Notification,
+        'message' | 'type' | 'duration' | 'actions'
+    >;
+    [CommandEffectType.ANIMATION]: AnimationEffectPayload;
+    [CommandEffectType.SOUND]: SoundEffectPayload;
+    [CommandEffectType.NAVIGATION]: NavigationEffectPayload;
+}
+
+/**
+ * A side effect produced by command execution. The `payload` type is
+ * discriminated by the `type` field, so e.g. a value with
+ * `type: CommandEffectType.ANIMATION` has `payload: AnimationEffectPayload`.
+ */
+export type CommandEffect<EffectType extends CommandEffectType> =
+    EffectType extends unknown ? { type: EffectType; payload: CommandEffectMap[EffectType] } : never;
 
 /**
  * Payload for animation effects.
@@ -84,7 +124,7 @@ export interface AnimationEffectPayload {
     /** Target element or node ID */
     target: string;
     /** Type of animation */
-    animation_type: AnimationType;
+    type: AnimationType;
     /** Animation configuration */
     config: AnimationConfig;
 }
@@ -100,18 +140,10 @@ export interface CommandResult<ResultData = void> {
     /** Error message if failed */
     error?: string;
     /** Side effects to apply */
-    effects?: CommandEffect[];
+    effects?: CommandEffect<CommandEffectType>[];
     /** Metadata about execution */
     metadata?: Record<string, unknown>;
 }
-
-/**
- * Base command payload type.
- */
-export type CommandPayload = Record<
-    string,
-    string | number | boolean | null | CommandPayload | CommandPayload[]
->;
 
 /**
  * A command that can be executed.
@@ -171,7 +203,7 @@ export interface ValidationResult {
 /**
  * Entry in command history for undo/redo.
  */
-export interface CommandHistoryEntry<PayloadData = CommandPayload, ResultData = CommandPayload> {
+export interface CommandHistoryEntry<PayloadData, ResultData> {
     /** Command ID */
     command: string;
     /** Command payload */

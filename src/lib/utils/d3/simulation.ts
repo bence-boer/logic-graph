@@ -5,9 +5,9 @@
  * for the logic graph visualization.
  */
 
-import * as d3 from 'd3';
+import type { D3Link, LogicNode } from '$lib/types/graph';
 import type { Simulation } from 'd3';
-import type { LogicNode, D3Link } from '$lib/types/graph';
+import * as d3 from 'd3';
 
 /**
  * Configuration for the force simulation
@@ -238,10 +238,8 @@ export function sync_simulation_nodes(
                 statement: store_node.statement,
                 details: store_node.details,
                 type: store_node.type,
-                question_state: store_node.question_state,
                 statement_state: store_node.statement_state,
                 answered_by: store_node.answered_by,
-                manual_state_override: store_node.manual_state_override,
                 fx: store_node.fx,
                 fy: store_node.fy
             });

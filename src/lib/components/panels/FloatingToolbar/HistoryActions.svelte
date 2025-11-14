@@ -22,10 +22,10 @@
 </script>
 
 <div class="flex items-center gap-1.5 max-md:gap-0.5">
-    <Button size="sm" icon onclick={handle_undo} disabled={!can_undo}>
+    <Button size="sm" icon on_click={handle_undo} disabled={!can_undo}>
         <Undo2 size={icon_size} />
     </Button>
-    <Button size="sm" icon onclick={handle_redo} disabled={!can_redo}>
+    <Button size="sm" icon on_click={handle_redo} disabled={!can_redo}>
         <Redo2 size={icon_size} />
     </Button>
 </div>

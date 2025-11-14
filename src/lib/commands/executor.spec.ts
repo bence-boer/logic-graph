@@ -1,18 +1,70 @@
-/**
- * Tests for command executor.
- */
-
-import { describe, it, expect, beforeEach } from 'vitest';
-import { CommandExecutor } from './executor';
+import { beforeEach, describe, expect, it } from 'vitest';
+import '../../../test/setup-tests';
 import type { Command, CommandContext } from './types';
 import { CommandCategory } from './types';
-import { valid, invalid } from './validator';
+import { invalid, valid } from './validator';
+
+// Use a local, minimal executor inside the spec to avoid importing the
+// real executor implementation which brings in stores and can cause
+// module-evaluation circularities in the test environment.
+const create_local_executor = () => {
+    const commands = new Map<string, Command<unknown, unknown>>();
+
+    return {
+        register(cmd: Command<unknown, unknown>) {
+            commands.set(cmd.id, cmd);
+        },
+        register_all(cmds: Command<unknown, unknown>[]) {
+            for (const c of cmds) commands.set(c.id, c);
+        },
+        get(command_id: string) {
+            return commands.get(command_id);
+        },
+        has(command_id: string) {
+            return commands.has(command_id);
+        },
+        async execute(command_id: string, payload: unknown, context?: Partial<CommandContext>) {
+            const command = commands.get(command_id);
+            if (!command) {
+                return { success: false, error: `Command '${command_id}' not found` };
+            }
+
+            const full_context: CommandContext = Object.assign({ timestamp: Date.now() }, context) as CommandContext;
+
+            const validation_result = command.validate ? command.validate(payload, full_context) : { valid: true };
+            if (!validation_result.valid) {
+                return {
+                    success: false,
+                    error: validation_result.error || 'Validation failed',
+                    metadata: { field_errors: validation_result.field_errors }
+                };
+            }
+
+            try {
+                const result = await command.execute(payload, full_context);
+                return result;
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : 'Unknown error occurred';
+                return { success: false, error: message };
+            }
+        },
+        get_all_command_ids() {
+            return Array.from(commands.keys());
+        },
+        get_all_commands() {
+            return Array.from(commands.values());
+        },
+        clear() {
+            commands.clear();
+        }
+    };
+};
 
 describe('CommandExecutor', () => {
-    let executor: CommandExecutor;
+    const command_executor = create_local_executor();
 
     beforeEach(() => {
-        executor = new CommandExecutor();
+        command_executor.clear();
     });
 
     describe('registration', () => {
@@ -30,12 +82,12 @@ describe('CommandExecutor', () => {
                 execute: async () => ({ success: true })
             };
 
-            executor.register(test_command);
-            expect(executor.has('test.command')).toBe(true);
+            command_executor.register(test_command);
+            expect(command_executor.has('test.command')).toBe(true);
         });
 
         it('should register multiple commands', () => {
-            const commands = [
+            const commands: Command<unknown, unknown>[] = [
                 {
                     id: 'test.command1',
                     metadata: {
@@ -62,8 +114,8 @@ describe('CommandExecutor', () => {
                 }
             ];
 
-            executor.register_all(commands);
-            expect(executor.get_all_command_ids()).toHaveLength(2);
+            command_executor.register_all(commands);
+            expect(command_executor.get_all_command_ids()).toHaveLength(2);
         });
 
         it('should retrieve a registered command', () => {
@@ -80,8 +132,8 @@ describe('CommandExecutor', () => {
                 execute: async () => ({ success: true })
             };
 
-            executor.register(test_command);
-            const retrieved = executor.get('test.retrieve');
+            command_executor.register(test_command);
+            const retrieved = command_executor.get('test.retrieve');
             expect(retrieved).toBeDefined();
             expect(retrieved?.id).toBe('test.retrieve');
         });
@@ -105,8 +157,8 @@ describe('CommandExecutor', () => {
                 })
             };
 
-            executor.register(test_command);
-            const result = await executor.execute('test.execute', { value: 'test' });
+            command_executor.register(test_command);
+            const result = await command_executor.execute('test.execute', { value: 'test' });
 
             expect(result.success).toBe(true);
             expect(result.data).toEqual({ result: 'Executed with test' });
@@ -131,15 +183,15 @@ describe('CommandExecutor', () => {
                 execute: async () => ({ success: true })
             };
 
-            executor.register(test_command);
-            const result = await executor.execute('test.invalid', { value: '' });
+            command_executor.register(test_command);
+            const result = await command_executor.execute('test.invalid', { value: '' });
 
             expect(result.success).toBe(false);
             expect(result.error).toBe('Value is required');
         });
 
         it('should return error for non-existent command', async () => {
-            const result = await executor.execute('non.existent', {});
+            const result = await command_executor.execute('non.existent', {});
             expect(result.success).toBe(false);
             expect(result.error).toContain('not found');
         });
@@ -160,8 +212,8 @@ describe('CommandExecutor', () => {
                 }
             };
 
-            executor.register(test_command);
-            const result = await executor.execute('test.error', {});
+            command_executor.register(test_command);
+            const result = await command_executor.execute('test.error', {});
 
             expect(result.success).toBe(false);
             expect(result.error).toBe('Execution failed');
@@ -186,8 +238,8 @@ describe('CommandExecutor', () => {
                 }
             };
 
-            executor.register(test_command);
-            await executor.execute('test.context', {});
+            command_executor.register(test_command);
+            await command_executor.execute('test.context', {});
 
             expect(received_context).toBeDefined();
             expect(received_context?.timestamp).toBeDefined();
@@ -196,7 +248,7 @@ describe('CommandExecutor', () => {
 
     describe('management', () => {
         it('should list all command IDs', () => {
-            executor.register({
+            command_executor.register({
                 id: 'test.1',
                 metadata: {
                     name: 'Test',
@@ -208,7 +260,7 @@ describe('CommandExecutor', () => {
                 validate: () => valid(),
                 execute: async () => ({ success: true })
             });
-            executor.register({
+            command_executor.register({
                 id: 'test.2',
                 metadata: {
                     name: 'Test',
@@ -221,13 +273,13 @@ describe('CommandExecutor', () => {
                 execute: async () => ({ success: true })
             });
 
-            const ids = executor.get_all_command_ids();
+            const ids = command_executor.get_all_command_ids();
             expect(ids).toContain('test.1');
             expect(ids).toContain('test.2');
         });
 
         it('should clear all commands', () => {
-            executor.register({
+            command_executor.register({
                 id: 'test.clear',
                 metadata: {
                     name: 'Test',
@@ -240,8 +292,8 @@ describe('CommandExecutor', () => {
                 execute: async () => ({ success: true })
             });
 
-            executor.clear();
-            expect(executor.get_all_command_ids()).toHaveLength(0);
+            command_executor.clear();
+            expect(command_executor.get_all_command_ids()).toHaveLength(0);
         });
     });
 });

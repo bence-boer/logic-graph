@@ -120,7 +120,7 @@
     <div class="flex h-full flex-col">
         <div class="flex items-center justify-between border-b border-(--border-default) p-3">
             <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Edit Connection</h3>
-            <Button size="sm" icon onclick={close_panel}>
+            <Button size="sm" icon on_click={close_panel}>
                 <X size={14} />
             </Button>
         </div>
@@ -174,7 +174,7 @@
             <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
             <div class="flex gap-1">
-                <Button variant="danger" size="sm" onclick={handle_delete}>
+                <Button variant="danger" size="sm" on_click={handle_delete}>
                     <Trash2 size={14} />
                 </Button>
             </div>

@@ -30,7 +30,7 @@
             {state_label}
         </span>
     </div>
-    <Button size="sm" icon onclick={onclose}>
+    <Button size="sm" icon on_click={onclose}>
         <X size={14} />
     </Button>
 </div>

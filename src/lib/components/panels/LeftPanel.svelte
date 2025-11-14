@@ -4,7 +4,10 @@
     import {
         search_store,
         SearchFilterType,
-        CONNECTION_TYPE_FILTER_VALUE
+        CONNECTION_TYPE_FILTER_VALUE,
+
+        type ConnectionTypeFilter
+
     } from '$lib/stores/search.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
     import type { LogicNode, LogicConnection } from '$lib/types/graph';
@@ -95,7 +98,7 @@
     }
 
     function handle_connection_type_change(
-        type: (typeof CONNECTION_TYPE_FILTER_VALUE)[keyof typeof CONNECTION_TYPE_FILTER_VALUE]
+        type: ConnectionTypeFilter
     ) {
         search_store.connection_type_filter = type;
     }
@@ -169,7 +172,7 @@
                 <SearchInput
                     bind:value={search_store.query}
                     onchange={handle_query_change}
-                    onclear={handle_clear}
+                    on_clear={handle_clear}
                 />
 
                 <SearchFilters

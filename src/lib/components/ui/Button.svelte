@@ -1,6 +1,6 @@
 <script lang="ts">
     interface Props {
-        onclick?: () => void;
+        on_click?: () => void;
         variant?: 'primary' | 'secondary' | 'danger';
         size?: 'sm' | 'md' | 'lg';
         disabled?: boolean;
@@ -10,7 +10,7 @@
     }
 
     let {
-        onclick,
+        on_click,
         variant = 'secondary',
         size = 'md',
         disabled = false,
@@ -51,6 +51,6 @@
     const button_classes = `${base_classes} ${variant_style} ${size_classes[size]} ${disabled_classes} ${active_classes} ${additional_classes}`;
 </script>
 
-<button class={button_classes} {onclick} {disabled}>
+<button class={button_classes} onclick={on_click} {disabled}>
     {@render children()}
 </button>

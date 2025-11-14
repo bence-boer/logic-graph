@@ -74,7 +74,7 @@
         />
     {/if}
     <div class="flex gap-2">
-        <Button variant="primary" size="sm" onclick={onconfirm} disabled={is_disabled}>Add</Button>
-        <Button variant="secondary" size="sm" onclick={oncancel}>Cancel</Button>
+        <Button variant="primary" size="sm" on_click={onconfirm} disabled={is_disabled}>Add</Button>
+        <Button variant="secondary" size="sm" on_click={oncancel}>Cancel</Button>
     </div>
 </div>

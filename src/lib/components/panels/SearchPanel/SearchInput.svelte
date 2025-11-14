@@ -4,10 +4,10 @@
     interface Props {
         value: string;
         onchange: (value: string) => void;
-        onclear: () => void;
+        on_clear: () => void;
     }
 
-    let { value = $bindable(''), onchange, onclear }: Props = $props();
+    let { value = $bindable(''), onchange, on_clear: onclear }: Props = $props();
 </script>
 
 <div class="relative">

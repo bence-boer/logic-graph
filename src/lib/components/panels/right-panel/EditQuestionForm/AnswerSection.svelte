@@ -198,10 +198,10 @@
                 maxlength={100}
             />
             <div class="flex gap-2">
-                <Button onclick={handle_quick_answer} variant="primary" size="sm">
+                <Button on_click={handle_quick_answer} variant="primary" size="sm">
                     Create & Link
                 </Button>
-                <Button onclick={cancel_creating} variant="secondary" size="sm">Cancel</Button>
+                <Button on_click={cancel_creating} variant="secondary" size="sm">Cancel</Button>
             </div>
         </div>
     {:else if is_linking}
@@ -214,24 +214,24 @@
             />
             <div class="flex gap-2">
                 <Button
-                    onclick={handle_link_answer}
+                    on_click={handle_link_answer}
                     variant="primary"
                     size="sm"
                     disabled={!selected_statement_id}
                 >
                     Link Answer
                 </Button>
-                <Button onclick={cancel_linking} variant="secondary" size="sm">Cancel</Button>
+                <Button on_click={cancel_linking} variant="secondary" size="sm">Cancel</Button>
             </div>
         </div>
     {:else}
         <!-- Action buttons -->
         <div class="flex gap-2">
-            <Button onclick={start_linking} variant="secondary" size="sm">
+            <Button on_click={start_linking} variant="secondary" size="sm">
                 <Link size={14} />
                 Link Statement
             </Button>
-            <Button onclick={start_creating} variant="secondary" size="sm">
+            <Button on_click={start_creating} variant="secondary" size="sm">
                 <Plus size={14} />
                 Create Statement
             </Button>
@@ -271,8 +271,8 @@
             </p>
 
             <div class="flex justify-end gap-2">
-                <Button onclick={cancel_replace} variant="secondary" size="sm">Cancel</Button>
-                <Button onclick={confirm_replace} variant="primary" size="sm">
+                <Button on_click={cancel_replace} variant="secondary" size="sm">Cancel</Button>
+                <Button on_click={confirm_replace} variant="primary" size="sm">
                     Accept This Answer
                 </Button>
             </div>

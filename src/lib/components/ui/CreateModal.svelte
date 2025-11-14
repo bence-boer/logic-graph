@@ -150,7 +150,7 @@
                 variant="primary"
                 size="md"
                 class="w-full"
-                onclick={() => {
+                on_click={() => {
                     if (active_tab === 'statement') handle_create_statement();
                     else if (active_tab === 'question') handle_create_question();
                     else handle_create_connection();

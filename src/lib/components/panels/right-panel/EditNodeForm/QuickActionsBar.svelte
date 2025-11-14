@@ -18,14 +18,14 @@
     class="flex items-center gap-2 rounded-md border border-(--border-default) bg-(--bg-secondary) px-3 py-2"
 >
     <span class="flex-1 text-sm font-medium text-(--text-secondary)">Quick Actions</span>
-    <Button size="sm" icon onclick={onpin_toggle}>
+    <Button size="sm" icon on_click={onpin_toggle}>
         {#if is_pinned}
             <PinOff size={14} />
         {:else}
             <Pin size={14} />
         {/if}
     </Button>
-    <Button variant="danger" size="sm" icon onclick={ondelete}>
+    <Button variant="danger" size="sm" icon on_click={ondelete}>
         <Trash2 size={14} />
     </Button>
 </div>

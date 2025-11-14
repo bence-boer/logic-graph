@@ -106,7 +106,7 @@
 <div class="flex h-full flex-col">
     <div class="flex items-center justify-between border-b border-(--border-default) p-3">
         <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Create New Connection</h3>
-        <Button size="sm" icon onclick={handle_cancel}>
+        <Button size="sm" icon on_click={handle_cancel}>
             <XIcon size={14} />
         </Button>
     </div>
@@ -175,12 +175,12 @@
         <Button
             variant="primary"
             size="sm"
-            onclick={handle_create}
+            on_click={handle_create}
             disabled={is_submitting || !has_enough_nodes}
         >
             <Link size={14} />
         </Button>
-        <Button size="sm" icon onclick={handle_cancel}>
+        <Button size="sm" icon on_click={handle_cancel}>
             <XIcon size={14} />
         </Button>
     </div>

@@ -1,16 +1,22 @@
-/**
- * Tests for create-node command.
- */
-
-import { describe, it, expect, beforeEach } from 'vitest';
-import { create_node_command, type CreateNodePayload } from './create-node';
-import { graph_store } from '$lib/stores/graph.svelte';
-import { NodeType } from '$lib/types/graph';
 import { CommandEffectType } from '$lib/commands/types';
+import { NodeType } from '$lib/types/graph';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import type { CreateNodePayload } from './create-node';
+
+let create_node_command!: typeof import('./create-node').create_node_command;
+let graph_store: typeof import('$lib/stores/graph.svelte')['graph_store'];
 
 const TEST_CONTEXT = { timestamp: Date.now() };
 
 describe('create_node_command', () => {
+    beforeAll(async () => {
+        // Dynamically import the store and the command after stubbing $state so
+        // that module evaluation doesn't fail due to missing Svelte runes.
+        graph_store = (await import('$lib/stores/graph.svelte')).graph_store;
+        const mod = await import('./create-node');
+        create_node_command = mod.create_node_command;
+    });
+
     beforeEach(() => {
         // Clear the graph before each test
         graph_store.nodes = [];

@@ -168,7 +168,7 @@ export const update_node_command: Command<UpdateNodePayload, UpdateNodeResult> =
                         type: CommandEffectType.ANIMATION,
                         payload: {
                             target: `#node-${payload.node_id}`,
-                            animation_type: AnimationType.PULSE,
+                            type: AnimationType.PULSE,
                             config: {
                                 duration: 600,
                                 easing: EasingType.EASE_IN_OUT

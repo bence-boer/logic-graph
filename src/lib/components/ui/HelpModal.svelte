@@ -112,7 +112,7 @@
             </div>
 
             <div class="flex justify-end border-t border-neutral-700 p-6">
-                <Button onclick={handle_close}>Close</Button>
+                <Button on_click={handle_close}>Close</Button>
             </div>
         </div>
     </div>

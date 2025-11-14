@@ -8,6 +8,7 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
+import { ToastType } from '$lib/stores/notification.svelte';
 import type { LogicConnection } from '$lib/types/graph';
 import { ConnectionType } from '$lib/types/graph';
 
@@ -138,7 +139,7 @@ export const create_connection_command: Command<CreateConnectionPayload, CreateC
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Connection created successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {

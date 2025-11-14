@@ -8,7 +8,9 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
-import { NodeType, ConnectionType } from '$lib/types/graph';
+import { ToastType } from '$lib/stores/notification.svelte';
+import { AnimationType } from '$lib/types/animations';
+import { ConnectionType, NodeType } from '$lib/types/graph';
 
 /**
  * Payload for linking an answer to a question.
@@ -146,13 +148,13 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Answer linked successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'draw_line',
+                            type: AnimationType.d,
                             target: connection.id,
                             duration: 300
                         }
@@ -160,7 +162,7 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'pulse',
+                            type: AnimationType.PULSE,
                             target: payload.question_id,
                             duration: 400
                         }
@@ -201,7 +203,7 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Answer link undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     }
                 ]
@@ -332,13 +334,13 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Answer unlinked successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'fade_out',
+                            type: AnimationType.FADE_OUT,
                             target: connection_id,
                             duration: 200
                         }
@@ -383,13 +385,13 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Answer unlink undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'draw_line',
+                            type: AnimationType.DRAW_LINE,
                             target: connection.id,
                             duration: 300
                         }

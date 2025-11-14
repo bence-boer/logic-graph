@@ -8,6 +8,8 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
+import { ToastType } from '$lib/stores/notification.svelte';
+import { AnimationType } from '$lib/types/animations';
 import type { LogicConnection } from '$lib/types/graph';
 
 /**
@@ -87,13 +89,13 @@ export const delete_connection_command: Command<DeleteConnectionPayload, DeleteC
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Connection deleted successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'fade_out',
+                            type: AnimationType.FADE_OUT,
                             target: payload.connection_id,
                             duration: 200
                         }
@@ -128,7 +130,7 @@ export const delete_connection_command: Command<DeleteConnectionPayload, DeleteC
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Connection deletion undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     },
                     {

@@ -148,7 +148,7 @@
                     variant={get_button_variant(action)}
                     size="sm"
                     disabled={is_action_disabled(action) || form.state.submitting}
-                    onclick={() => handle_action(action)}
+                    on_click={() => handle_action(action)}
                 >
                     {action.label}
                 </Button>

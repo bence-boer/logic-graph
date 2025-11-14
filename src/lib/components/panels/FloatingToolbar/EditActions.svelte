@@ -12,10 +12,10 @@
 </script>
 
 <div class="flex items-center gap-1.5 max-md:gap-0.5">
-    <Button variant="primary" size="sm" icon onclick={on_create}>
+    <Button variant="primary" size="sm" icon on_click={on_create}>
         <Plus size={icon_size} />
     </Button>
-    <Button size="sm" icon onclick={on_recenter}>
+    <Button size="sm" icon on_click={on_recenter}>
         <Focus size={icon_size} />
     </Button>
 </div>

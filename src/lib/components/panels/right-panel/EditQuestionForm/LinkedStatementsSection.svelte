@@ -251,8 +251,8 @@
             </p>
 
             <div class="flex justify-end gap-2">
-                <Button onclick={cancel_replace} variant="secondary" size="sm">Cancel</Button>
-                <Button onclick={confirm_replace} variant="primary" size="sm">
+                <Button on_click={cancel_replace} variant="secondary" size="sm">Cancel</Button>
+                <Button on_click={confirm_replace} variant="primary" size="sm">
                     Accept This Answer
                 </Button>
             </div>

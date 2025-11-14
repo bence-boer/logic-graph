@@ -1,9 +1,5 @@
-/**
- * Tests for notification store.
- */
-
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { notification_store, NOTIFICATION_PRESETS, ERROR_PRESETS } from './notification.svelte';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ERROR_PRESETS, NOTIFICATION_PRESETS, notification_store, type NotificationPresetID } from './notification.svelte';
 
 describe('notification_store', () => {
     beforeEach(() => {
@@ -26,14 +22,23 @@ describe('notification_store', () => {
             expect(notification_store.notifications[0].type).toBe('info');
         });
 
-        it('should auto-dismiss notification after duration', () => {
-            notification_store.show('Test', 'info', { duration: 3000 });
+        it('should auto-dismiss notification after duration', async () => {
+            // Use real timers for this test to avoid incompatibilities with the
+            // fake-timer APIs across runner versions. Keep duration short so the
+            // test runs quickly.
+            vi.useRealTimers();
+
+            notification_store.show('Test', 'info', { duration: 10 });
 
             expect(notification_store.notifications).toHaveLength(1);
 
-            vi.advanceTimersByTime(3000);
+            // Wait slightly longer than the duration
+            await new Promise((resolve) => setTimeout(resolve, 20));
 
             expect(notification_store.notifications).toHaveLength(0);
+
+            // Restore fake timers for other tests
+            vi.useFakeTimers();
         });
 
         it('should not auto-dismiss when duration is 0', () => {
@@ -41,7 +46,11 @@ describe('notification_store', () => {
 
             expect(notification_store.notifications).toHaveLength(1);
 
-            vi.advanceTimersByTime(10000);
+            if (typeof vi.advanceTimersByTime === 'function') {
+                vi.advanceTimersByTime(10000);
+            } else if (typeof vi.runAllTimers === 'function') {
+                vi.runAllTimers();
+            }
 
             expect(notification_store.notifications).toHaveLength(1);
         });
@@ -120,7 +129,7 @@ describe('notification_store', () => {
         });
 
         it('should return undefined for unknown command', () => {
-            const id = notification_store.success_for_command('unknown.command');
+            const id = notification_store.success_for_command('unknown.command' as NotificationPresetID);
 
             expect(id).toBeUndefined();
             expect(notification_store.notifications).toHaveLength(0);
