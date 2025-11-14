@@ -2,8 +2,8 @@
  * Import utilities for loading graphs from various sources
  */
 
-import type { LogicGraph, LogicConnection, LogicNode } from '$lib/types/graph';
-import { NodeType, StatementState, ConnectionType } from '$lib/types/graph';
+import type { LogicConnection, LogicGraph, LogicNode } from '$lib/types/graph';
+import { ConnectionType, NodeType, StatementState } from '$lib/types/graph';
 
 /**
  * Minimal import node structure (only id and statement are required)

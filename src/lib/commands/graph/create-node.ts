@@ -8,9 +8,10 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
+import { ToastType } from '$lib/stores/notification.svelte';
+import { AnimationType, EasingType } from '$lib/types/animations';
 import type { LogicNode } from '$lib/types/graph';
 import { NodeType, StatementState } from '$lib/types/graph';
-import { AnimationType, EasingType } from '$lib/types/animations';
 
 /**
  * Payload for creating a node.
@@ -43,7 +44,7 @@ export interface CreateNodeResult {
 /**
  * Command to create a new node.
  */
-export const create_node_command: Command<CreateNodePayload, CreateNodeResult> = {
+export const create_node_command = {
     id: 'graph.node.create',
 
     metadata: {
@@ -140,14 +141,14 @@ export const create_node_command: Command<CreateNodePayload, CreateNodeResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: `${node_type_name} created successfully`,
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
                             target: `#node-${created_node.id}`,
-                            animation_type: AnimationType.GROW_IN,
+                            type: AnimationType.GROW_IN,
                             config: {
                                 duration: 400,
                                 easing: EasingType.EASE_OUT
@@ -182,7 +183,7 @@ export const create_node_command: Command<CreateNodePayload, CreateNodeResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Node creation undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     }
                 ]
@@ -194,4 +195,4 @@ export const create_node_command: Command<CreateNodePayload, CreateNodeResult> =
             };
         }
     }
-};
+} as const satisfies Command<CreateNodePayload, CreateNodeResult>;

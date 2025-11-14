@@ -8,6 +8,9 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
+import { ToastType } from '$lib/stores/notification.svelte';
+import { AnimationType } from '$lib/styles';
+import { EasingType } from '$lib/types/animations';
 import type { LogicConnection } from '$lib/types/graph';
 import { ConnectionType } from '$lib/types/graph';
 
@@ -36,7 +39,7 @@ export interface CreateConnectionResult {
 /**
  * Command to create a new connection.
  */
-export const create_connection_command: Command<CreateConnectionPayload, CreateConnectionResult> = {
+export const create_connection_command = {
     id: 'graph.connection.create',
 
     metadata: {
@@ -138,15 +141,18 @@ export const create_connection_command: Command<CreateConnectionPayload, CreateC
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Connection created successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'draw_line',
+                            type: AnimationType.FADE_IN,
                             target: connection.id,
-                            duration: 300
+                            config: {
+                                duration: 300,
+                                easing: EasingType.EASE_IN_OUT
+                            }
                         }
                     }
                 ]
@@ -177,7 +183,7 @@ export const create_connection_command: Command<CreateConnectionPayload, CreateC
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Connection creation undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     }
                 ]
@@ -189,4 +195,4 @@ export const create_connection_command: Command<CreateConnectionPayload, CreateC
             };
         }
     }
-};
+} as const satisfies Command<CreateConnectionPayload, CreateConnectionResult>;

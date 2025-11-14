@@ -16,22 +16,22 @@ const MAX_HISTORY_SIZE = 100;
  */
 class HistoryStore {
     /** Stack of executed commands that can be undone */
-    private undo_stack = $state<CommandHistoryEntry[]>([]);
+    private undo_stack = $state<CommandHistoryEntry<unknown, unknown>[]>([]);
 
     /** Stack of undone commands that can be redone */
-    private redo_stack = $state<CommandHistoryEntry[]>([]);
+    private redo_stack = $state<CommandHistoryEntry<unknown, unknown>[]>([]);
 
     /**
      * Get the undo stack (read-only).
      */
-    get undo_history(): readonly CommandHistoryEntry[] {
+    get undo_history(): readonly CommandHistoryEntry<unknown, unknown>[] {
         return this.undo_stack;
     }
 
     /**
      * Get the redo stack (read-only).
      */
-    get redo_history(): readonly CommandHistoryEntry[] {
+    get redo_history(): readonly CommandHistoryEntry<unknown, unknown>[] {
         return this.redo_stack;
     }
 
@@ -66,7 +66,7 @@ class HistoryStore {
      * });
      * ```
      */
-    push(entry: CommandHistoryEntry): void {
+    push(entry: CommandHistoryEntry<unknown, unknown>): void {
         // Clear redo stack when new command is executed
         this.redo_stack = [];
 
@@ -92,7 +92,7 @@ class HistoryStore {
      * }
      * ```
      */
-    peek_undo(): CommandHistoryEntry | undefined {
+    peek_undo(): CommandHistoryEntry<unknown, unknown> | undefined {
         return this.undo_stack[this.undo_stack.length - 1];
     }
 
@@ -109,7 +109,7 @@ class HistoryStore {
      * }
      * ```
      */
-    peek_redo(): CommandHistoryEntry | undefined {
+    peek_redo(): CommandHistoryEntry<unknown, unknown> | undefined {
         return this.redo_stack[this.redo_stack.length - 1];
     }
 
@@ -128,7 +128,7 @@ class HistoryStore {
      * }
      * ```
      */
-    pop_undo(): CommandHistoryEntry | undefined {
+    pop_undo(): CommandHistoryEntry<unknown, unknown> | undefined {
         const entry = this.undo_stack.pop();
         if (entry) {
             this.redo_stack.push(entry);
@@ -151,7 +151,7 @@ class HistoryStore {
      * }
      * ```
      */
-    pop_redo(): CommandHistoryEntry | undefined {
+    pop_redo(): CommandHistoryEntry<unknown, unknown> | undefined {
         const entry = this.redo_stack.pop();
         if (entry) {
             this.undo_stack.push(entry);
@@ -202,7 +202,7 @@ class HistoryStore {
      * }
      * ```
      */
-    get_all(): CommandHistoryEntry[] {
+    get_all(): CommandHistoryEntry<unknown, unknown>[] {
         return [...this.undo_stack, ...this.redo_stack.reverse()];
     }
 }

@@ -1,10 +1,8 @@
-/**
- * Gesture store tests.
- */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { gesture_store, type GestureRecognizer, type ActiveGesture } from './gesture.svelte';
 import { GestureType } from '$lib/interactions/types';
+
+import { type ActiveGesture, gesture_store, type GestureRecognizer } from './gesture.svelte';
 
 describe('gesture_store', () => {
     beforeEach(() => {
@@ -148,7 +146,7 @@ describe('gesture_store', () => {
                 }
             };
 
-            vi.mocked(mock_recognizer.get_gesture).mockReturnValue(mock_gesture);
+            mock_recognizer.get_gesture = vi.fn().mockReturnValue(mock_gesture);
 
             gesture_store.start(mock_event);
             gesture_store.update(mock_event);

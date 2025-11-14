@@ -1,15 +1,16 @@
 <script lang="ts">
-    import { ui_store } from '$lib/stores/ui.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import {
+        type ConnectionTypeFilter,
         search_store,
-        SearchFilterType,
-        CONNECTION_TYPE_FILTER_VALUE
+        SearchFilterType
     } from '$lib/stores/search.svelte';
     import { selection_store } from '$lib/stores/selection.svelte';
-    import type { LogicNode, LogicConnection } from '$lib/types/graph';
+    import { ui_store } from '$lib/stores/ui.svelte';
+    import type { LogicConnection, LogicNode } from '$lib/types/graph';
     import { search_graph } from '$lib/utils/search';
-    import { SearchInput, SearchFilters, SearchResults } from './SearchPanel';
+
+    import { SearchFilters, SearchInput, SearchResults } from './SearchPanel';
 
     let is_open = $derived(ui_store.left_panel_open);
 
@@ -94,9 +95,7 @@
         search_store.filter_type = filter;
     }
 
-    function handle_connection_type_change(
-        type: (typeof CONNECTION_TYPE_FILTER_VALUE)[keyof typeof CONNECTION_TYPE_FILTER_VALUE]
-    ) {
+    function handle_connection_type_change(type: ConnectionTypeFilter) {
         search_store.connection_type_filter = type;
     }
 
@@ -169,7 +168,7 @@
                 <SearchInput
                     bind:value={search_store.query}
                     onchange={handle_query_change}
-                    onclear={handle_clear}
+                    on_clear={handle_clear}
                 />
 
                 <SearchFilters

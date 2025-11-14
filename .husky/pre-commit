@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run lint-staged (prettier + eslint --fix) on staged files
+bunx lint-staged
+

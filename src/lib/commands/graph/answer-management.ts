@@ -8,7 +8,9 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
-import { NodeType, ConnectionType } from '$lib/types/graph';
+import { ToastType } from '$lib/stores/notification.svelte';
+import { AnimationType, EasingType } from '$lib/types/animations';
+import { ConnectionType, NodeType } from '$lib/types/graph';
 
 /**
  * Payload for linking an answer to a question.
@@ -37,7 +39,7 @@ export interface LinkAnswerResult {
 /**
  * Command to link an answer to a question.
  */
-export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> = {
+export const link_answer_command = {
     id: 'graph.answer.link',
 
     metadata: {
@@ -146,23 +148,29 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Answer linked successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'draw_line',
+                            type: AnimationType.FADE_IN,
                             target: connection.id,
-                            duration: 300
+                            config: {
+                                duration: 300,
+                                easing: EasingType.EASE_IN_OUT
+                            }
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'pulse',
+                            type: AnimationType.PULSE,
                             target: payload.question_id,
-                            duration: 400
+                            config: {
+                                duration: 400,
+                                easing: EasingType.EASE_IN_OUT
+                            }
                         }
                     }
                 ]
@@ -201,7 +209,7 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Answer link undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     }
                 ]
@@ -213,7 +221,7 @@ export const link_answer_command: Command<LinkAnswerPayload, LinkAnswerResult> =
             };
         }
     }
-};
+} as const satisfies Command<LinkAnswerPayload, LinkAnswerResult>;
 
 /**
  * Payload for unlinking an answer from a question.
@@ -238,7 +246,7 @@ export interface UnlinkAnswerResult {
 /**
  * Command to unlink an answer from a question.
  */
-export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerResult> = {
+export const unlink_answer_command = {
     id: 'graph.answer.unlink',
 
     metadata: {
@@ -332,15 +340,18 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Answer unlinked successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'fade_out',
+                            type: AnimationType.FADE_OUT,
                             target: connection_id,
-                            duration: 200
+                            config: {
+                                duration: 200,
+                                easing: EasingType.EASE_IN_OUT
+                            }
                         }
                     }
                 ]
@@ -383,15 +394,18 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Answer unlink undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'draw_line',
+                            type: AnimationType.FADE_IN,
                             target: connection.id,
-                            duration: 300
+                            config: {
+                                duration: 300,
+                                easing: EasingType.EASE_IN_OUT
+                            }
                         }
                     }
                 ]
@@ -403,4 +417,4 @@ export const unlink_answer_command: Command<UnlinkAnswerPayload, UnlinkAnswerRes
             };
         }
     }
-};
+} as const satisfies Command<UnlinkAnswerPayload, UnlinkAnswerResult>;

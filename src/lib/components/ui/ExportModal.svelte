@@ -1,15 +1,16 @@
 <script lang="ts">
+    import { Download, X } from '@lucide/svelte';
+
     import { graph_store } from '$lib/stores/graph.svelte';
     import { loading_store } from '$lib/stores/loading.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
     import {
-        download_graph_as_json,
-        download_as_svg,
-        download_as_png,
+        download_as_html,
         download_as_jpeg,
-        download_as_html
+        download_as_png,
+        download_as_svg,
+        download_graph_as_json
     } from '$lib/utils/export';
-    import { X, Download } from '@lucide/svelte';
 
     interface Props {
         is_open: boolean;

@@ -6,4 +6,18 @@ bun.lock
 bun.lockb
 
 # Miscellaneous
-/static/
+static/
+
+# Generated / build artifacts
+build/
+dist/
+.svelte-kit/
+.output/
+
+# Tool caches
+.cache/
+.parcel-cache/
+.vite/
+
+# Coverage / test output
+coverage/

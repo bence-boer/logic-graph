@@ -5,10 +5,11 @@
  * Converts low-level pointer/touch events into high-level gesture events.
  */
 
-import { gesture_store } from '$lib/stores/gesture.svelte';
-import type { InteractionDefinition } from './types';
-import { InteractionContext, EventMatcherType, GestureType } from './types';
 import type { CommandPayload } from '$lib/commands/types';
+import { gesture_store } from '$lib/stores/gesture.svelte';
+
+import type { InteractionDefinition } from './types';
+import { EventMatcherType, GestureType, InteractionContext } from './types';
 
 /**
  * Gesture event data.

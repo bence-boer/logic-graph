@@ -1,6 +1,7 @@
 <script lang="ts">
-    import type { LogicGraph } from '$lib/types/graph';
     import { CircleQuestionMark, FileText, Upload, X } from '@lucide/svelte';
+
+    import type { LogicGraph } from '$lib/types/graph';
 
     interface Props {
         is_open: boolean;

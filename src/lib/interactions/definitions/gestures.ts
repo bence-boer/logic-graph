@@ -4,14 +4,15 @@
  * Defines all touch gesture interactions for mobile devices.
  */
 
+import { graph_store } from '$lib/stores/graph.svelte';
+
 import {
-    InteractionContext,
     EventMatcherType,
     GestureType,
+    InteractionContext,
     type InteractionDefinition,
     InteractionPreconditionType
 } from '../types';
-import { graph_store } from '$lib/stores/graph.svelte';
 
 /**
  * Mobile gesture interactions.

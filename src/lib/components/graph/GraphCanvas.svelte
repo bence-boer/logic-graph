@@ -1,7 +1,10 @@
 <script lang="ts">
+    import type { Simulation } from 'd3';
+    import * as d3 from 'd3';
+    import { onDestroy, onMount } from 'svelte';
+
     import { graph_store } from '$lib/stores/graph.svelte';
     import type { D3Link, LogicNode } from '$lib/types/graph';
-    import { convert_connections_to_d3_links } from '$lib/utils/d3-helpers';
     import { create_drag_handlers } from '$lib/utils/d3/interactions';
     import {
         calculate_focus_transform,
@@ -14,10 +17,9 @@
         update_collision_radii,
         update_simulation
     } from '$lib/utils/d3/simulation';
+    import { convert_connections_to_d3_links } from '$lib/utils/d3-helpers';
     import { GraphTopology } from '$lib/utils/graph-algorithms';
-    import type { Simulation } from 'd3';
-    import * as d3 from 'd3';
-    import { onDestroy, onMount } from 'svelte';
+
     import ArrowMarkers from './ArrowMarkers.svelte';
     import {
         render_links,

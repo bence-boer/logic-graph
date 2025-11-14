@@ -1,13 +1,14 @@
 <script lang="ts">
+    import { ArrowRight, CheckCircle2, X, Zap } from '@lucide/svelte';
+
+    import Button from '$lib/components/ui/Button.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
-    import Button from '$lib/components/ui/Button.svelte';
     import type { LogicNode } from '$lib/types/graph';
     import { ConnectionType } from '$lib/types/graph';
-    import { is_statement_node } from '$lib/utils/node-classification';
     import { can_link_as_answer } from '$lib/utils/answer-management';
-    import { CheckCircle2, X, ArrowRight, Zap } from '@lucide/svelte';
+    import { is_statement_node } from '$lib/utils/node-classification';
 
     interface Props {
         node: LogicNode;
@@ -251,8 +252,8 @@
             </p>
 
             <div class="flex justify-end gap-2">
-                <Button onclick={cancel_replace} variant="secondary" size="sm">Cancel</Button>
-                <Button onclick={confirm_replace} variant="primary" size="sm">
+                <Button on_click={cancel_replace} variant="secondary" size="sm">Cancel</Button>
+                <Button on_click={confirm_replace} variant="primary" size="sm">
                     Accept This Answer
                 </Button>
             </div>

@@ -1,15 +1,16 @@
 <script lang="ts">
-    import { ui_store } from '$lib/stores/ui.svelte';
-    import { selection_store } from '$lib/stores/selection.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
+    import { selection_store } from '$lib/stores/selection.svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
     import { RightPanelModeType, SelectionTypeEnum } from '$lib/types/graph';
     import { is_question_node } from '$lib/utils/node-classification';
+
+    import CreateConnectionForm from './right-panel/CreateConnectionForm.svelte';
     import CreateNodeForm from './right-panel/CreateNodeForm.svelte';
     import CreateQuestionForm from './right-panel/CreateQuestionForm.svelte';
-    import CreateConnectionForm from './right-panel/CreateConnectionForm.svelte';
+    import EditConnectionForm from './right-panel/EditConnectionForm.svelte';
     import EditNodeForm from './right-panel/EditNodeForm';
     import EditQuestionForm from './right-panel/EditQuestionForm';
-    import EditConnectionForm from './right-panel/EditConnectionForm.svelte';
 
     let mode = $derived(ui_store.right_panel_mode);
     let is_open = $derived(mode.type !== RightPanelModeType.CLOSED);

@@ -1,13 +1,14 @@
 <script lang="ts">
+    import { Menu } from '@lucide/svelte';
+
     import GraphCanvas from '$lib/components/graph/GraphCanvas.svelte';
     import FloatingToolbar from '$lib/components/panels/FloatingToolbar.svelte';
     import LeftPanel from '$lib/components/panels/LeftPanel.svelte';
     import RightPanel from '$lib/components/panels/RightPanel.svelte';
     import LoadingOverlay from '$lib/components/ui/LoadingOverlay.svelte';
     import NotificationContainer from '$lib/components/ui/NotificationContainer.svelte';
-    import { ui_store } from '$lib/stores/ui.svelte';
     import { loading_store } from '$lib/stores/loading.svelte';
-    import { Menu } from '@lucide/svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
 
     let graph_canvas: GraphCanvas;
 </script>

@@ -5,15 +5,16 @@
  * to enable undo and redo of previous actions.
  */
 
+import { command_executor } from '$lib/commands/executor';
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { history_store } from '$lib/stores/history.svelte';
-import { command_executor } from '$lib/commands/executor';
+import { ToastType } from '$lib/stores/notification.svelte';
 
 /**
  * Command to undo the last action.
  */
-export const undo_command: Command<void, void> = {
+export const undo_command = {
     id: 'history.undo',
 
     metadata: {
@@ -84,7 +85,7 @@ export const undo_command: Command<void, void> = {
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: `Undid: ${command.metadata.name}`,
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     }
                 ]
@@ -96,12 +97,12 @@ export const undo_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to redo the last undone action.
  */
-export const redo_command: Command<void, void> = {
+export const redo_command = {
     id: 'history.redo',
 
     metadata: {
@@ -160,7 +161,7 @@ export const redo_command: Command<void, void> = {
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: `Redid: ${command_name}`,
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     }
                 ]
@@ -172,12 +173,12 @@ export const redo_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to clear history.
  */
-export const clear_history_command: Command<void, void> = {
+export const clear_history_command = {
     id: 'history.clear',
 
     metadata: {
@@ -203,7 +204,7 @@ export const clear_history_command: Command<void, void> = {
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'History cleared',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     }
                 ]
@@ -215,4 +216,4 @@ export const clear_history_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;

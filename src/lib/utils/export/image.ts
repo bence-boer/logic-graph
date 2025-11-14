@@ -5,8 +5,8 @@
  * by converting SVG to canvas and then to image formats.
  */
 
-import { export_to_svg } from './svg';
 import { trigger_download } from './download';
+import { export_to_svg } from './svg';
 
 /**
  * Options for image export

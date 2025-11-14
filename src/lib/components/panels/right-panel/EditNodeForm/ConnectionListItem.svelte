@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { Trash2, ArrowRight } from '@lucide/svelte';
+    import { ArrowRight, Trash2 } from '@lucide/svelte';
+
     import type { LogicNode } from '$lib/types/graph';
 
     interface Props {

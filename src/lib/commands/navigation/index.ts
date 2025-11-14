@@ -26,7 +26,7 @@ export interface PanPayload {
  * Note: This command emits a custom event that the GraphCanvas component
  * listens for to apply the pan transformation via D3.
  */
-export const pan_command: Command<PanPayload, void> = {
+export const pan_command = {
     id: 'nav.pan',
 
     metadata: {
@@ -78,7 +78,7 @@ export const pan_command: Command<PanPayload, void> = {
             };
         }
     }
-};
+} as const satisfies Command<PanPayload, void>;
 
 /**
  * Payload for zoom command.
@@ -95,7 +95,7 @@ export interface ZoomPayload {
 /**
  * Command to zoom the canvas.
  */
-export const zoom_command: Command<ZoomPayload, void> = {
+export const zoom_command = {
     id: 'nav.zoom',
 
     metadata: {
@@ -167,12 +167,12 @@ export const zoom_command: Command<ZoomPayload, void> = {
             };
         }
     }
-};
+} as const satisfies Command<ZoomPayload, void>;
 
 /**
  * Command to zoom in.
  */
-export const zoom_in_command: Command<void, void> = {
+export const zoom_in_command = {
     id: 'nav.zoom.in',
 
     metadata: {
@@ -189,14 +189,14 @@ export const zoom_in_command: Command<void, void> = {
 
     async execute(): Promise<CommandResult<void>> {
         // Use the zoom command with a delta
-        return await zoom_command.execute({ delta: 0.2, animate: true }, { timestamp: Date.now() });
+        return await zoom_command.execute({ delta: 0.2, animate: true });
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to zoom out.
  */
-export const zoom_out_command: Command<void, void> = {
+export const zoom_out_command = {
     id: 'nav.zoom.out',
 
     metadata: {
@@ -213,17 +213,14 @@ export const zoom_out_command: Command<void, void> = {
 
     async execute(): Promise<CommandResult<void>> {
         // Use the zoom command with a negative delta
-        return await zoom_command.execute(
-            { delta: -0.2, animate: true },
-            { timestamp: Date.now() }
-        );
+        return await zoom_command.execute({ delta: -0.2, animate: true });
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to reset zoom to 100%.
  */
-export const zoom_reset_command: Command<void, void> = {
+export const zoom_reset_command = {
     id: 'nav.zoom.reset',
 
     metadata: {
@@ -240,14 +237,14 @@ export const zoom_reset_command: Command<void, void> = {
 
     async execute(): Promise<CommandResult<void>> {
         // Use the zoom command with scale = 1.0
-        return await zoom_command.execute({ scale: 1.0, animate: true }, { timestamp: Date.now() });
+        return await zoom_command.execute({ scale: 1.0, animate: true });
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to recenter the view on all nodes.
  */
-export const recenter_command: Command<void, void> = {
+export const recenter_command = {
     id: 'nav.recenter',
 
     metadata: {
@@ -278,7 +275,7 @@ export const recenter_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Payload for focus node command.
@@ -293,7 +290,7 @@ export interface FocusNodePayload {
 /**
  * Command to focus on a specific node.
  */
-export const focus_node_command: Command<FocusNodePayload, void> = {
+export const focus_node_command = {
     id: 'nav.node.focus',
 
     metadata: {
@@ -336,4 +333,4 @@ export const focus_node_command: Command<FocusNodePayload, void> = {
             };
         }
     }
-};
+} as const satisfies Command<FocusNodePayload, void>;

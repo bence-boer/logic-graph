@@ -8,8 +8,9 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
-import type { LogicNode, LogicConnection } from '$lib/types/graph';
+import { ToastType } from '$lib/stores/notification.svelte';
 import { AnimationType, EasingType } from '$lib/types/animations';
+import type { LogicConnection, LogicNode } from '$lib/types/graph';
 
 /**
  * Payload for deleting a node.
@@ -32,7 +33,7 @@ export interface DeleteNodeResult {
 /**
  * Command to delete a node.
  */
-export const delete_node_command: Command<DeleteNodePayload, DeleteNodeResult> = {
+export const delete_node_command = {
     id: 'graph.node.delete',
 
     metadata: {
@@ -95,14 +96,14 @@ export const delete_node_command: Command<DeleteNodePayload, DeleteNodeResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Node deleted successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
                             target: `#node-${payload.node_id}`,
-                            animation_type: AnimationType.SHRINK_OUT,
+                            type: AnimationType.SHRINK_OUT,
                             config: {
                                 duration: 300,
                                 easing: EasingType.EASE_IN
@@ -151,15 +152,18 @@ export const delete_node_command: Command<DeleteNodePayload, DeleteNodeResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Node deletion undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'fade_in',
+                            type: AnimationType.FADE_IN,
                             target: node_id,
-                            duration: 300
+                            config: {
+                                duration: 300,
+                                easing: EasingType.EASE_OUT
+                            }
                         }
                     }
                 ]
@@ -171,4 +175,4 @@ export const delete_node_command: Command<DeleteNodePayload, DeleteNodeResult> =
             };
         }
     }
-};
+} as const satisfies Command<DeleteNodePayload, DeleteNodeResult>;

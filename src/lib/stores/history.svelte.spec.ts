@@ -2,9 +2,11 @@
  * Tests for history store.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { history_store } from './history.svelte';
+import { beforeEach, describe, expect, it } from 'vitest';
+
 import type { CommandHistoryEntry } from '$lib/commands/types';
+
+import { history_store } from './history.svelte';
 
 describe('HistoryStore', () => {
     beforeEach(() => {
@@ -13,7 +15,7 @@ describe('HistoryStore', () => {
 
     describe('push', () => {
         it('should add command to undo stack', () => {
-            const entry: CommandHistoryEntry = {
+            const entry: CommandHistoryEntry<object, never> = {
                 command: 'test.command',
                 payload: { value: 'test' },
                 result: { success: true },
@@ -26,13 +28,13 @@ describe('HistoryStore', () => {
         });
 
         it('should clear redo stack when new command is pushed', () => {
-            const entry1: CommandHistoryEntry = {
+            const entry1: CommandHistoryEntry<object, never> = {
                 command: 'test.1',
                 payload: {},
                 result: { success: true },
                 timestamp: Date.now()
             };
-            const entry2: CommandHistoryEntry = {
+            const entry2: CommandHistoryEntry<object, never> = {
                 command: 'test.2',
                 payload: {},
                 result: { success: true },
@@ -64,7 +66,7 @@ describe('HistoryStore', () => {
 
     describe('undo operations', () => {
         it('should peek undo without modifying stack', () => {
-            const entry: CommandHistoryEntry = {
+            const entry: CommandHistoryEntry<object, never> = {
                 command: 'test.peek',
                 payload: {},
                 result: { success: true },
@@ -79,7 +81,7 @@ describe('HistoryStore', () => {
         });
 
         it('should pop undo and move to redo stack', () => {
-            const entry: CommandHistoryEntry = {
+            const entry: CommandHistoryEntry<object, never> = {
                 command: 'test.pop',
                 payload: {},
                 result: { success: true },
@@ -102,7 +104,7 @@ describe('HistoryStore', () => {
 
     describe('redo operations', () => {
         it('should peek redo without modifying stack', () => {
-            const entry: CommandHistoryEntry = {
+            const entry: CommandHistoryEntry<object, never> = {
                 command: 'test.redo',
                 payload: {},
                 result: { success: true },
@@ -118,7 +120,7 @@ describe('HistoryStore', () => {
         });
 
         it('should pop redo and move to undo stack', () => {
-            const entry: CommandHistoryEntry = {
+            const entry: CommandHistoryEntry<object, never> = {
                 command: 'test.redo',
                 payload: {},
                 result: { success: true },
@@ -182,13 +184,13 @@ describe('HistoryStore', () => {
         });
 
         it('should get all commands in order', () => {
-            const entry1: CommandHistoryEntry = {
+            const entry1: CommandHistoryEntry<object, never> = {
                 command: 'test.1',
                 payload: {},
                 result: { success: true },
                 timestamp: 1000
             };
-            const entry2: CommandHistoryEntry = {
+            const entry2: CommandHistoryEntry<object, never> = {
                 command: 'test.2',
                 payload: {},
                 result: { success: true },

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { AlertTriangle } from '@lucide/svelte';
+
     import Button from './Button.svelte';
 
     interface Props {
@@ -94,11 +95,11 @@
             </div>
 
             <div class="flex justify-end gap-2">
-                <Button onclick={handle_cancel} variant="secondary" size="sm">
+                <Button on_click={handle_cancel} variant="secondary" size="sm">
                     {cancel_text}
                 </Button>
                 <Button
-                    onclick={handle_confirm}
+                    on_click={handle_confirm}
                     variant={variant === 'danger' ? 'danger' : 'primary'}
                     size="sm"
                 >

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { X } from '@lucide/svelte';
+
     import Button from '$lib/components/ui/Button.svelte';
     import type { LogicNode } from '$lib/types/graph';
     import { is_question_resolved } from '$lib/utils/graph-helpers';
@@ -30,7 +31,7 @@
             {state_label}
         </span>
     </div>
-    <Button size="sm" icon onclick={onclose}>
+    <Button size="sm" icon on_click={onclose}>
         <X size={14} />
     </Button>
 </div>

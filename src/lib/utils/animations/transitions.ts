@@ -6,8 +6,9 @@
  * @module utils/animations/transitions
  */
 
-import type { TransitionSpec, TransitionProperty, EasingFunction } from '$lib/types/animations';
+import type { EasingFunction, TransitionProperty, TransitionSpec } from '$lib/types/animations';
 import { EasingType } from '$lib/types/animations';
+
 import { get_easing_function } from './easing';
 
 /**

@@ -1,11 +1,8 @@
-/**
- * Tap recognizer tests.
- * @vitest-environment happy-dom
- */
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { TapRecognizer } from './tap';
 import { GestureType } from '$lib/interactions/types';
+
+import { TapRecognizer } from './tap';
 
 describe('TapRecognizer', () => {
     let recognizer: TapRecognizer;

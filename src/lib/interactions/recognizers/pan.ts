@@ -4,8 +4,8 @@
  * Recognizes two-finger pan/drag gestures.
  */
 
-import type { GestureRecognizer, ActiveGesture, Point } from '$lib/stores/gesture.svelte';
 import { GestureType } from '$lib/interactions/types';
+import type { ActiveGesture, GestureRecognizer, Point } from '$lib/stores/gesture.svelte';
 
 /**
  * Minimum pan distance (pixels).

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { notification_store } from '$lib/stores/notification.svelte';
     import { command_executor } from '$lib/commands/executor';
     import type { NotificationAction } from '$lib/stores/notification.svelte';
+    import { notification_store } from '$lib/stores/notification.svelte';
 
     function handle_close(id: string) {
         notification_store.remove(id);
     }
 
-    async function handle_action(action: NotificationAction, notification_id: string) {
+    async function handle_action(action: NotificationAction<unknown>, notification_id: string) {
         // Execute the action's command
         await command_executor.execute(action.command, action.payload || {});
         // Close the notification after action

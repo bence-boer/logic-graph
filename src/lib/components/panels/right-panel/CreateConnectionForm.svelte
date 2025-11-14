@@ -1,15 +1,16 @@
 <script lang="ts">
+    import { Link, X as XIcon } from '@lucide/svelte';
+
+    import Button from '$lib/components/ui/Button.svelte';
+    import FormField from '$lib/components/ui/FormField.svelte';
+    import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
+    import Select from '$lib/components/ui/Select.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
-    import { ui_store } from '$lib/stores/ui.svelte';
-    import { selection_store } from '$lib/stores/selection.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
+    import { selection_store } from '$lib/stores/selection.svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
     import { ConnectionType } from '$lib/types/graph';
     import { get_available_nodes_by_type } from '$lib/utils/node-connections';
-    import Select from '$lib/components/ui/Select.svelte';
-    import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
-    import FormField from '$lib/components/ui/FormField.svelte';
-    import Button from '$lib/components/ui/Button.svelte';
-    import { Link, X as XIcon } from '@lucide/svelte';
 
     let connection_type = $state<ConnectionType>(ConnectionType.IMPLICATION);
     let source_ids = $state<string[]>([]);
@@ -106,7 +107,7 @@
 <div class="flex h-full flex-col">
     <div class="flex items-center justify-between border-b border-(--border-default) p-3">
         <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Create New Connection</h3>
-        <Button size="sm" icon onclick={handle_cancel}>
+        <Button size="sm" icon on_click={handle_cancel}>
             <XIcon size={14} />
         </Button>
     </div>
@@ -175,12 +176,12 @@
         <Button
             variant="primary"
             size="sm"
-            onclick={handle_create}
+            on_click={handle_create}
             disabled={is_submitting || !has_enough_nodes}
         >
             <Link size={14} />
         </Button>
-        <Button size="sm" icon onclick={handle_cancel}>
+        <Button size="sm" icon on_click={handle_cancel}>
             <XIcon size={14} />
         </Button>
     </div>

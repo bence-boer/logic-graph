@@ -3,7 +3,7 @@
  * Provides validators for common field validation rules.
  */
 
-import type { FieldValidator, FormFieldValue, FormData } from './types';
+import type { FieldValidator, FormData, FormFieldValue } from './types';
 import { ValidationRuleType as VRT } from './types';
 
 /**

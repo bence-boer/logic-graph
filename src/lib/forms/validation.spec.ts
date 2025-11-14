@@ -2,10 +2,11 @@
  * Tests for form validation utilities.
  */
 
-import { describe, it, expect } from 'vitest';
-import { validate_field, validators } from './validation';
-import { ValidationRuleType } from './types';
+import { describe, expect, it } from 'vitest';
+
 import type { FormData } from './types';
+import { ValidationRuleType } from './types';
+import { validate_field, validators } from './validation';
 
 describe('Form Validation', () => {
     describe('validate_field', () => {

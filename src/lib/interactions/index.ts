@@ -5,9 +5,9 @@
  */
 
 import { canvas_interactions } from './definitions/canvas';
-import { keyboard_interactions } from './definitions/keyboard';
-import { gesture_interactions } from './definitions/gestures';
 import { form_interactions } from './definitions/forms';
+import { gesture_interactions } from './definitions/gestures';
+import { keyboard_interactions } from './definitions/keyboard';
 import type { InteractionDefinition } from './types';
 
 /**
@@ -23,10 +23,10 @@ export const all_interactions: InteractionDefinition[] = [
 /**
  * Export individual interaction groups.
  */
-export { canvas_interactions, keyboard_interactions, gesture_interactions, form_interactions };
+export { canvas_interactions, form_interactions, gesture_interactions, keyboard_interactions };
 
 /**
  * Export types and router.
  */
-export * from './types';
 export * from './router';
+export * from './types';

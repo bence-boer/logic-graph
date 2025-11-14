@@ -4,8 +4,8 @@
  * Recognizes long press (press and hold) gestures.
  */
 
-import type { GestureRecognizer, ActiveGesture, Point } from '$lib/stores/gesture.svelte';
 import { GestureType } from '$lib/interactions/types';
+import type { ActiveGesture, GestureRecognizer, Point } from '$lib/stores/gesture.svelte';
 
 /**
  * Minimum time for a long press gesture (ms).

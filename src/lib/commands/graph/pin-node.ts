@@ -8,6 +8,9 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
+import { ToastType } from '$lib/stores/notification.svelte';
+import { AnimationType } from '$lib/styles';
+import { EasingType } from '$lib/types/animations';
 
 /**
  * Payload for pinning/unpinning a node.
@@ -32,7 +35,7 @@ export interface PinNodeResult {
 /**
  * Command to pin or unpin a node.
  */
-export const pin_node_command: Command<PinNodePayload, PinNodeResult> = {
+export const pin_node_command = {
     id: 'graph.node.pin',
 
     metadata: {
@@ -112,15 +115,18 @@ export const pin_node_command: Command<PinNodePayload, PinNodeResult> = {
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: `Node ${action} successfully`,
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'pulse',
+                            type: AnimationType.PULSE,
                             target: payload.node_id,
-                            duration: 200
+                            config: {
+                                duration: 200,
+                                easing: EasingType.EASE_IN_OUT
+                            }
                         }
                     }
                 ]
@@ -171,7 +177,7 @@ export const pin_node_command: Command<PinNodePayload, PinNodeResult> = {
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Pin state restored',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     }
                 ]
@@ -183,4 +189,4 @@ export const pin_node_command: Command<PinNodePayload, PinNodeResult> = {
             };
         }
     }
-};
+} as const satisfies Command<PinNodePayload, PinNodeResult>;

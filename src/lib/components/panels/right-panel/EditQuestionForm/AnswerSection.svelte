@@ -1,15 +1,16 @@
 <script lang="ts">
+    import { CheckCircle2, Link, Plus, X } from '@lucide/svelte';
+
+    import Button from '$lib/components/ui/Button.svelte';
+    import Input from '$lib/components/ui/Input.svelte';
+    import Select from '$lib/components/ui/Select.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
-    import Button from '$lib/components/ui/Button.svelte';
-    import Select from '$lib/components/ui/Select.svelte';
-    import Input from '$lib/components/ui/Input.svelte';
     import type { LogicNode } from '$lib/types/graph';
-    import { NodeType, ConnectionType } from '$lib/types/graph';
-    import { is_statement_node } from '$lib/utils/node-classification';
+    import { ConnectionType, NodeType } from '$lib/types/graph';
     import { can_link_as_answer } from '$lib/utils/answer-management';
-    import { CheckCircle2, X, Link, Plus } from '@lucide/svelte';
+    import { is_statement_node } from '$lib/utils/node-classification';
 
     interface Props {
         node: LogicNode;
@@ -198,10 +199,10 @@
                 maxlength={100}
             />
             <div class="flex gap-2">
-                <Button onclick={handle_quick_answer} variant="primary" size="sm">
+                <Button on_click={handle_quick_answer} variant="primary" size="sm">
                     Create & Link
                 </Button>
-                <Button onclick={cancel_creating} variant="secondary" size="sm">Cancel</Button>
+                <Button on_click={cancel_creating} variant="secondary" size="sm">Cancel</Button>
             </div>
         </div>
     {:else if is_linking}
@@ -214,24 +215,24 @@
             />
             <div class="flex gap-2">
                 <Button
-                    onclick={handle_link_answer}
+                    on_click={handle_link_answer}
                     variant="primary"
                     size="sm"
                     disabled={!selected_statement_id}
                 >
                     Link Answer
                 </Button>
-                <Button onclick={cancel_linking} variant="secondary" size="sm">Cancel</Button>
+                <Button on_click={cancel_linking} variant="secondary" size="sm">Cancel</Button>
             </div>
         </div>
     {:else}
         <!-- Action buttons -->
         <div class="flex gap-2">
-            <Button onclick={start_linking} variant="secondary" size="sm">
+            <Button on_click={start_linking} variant="secondary" size="sm">
                 <Link size={14} />
                 Link Statement
             </Button>
-            <Button onclick={start_creating} variant="secondary" size="sm">
+            <Button on_click={start_creating} variant="secondary" size="sm">
                 <Plus size={14} />
                 Create Statement
             </Button>
@@ -271,8 +272,8 @@
             </p>
 
             <div class="flex justify-end gap-2">
-                <Button onclick={cancel_replace} variant="secondary" size="sm">Cancel</Button>
-                <Button onclick={confirm_replace} variant="primary" size="sm">
+                <Button on_click={cancel_replace} variant="secondary" size="sm">Cancel</Button>
+                <Button on_click={confirm_replace} variant="primary" size="sm">
                     Accept This Answer
                 </Button>
             </div>

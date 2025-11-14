@@ -68,7 +68,7 @@ function example_programmatic_usage() {
 }
 
 // Example 3: Creating a custom form definition
-import type { FormDefinition, FormData, FormFieldValue } from '$lib/forms';
+import type { FormData, FormDefinition, FormFieldValue } from '$lib/forms';
 import { FieldType, FormActionVariant, validators } from '$lib/forms';
 
 interface CustomFormData extends FormData {
@@ -233,9 +233,9 @@ const PASSWORD_FORM: FormDefinition<PasswordFormData> = {
 };
 
 export {
+    CONDITIONAL_FORM,
+    CUSTOM_FORM,
     example_basic_usage,
     example_programmatic_usage,
-    CUSTOM_FORM,
-    CONDITIONAL_FORM,
     PASSWORD_FORM
 };

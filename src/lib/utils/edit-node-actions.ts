@@ -1,11 +1,11 @@
+import { animation_store } from '$lib/stores/animation.svelte';
 import { graph_store } from '$lib/stores/graph.svelte';
 import { notification_store } from '$lib/stores/notification.svelte';
-import { ui_store } from '$lib/stores/ui.svelte';
 import { selection_store } from '$lib/stores/selection.svelte';
-import { animation_store } from '$lib/stores/animation.svelte';
-import { ConnectionType } from '$lib/types/graph';
-import type { LogicNode } from '$lib/types/graph';
+import { ui_store } from '$lib/stores/ui.svelte';
 import { AnimationType, EasingType } from '$lib/types/animations';
+import type { LogicNode } from '$lib/types/graph';
+import { ConnectionType } from '$lib/types/graph';
 
 /**
  * Validates and saves node statement and details updates.

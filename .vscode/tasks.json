@@ -1,0 +1,22 @@
+{
+    // See https://code.visualstudio.com/docs/editor/tasks for more information
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ESLint + Prettier: Format Current File",
+            "type": "shell",
+            "command": "(command -v bunx >/dev/null 2>&1 && bunx eslint --fix \"${file}\" || npx eslint --fix \"${file}\") && (command -v bunx >/dev/null 2>&1 && bunx prettier --write \"${file}\" || npx prettier --write \"${file}\")",
+            "presentation": {
+                "reveal": "never",
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "none",
+                "isDefault": false
+            }
+        }
+    ]
+}

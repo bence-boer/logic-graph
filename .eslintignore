@@ -1,0 +1,21 @@
+# Ignore generated and third-party files for ESLint
+node_modules/
+build/
+dist/
+.svelte-kit/
+.output/
+/.vite/
+.parcel-cache/
+.cache/
+coverage/
+
+# Ignore lockfiles and generated assets
+bun.lock
+bun.lockb
+
+# Editor state
+.idea/
+.vscode/*.code-workspace
+
+# test artifacts
+test-results/

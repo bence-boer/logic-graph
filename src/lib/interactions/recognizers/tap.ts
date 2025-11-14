@@ -4,8 +4,8 @@
  * Recognizes single tap/click gestures.
  */
 
-import type { GestureRecognizer, ActiveGesture, Point } from '$lib/stores/gesture.svelte';
 import { GestureType } from '$lib/interactions/types';
+import type { ActiveGesture, GestureRecognizer, Point } from '$lib/stores/gesture.svelte';
 
 /**
  * Maximum time for a tap gesture (ms).

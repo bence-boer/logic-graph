@@ -1,12 +1,13 @@
 <script lang="ts">
+    import { X } from '@lucide/svelte';
+
+    import Button from '$lib/components/ui/Button.svelte';
     import { keyboard_interactions } from '$lib/interactions/definitions/keyboard';
     import {
-        KeyModifier,
         EventMatcherType,
-        type InteractionDefinition
+        type InteractionDefinition,
+        KeyModifier
     } from '$lib/interactions/types';
-    import Button from '$lib/components/ui/Button.svelte';
-    import { X } from '@lucide/svelte';
 
     interface Props {
         is_open: boolean;
@@ -112,7 +113,7 @@
             </div>
 
             <div class="flex justify-end border-t border-neutral-700 p-6">
-                <Button onclick={handle_close}>Close</Button>
+                <Button on_click={handle_close}>Close</Button>
             </div>
         </div>
     </div>

@@ -6,8 +6,9 @@
  */
 
 import type { Simulation } from 'd3';
+
 import type { DragTrackingNode } from '$lib/types/d3-extensions';
-import type { LogicNode, D3Link } from '$lib/types/graph';
+import type { D3Link, LogicNode } from '$lib/types/graph';
 
 /**
  * Callback function when a node is pinned

@@ -2,10 +2,12 @@
  * Tests for graph validation utilities
  */
 
-import { describe, it, expect } from 'vitest';
-import { validate_node, validate_connection, validate_graph } from './validation';
-import { NodeType, ConnectionType, StatementState } from '$lib/types/graph';
-import type { LogicNode, LogicConnection, LogicGraph } from '$lib/types/graph';
+import { describe, expect, it } from 'vitest';
+
+import type { LogicConnection, LogicGraph, LogicNode } from '$lib/types/graph';
+import { ConnectionType, NodeType, StatementState } from '$lib/types/graph';
+
+import { validate_connection, validate_graph, validate_node } from './validation';
 
 describe('validate_node', () => {
     it('should accept node without details field (optional)', () => {

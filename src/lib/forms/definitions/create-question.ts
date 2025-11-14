@@ -2,7 +2,7 @@
  * Form definition for creating a new question node.
  */
 
-import type { FormDefinition, FormData } from '../types';
+import type { FormData, FormDefinition } from '../types';
 import { FieldType, FormActionVariant } from '../types';
 import { validators } from '../validation';
 

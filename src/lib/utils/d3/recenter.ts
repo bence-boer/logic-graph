@@ -4,8 +4,9 @@
  * @module utils/d3/recenter
  */
 
-import type { LogicNode } from '$lib/types/graph';
 import * as d3 from 'd3';
+
+import type { LogicNode } from '$lib/types/graph';
 
 /**
  * Bounding box for a set of nodes.

@@ -7,8 +7,9 @@
  * - Generate CSS variables
  */
 
-import type { ResolvedNodeStyle } from '../types';
 import type * as d3 from 'd3';
+
+import type { ResolvedNodeStyle } from '../types';
 
 /**
  * Generate inline styles for properties that can't be predefined

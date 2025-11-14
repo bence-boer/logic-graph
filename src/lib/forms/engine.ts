@@ -4,12 +4,12 @@
  */
 
 import type {
-    FormDefinition,
-    FormState,
     FormContext,
     FormData,
+    FormDefinition,
+    FormField,
     FormFieldValue,
-    FormField
+    FormState
 } from './types';
 import { validate_field } from './validation';
 

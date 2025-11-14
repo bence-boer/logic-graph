@@ -10,7 +10,8 @@
  * - Overlays (visual indicators like pins and checkmarks)
  */
 
-import type { LogicNode, LogicConnection, NodeType, StatementState } from '$lib/types/graph';
+import type { AnimationType } from '$lib/types/animations';
+import type { LogicConnection, LogicNode, NodeType, StatementState } from '$lib/types/graph';
 
 // ============================================================================
 // Design Tokens
@@ -290,17 +291,6 @@ export interface AnimationConfig {
 
     /** Animation direction */
     direction?: 'normal' | 'reverse' | 'alternate';
-}
-
-export enum AnimationType {
-    FADE_IN = 'fade-in',
-    FADE_OUT = 'fade-out',
-    SCALE_IN = 'scale-in',
-    SCALE_OUT = 'scale-out',
-    PULSE = 'pulse',
-    SHAKE = 'shake',
-    SLIDE_IN = 'slide-in',
-    SLIDE_OUT = 'slide-out'
 }
 
 // ============================================================================

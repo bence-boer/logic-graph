@@ -1,4 +1,4 @@
-import type { LogicNode, LogicConnection } from '$lib/types/graph';
+import type { LogicConnection, LogicNode } from '$lib/types/graph';
 import { ConnectionType } from '$lib/types/graph';
 
 /**

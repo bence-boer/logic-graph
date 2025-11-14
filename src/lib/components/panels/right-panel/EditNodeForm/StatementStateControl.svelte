@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { graph_store } from '$lib/stores/graph.svelte';
     import FormField from '$lib/components/ui/FormField.svelte';
+    import { graph_store } from '$lib/stores/graph.svelte';
     import type { LogicNode } from '$lib/types/graph';
     import { StatementState } from '$lib/types/graph';
 

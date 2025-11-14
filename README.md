@@ -36,3 +36,15 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+
+## Editor & formatting
+
+This repository uses Prettier and ESLint for formatting and linting. Important notes about editor integration:
+
+- Format-on-save and automatic organize-imports on save are disabled in the workspace settings. This prevents unexpected edits when saving files.
+- Use the explicit commands when you want to format or fix issues:
+    - Run `npm run format` to apply Prettier to the entire repo.
+    - Run `npm run lint:fix` to run Prettier and ESLint --fix across the repo.
+- Pre-commit hooks (Husky + lint-staged) run Prettier and `eslint --fix` on staged files to keep commits tidy.
+
+If you prefer format-on-save, you can re-enable it in your local VS Code settings, but the project defaults to manual formatting and pre-commit enforcement.

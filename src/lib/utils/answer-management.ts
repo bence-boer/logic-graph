@@ -5,8 +5,9 @@
  * This includes validation, linking/unlinking, and querying answer relationships.
  */
 
-import type { LogicNode, LogicConnection } from '$lib/types/graph';
+import type { LogicConnection, LogicNode } from '$lib/types/graph';
 import { ConnectionType } from '$lib/types/graph';
+
 import { is_question_node, is_statement_node } from './node-classification';
 
 // ============================================================================

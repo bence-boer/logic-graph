@@ -30,11 +30,11 @@
  */
 
 // Re-export all format-specific utilities
-export { export_graph_to_json, download_graph_as_json } from './json';
-export { export_to_svg, download_as_svg } from './svg';
-export { export_to_image, download_as_png, download_as_jpeg } from './image';
-export { export_to_html, download_as_html } from './html';
 export { trigger_download } from './download';
+export { download_as_html, export_to_html } from './html';
+export { download_as_jpeg, download_as_png, export_to_image } from './image';
+export { download_graph_as_json, export_graph_to_json } from './json';
+export { download_as_svg, export_to_svg } from './svg';
 
 // Re-export types
 export type { ImageExportOptions } from './image';

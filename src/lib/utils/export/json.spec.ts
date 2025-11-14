@@ -2,10 +2,12 @@
  * Tests for JSON export functionality
  */
 
-import { describe, it, expect } from 'vitest';
-import { export_graph_to_json } from './json';
+import { describe, expect, it } from 'vitest';
+
 import type { LogicGraph } from '$lib/types/graph';
-import { NodeType, ConnectionType, StatementState } from '$lib/types/graph';
+import { ConnectionType, NodeType, StatementState } from '$lib/types/graph';
+
+import { export_graph_to_json } from './json';
 
 describe('export_graph_to_json', () => {
     it('should export only semantic data without visual properties', () => {

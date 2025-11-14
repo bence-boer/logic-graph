@@ -11,14 +11,15 @@
         save_node_changes,
         toggle_node_pin
     } from '$lib/utils/edit-node-actions';
+    import { is_axiom_node } from '$lib/utils/node-classification';
     import {
         get_available_nodes_by_type,
         get_node_consequences,
         get_node_contradictions,
-        get_node_reasons,
-        get_node_questions
+        get_node_questions,
+        get_node_reasons
     } from '$lib/utils/node-connections';
-    import { is_axiom_node } from '$lib/utils/node-classification';
+
     import BasicNodeFields from './BasicNodeFields.svelte';
     import ConnectionSection from './ConnectionSection.svelte';
     import EditNodeFormHeader from './EditNodeFormHeader.svelte';

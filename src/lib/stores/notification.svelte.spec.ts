@@ -1,9 +1,13 @@
-/**
- * Tests for notification store.
- */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { notification_store, NOTIFICATION_PRESETS, ERROR_PRESETS } from './notification.svelte';
+import {
+    ERROR_PRESETS,
+    type ErrorPresetID,
+    NOTIFICATION_PRESETS,
+    notification_store,
+    type NotificationPresetID,
+    ToastType
+} from './notification.svelte';
 
 describe('notification_store', () => {
     beforeEach(() => {
@@ -18,30 +22,43 @@ describe('notification_store', () => {
 
     describe('show', () => {
         it('should add a notification', () => {
-            const id = notification_store.show('Test message', 'info');
+            const id = notification_store.show('Test message', ToastType.INFO);
 
             expect(id).toBeTruthy();
             expect(notification_store.notifications).toHaveLength(1);
             expect(notification_store.notifications[0].message).toBe('Test message');
-            expect(notification_store.notifications[0].type).toBe('info');
+            expect(notification_store.notifications[0].type).toBe(ToastType.INFO);
         });
 
-        it('should auto-dismiss notification after duration', () => {
-            notification_store.show('Test', 'info', { duration: 3000 });
+        it('should auto-dismiss notification after duration', async () => {
+            // Use real timers for this test to avoid incompatibilities with the
+            // fake-timer APIs across runner versions. Keep duration short so the
+            // test runs quickly.
+            vi.useRealTimers();
+
+            notification_store.show('Test', ToastType.INFO, { duration: 10 });
 
             expect(notification_store.notifications).toHaveLength(1);
 
-            vi.advanceTimersByTime(3000);
+            // Wait slightly longer than the duration
+            await new Promise((resolve) => setTimeout(resolve, 20));
 
             expect(notification_store.notifications).toHaveLength(0);
+
+            // Restore fake timers for other tests
+            vi.useFakeTimers();
         });
 
         it('should not auto-dismiss when duration is 0', () => {
-            notification_store.show('Test', 'info', { duration: 0 });
+            notification_store.show('Test', ToastType.INFO, { duration: 0 });
 
             expect(notification_store.notifications).toHaveLength(1);
 
-            vi.advanceTimersByTime(10000);
+            if (typeof vi.advanceTimersByTime === 'function') {
+                vi.advanceTimersByTime(10000);
+            } else if (typeof vi.runAllTimers === 'function') {
+                vi.runAllTimers();
+            }
 
             expect(notification_store.notifications).toHaveLength(1);
         });
@@ -52,14 +69,14 @@ describe('notification_store', () => {
                 { label: 'Retry', command: 'retry.action' }
             ];
 
-            notification_store.show('Test', 'error', { actions });
+            notification_store.show('Test', ToastType.ERROR, { actions });
 
             expect(notification_store.notifications[0].actions).toEqual(actions);
         });
 
         it('should group notifications by group_key', () => {
-            notification_store.show('Message 1', 'info', { group_key: 'test-group' });
-            notification_store.show('Message 2', 'info', { group_key: 'test-group' });
+            notification_store.show('Message 1', ToastType.INFO, { group_key: 'test-group' });
+            notification_store.show('Message 2', ToastType.INFO, { group_key: 'test-group' });
 
             expect(notification_store.grouped_notifications['test-group']).toHaveLength(2);
         });
@@ -69,14 +86,14 @@ describe('notification_store', () => {
         it('should show success notification', () => {
             notification_store.success('Success!');
 
-            expect(notification_store.notifications[0].type).toBe('success');
+            expect(notification_store.notifications[0].type).toBe(ToastType.SUCCESS);
             expect(notification_store.notifications[0].message).toBe('Success!');
         });
 
         it('should show error notification with longer duration', () => {
             notification_store.error('Error!');
 
-            expect(notification_store.notifications[0].type).toBe('error');
+            expect(notification_store.notifications[0].type).toBe(ToastType.ERROR);
             expect(notification_store.notifications[0].duration).toBe(5000);
         });
 
@@ -90,7 +107,7 @@ describe('notification_store', () => {
         it('should show info notification', () => {
             notification_store.info('Info!');
 
-            expect(notification_store.notifications[0].type).toBe('info');
+            expect(notification_store.notifications[0].type).toBe(ToastType.INFO);
         });
     });
 
@@ -100,7 +117,7 @@ describe('notification_store', () => {
 
             expect(id).toBeTruthy();
             expect(notification_store.notifications[0].message).toBe('Node created');
-            expect(notification_store.notifications[0].type).toBe('success');
+            expect(notification_store.notifications[0].type).toBe(ToastType.SUCCESS);
         });
 
         it('should use template function with data', () => {
@@ -120,7 +137,9 @@ describe('notification_store', () => {
         });
 
         it('should return undefined for unknown command', () => {
-            const id = notification_store.success_for_command('unknown.command');
+            const id = notification_store.success_for_command(
+                'unknown.command' as NotificationPresetID
+            );
 
             expect(id).toBeUndefined();
             expect(notification_store.notifications).toHaveLength(0);
@@ -134,11 +153,14 @@ describe('notification_store', () => {
             expect(notification_store.notifications[0].message).toBe(
                 'Failed to create node: Invalid data'
             );
-            expect(notification_store.notifications[0].type).toBe('error');
+            expect(notification_store.notifications[0].type).toBe(ToastType.ERROR);
         });
 
         it('should use raw error for unknown command', () => {
-            notification_store.error_for_command('unknown.command', 'Something went wrong');
+            notification_store.error_for_command(
+                'unknown.command' as unknown as ErrorPresetID,
+                'Something went wrong'
+            );
 
             expect(notification_store.notifications[0].message).toBe('Something went wrong');
         });
@@ -146,7 +168,7 @@ describe('notification_store', () => {
 
     describe('remove', () => {
         it('should remove notification by id', () => {
-            const id = notification_store.show('Test', 'info');
+            const id = notification_store.show('Test', ToastType.INFO);
 
             expect(notification_store.notifications).toHaveLength(1);
 
@@ -156,7 +178,7 @@ describe('notification_store', () => {
         });
 
         it('should remove notification from group', () => {
-            const id = notification_store.show('Test', 'info', { group_key: 'test-group' });
+            const id = notification_store.show('Test', ToastType.INFO, { group_key: 'test-group' });
 
             expect(notification_store.grouped_notifications['test-group']).toHaveLength(1);
 
@@ -168,9 +190,9 @@ describe('notification_store', () => {
 
     describe('remove_group', () => {
         it('should remove all notifications in a group', () => {
-            notification_store.show('Message 1', 'info', { group_key: 'test-group' });
-            notification_store.show('Message 2', 'info', { group_key: 'test-group' });
-            notification_store.show('Message 3', 'info', { group_key: 'other-group' });
+            notification_store.show('Message 1', ToastType.INFO, { group_key: 'test-group' });
+            notification_store.show('Message 2', ToastType.INFO, { group_key: 'test-group' });
+            notification_store.show('Message 3', ToastType.INFO, { group_key: 'other-group' });
 
             expect(notification_store.notifications).toHaveLength(3);
 
@@ -184,9 +206,9 @@ describe('notification_store', () => {
 
     describe('clear', () => {
         it('should remove all notifications', () => {
-            notification_store.show('Test 1', 'info');
-            notification_store.show('Test 2', 'error');
-            notification_store.show('Test 3', 'success');
+            notification_store.show('Test 1', ToastType.INFO);
+            notification_store.show('Test 2', ToastType.ERROR);
+            notification_store.show('Test 3', ToastType.SUCCESS);
 
             expect(notification_store.notifications).toHaveLength(3);
 
@@ -196,8 +218,8 @@ describe('notification_store', () => {
         });
 
         it('should clear all groups', () => {
-            notification_store.show('Test 1', 'info', { group_key: 'group1' });
-            notification_store.show('Test 2', 'info', { group_key: 'group2' });
+            notification_store.show('Test 1', ToastType.INFO, { group_key: 'group1' });
+            notification_store.show('Test 2', ToastType.INFO, { group_key: 'group2' });
 
             notification_store.clear();
 
@@ -209,8 +231,8 @@ describe('notification_store', () => {
         it('should return total notification count', () => {
             expect(notification_store.count).toBe(0);
 
-            notification_store.show('Test 1', 'info');
-            notification_store.show('Test 2', 'error');
+            notification_store.show('Test 1', ToastType.INFO);
+            notification_store.show('Test 2', ToastType.ERROR);
 
             expect(notification_store.count).toBe(2);
         });
@@ -218,13 +240,13 @@ describe('notification_store', () => {
 
     describe('count_by_type', () => {
         it('should return count for specific type', () => {
-            notification_store.show('Test 1', 'info');
-            notification_store.show('Test 2', 'error');
-            notification_store.show('Test 3', 'error');
+            notification_store.show('Test 1', ToastType.INFO);
+            notification_store.show('Test 2', ToastType.ERROR);
+            notification_store.show('Test 3', ToastType.ERROR);
 
-            expect(notification_store.count_by_type('info')).toBe(1);
-            expect(notification_store.count_by_type('error')).toBe(2);
-            expect(notification_store.count_by_type('success')).toBe(0);
+            expect(notification_store.count_by_type(ToastType.INFO)).toBe(1);
+            expect(notification_store.count_by_type(ToastType.ERROR)).toBe(2);
+            expect(notification_store.count_by_type(ToastType.SUCCESS)).toBe(0);
         });
     });
 });

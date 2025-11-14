@@ -5,10 +5,11 @@
  * All visual properties are defined declaratively using design tokens.
  */
 
-import type { StyleTheme } from '../types';
-import { OverlayType, OverlayPosition, AnimationType, InteractionType } from '../types';
 import { NodeType, StatementState } from '$lib/types/graph';
 import { is_question_resolved } from '$lib/utils/graph-helpers';
+
+import type { StyleTheme } from '../types';
+import { AnimationType, InteractionType, OverlayPosition, OverlayType } from '../types';
 
 /**
  * Default dark theme definition

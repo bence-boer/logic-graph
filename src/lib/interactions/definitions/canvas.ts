@@ -4,13 +4,14 @@
  * Defines all interactions that occur on the graph canvas.
  */
 
+import { graph_store } from '$lib/stores/graph.svelte';
+
 import {
-    InteractionContext,
     EventMatcherType,
+    InteractionContext,
     type InteractionDefinition,
     InteractionPreconditionType
 } from '../types';
-import { graph_store } from '$lib/stores/graph.svelte';
 
 /**
  * Canvas interactions.

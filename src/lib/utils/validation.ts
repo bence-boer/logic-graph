@@ -8,6 +8,7 @@
 
 import type { LogicConnection, LogicGraph, LogicNode } from '$lib/types/graph';
 import { ConnectionType, NodeType, StatementState } from '$lib/types/graph';
+
 import { is_question_node, is_statement_node } from './node-classification';
 
 /**

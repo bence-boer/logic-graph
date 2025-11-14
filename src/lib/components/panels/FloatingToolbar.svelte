@@ -9,6 +9,7 @@
     import { notification_store } from '$lib/stores/notification.svelte';
     import type { LogicGraph } from '$lib/types/graph';
     import { validate_graph } from '$lib/utils/validation';
+
     import { EditActions, FileActions, HistoryActions, UtilityActions } from './FloatingToolbar';
 
     interface Props {

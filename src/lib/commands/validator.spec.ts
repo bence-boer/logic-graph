@@ -2,15 +2,16 @@
  * Tests for command validation utilities.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
 import {
-    valid,
+    combine,
     invalid,
     invalid_fields,
-    required,
     max_length,
     min_length,
-    combine
+    required,
+    valid
 } from './validator';
 
 describe('Validator utilities', () => {

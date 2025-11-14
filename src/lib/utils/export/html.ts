@@ -1,4 +1,5 @@
 import type { LogicGraph } from '$lib/types/graph';
+
 import { trigger_download } from './download';
 
 /**

@@ -5,9 +5,10 @@
  * between nodes with appropriate styling, arrow markers, and interactions.
  */
 import * as d3 from 'd3';
-import type { LogicNode, D3Link } from '$lib/types/graph';
-import { ConnectionType, NodeType } from '$lib/types/graph';
+
 import { selection_store } from '$lib/stores/selection.svelte';
+import type { D3Link, LogicNode } from '$lib/types/graph';
+import { ConnectionType, NodeType } from '$lib/types/graph';
 import {
     get_arrow_marker_id,
     get_connection_class,

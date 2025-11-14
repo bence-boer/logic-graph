@@ -4,13 +4,14 @@
  * Tests for interaction definitions.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
 import {
+    all_interactions,
     canvas_interactions,
-    keyboard_interactions,
-    gesture_interactions,
     form_interactions,
-    all_interactions
+    gesture_interactions,
+    keyboard_interactions
 } from '../index';
 
 describe('Interaction Definitions', () => {

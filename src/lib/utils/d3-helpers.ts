@@ -5,7 +5,7 @@
  * and SVG rendering in the context of the logic graph visualization.
  */
 
-import type { LogicConnection, LogicNode, D3Link } from '$lib/types/graph';
+import type { D3Link, LogicConnection, LogicNode } from '$lib/types/graph';
 import { ConnectionType } from '$lib/types/graph';
 
 /**

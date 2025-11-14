@@ -1,9 +1,10 @@
 <script lang="ts">
     import { X } from '@lucide/svelte';
+
     import Button from '$lib/components/ui/Button.svelte';
-    import { ui_store } from '$lib/stores/ui.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
+    import { ui_store } from '$lib/stores/ui.svelte';
 
     interface Props {
         is_open: boolean;
@@ -150,7 +151,7 @@
                 variant="primary"
                 size="md"
                 class="w-full"
-                onclick={() => {
+                on_click={() => {
                     if (active_tab === 'statement') handle_create_statement();
                     else if (active_tab === 'question') handle_create_question();
                     else handle_create_connection();

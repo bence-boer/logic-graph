@@ -4,7 +4,7 @@
  * Defines all interactions within forms.
  */
 
-import { InteractionContext, EventMatcherType, type InteractionDefinition } from '../types';
+import { EventMatcherType, InteractionContext, type InteractionDefinition } from '../types';
 
 /**
  * Form interactions.

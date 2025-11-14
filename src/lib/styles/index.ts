@@ -6,7 +6,7 @@
 
 // Re-export types
 export type * from './types';
-export { OverlayType, OverlayPosition, AnimationType, InteractionType } from './types';
+export { AnimationType, InteractionType, OverlayPosition, OverlayType } from './types';
 
 // Re-export engine
 export { StyleEngine } from './engine';

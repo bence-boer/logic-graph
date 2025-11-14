@@ -1,9 +1,11 @@
 <script lang="ts">
     import '../app.css';
+
+    import { onDestroy, onMount } from 'svelte';
+
     import favicon from '$lib/assets/favicon.svg';
     import { register_all_commands } from '$lib/commands';
-    import { interaction_router, all_interactions } from '$lib/interactions';
-    import { onMount, onDestroy } from 'svelte';
+    import { all_interactions, interaction_router } from '$lib/interactions';
 
     let { children } = $props();
 

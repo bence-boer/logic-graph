@@ -6,8 +6,9 @@
  * working with different node types (statements, questions) and their states.
  */
 
-import type { LogicNode, LogicConnection } from '$lib/types/graph';
-import { NodeType, StatementState, QuestionState } from '$lib/types/graph';
+import type { LogicConnection, LogicNode } from '$lib/types/graph';
+import { NodeType, QuestionState, StatementState } from '$lib/types/graph';
+
 import { is_question_resolved } from './graph-helpers';
 
 // ============================================================================

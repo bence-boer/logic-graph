@@ -6,10 +6,10 @@
  */
 
 import {
-    InteractionContext,
     EventMatcherType,
-    KeyModifier,
-    type InteractionDefinition
+    InteractionContext,
+    type InteractionDefinition,
+    KeyModifier
 } from '../types';
 
 /**

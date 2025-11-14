@@ -6,8 +6,9 @@
 
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
-import { selection_store } from '$lib/stores/selection.svelte';
 import { graph_store } from '$lib/stores/graph.svelte';
+import { selection_store } from '$lib/stores/selection.svelte';
+import { AnimationType, EasingType } from '$lib/types/animations';
 import { SelectionTypeEnum } from '$lib/types/graph';
 
 /**
@@ -31,7 +32,7 @@ export interface SelectNodeResult {
 /**
  * Command to select a node.
  */
-export const select_node_command: Command<SelectNodePayload, SelectNodeResult> = {
+export const select_node_command = {
     id: 'selection.node.select',
 
     metadata: {
@@ -81,9 +82,12 @@ export const select_node_command: Command<SelectNodePayload, SelectNodeResult> =
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'pulse',
+                            type: AnimationType.HIGHLIGHT,
                             target: payload.node_id,
-                            duration: 200
+                            config: {
+                                duration: 200,
+                                easing: EasingType.EASE_OUT
+                            }
                         }
                     }
                 ]
@@ -124,7 +128,7 @@ export const select_node_command: Command<SelectNodePayload, SelectNodeResult> =
             };
         }
     }
-};
+} as const satisfies Command<SelectNodePayload, SelectNodeResult>;
 
 /**
  * Payload for selecting a connection.
@@ -147,7 +151,7 @@ export interface SelectConnectionResult {
 /**
  * Command to select a connection.
  */
-export const select_connection_command: Command<SelectConnectionPayload, SelectConnectionResult> = {
+export const select_connection_command = {
     id: 'selection.connection.select',
 
     metadata: {
@@ -199,9 +203,12 @@ export const select_connection_command: Command<SelectConnectionPayload, SelectC
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'highlight',
+                            type: AnimationType.HIGHLIGHT,
                             target: payload.connection_id,
-                            duration: 200
+                            config: {
+                                duration: 200,
+                                easing: EasingType.EASE_OUT
+                            }
                         }
                     }
                 ]
@@ -242,12 +249,12 @@ export const select_connection_command: Command<SelectConnectionPayload, SelectC
             };
         }
     }
-};
+} as const satisfies Command<SelectConnectionPayload, SelectConnectionResult>;
 
 /**
  * Command to clear selection.
  */
-export const clear_selection_command: Command<void, SelectNodeResult> = {
+export const clear_selection_command = {
     id: 'selection.clear',
 
     metadata: {
@@ -315,4 +322,4 @@ export const clear_selection_command: Command<void, SelectNodeResult> = {
             };
         }
     }
-};
+} as const satisfies Command<void, SelectNodeResult>;

@@ -7,5 +7,5 @@
  */
 
 export * from './easing';
-export * from './transitions';
 export * from './presets';
+export * from './transitions';

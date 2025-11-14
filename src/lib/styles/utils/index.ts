@@ -4,9 +4,10 @@
  * Helper functions for working with the style system
  */
 
-import type { StyleContext } from '../types';
-import type { LogicNode, LogicConnection } from '$lib/types/graph';
+import type { LogicConnection, LogicNode } from '$lib/types/graph';
 import { is_axiom_node } from '$lib/utils/node-classification';
+
+import type { StyleContext } from '../types';
 
 /**
  * Build a style context from node data and interaction states

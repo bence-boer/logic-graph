@@ -5,23 +5,24 @@
  * style rules, composes variants, and produces final resolved styles.
  */
 
+import { NodeType } from '$lib/types/graph';
+
 import type {
-    StyleTheme,
-    StyleContext,
-    StyleCondition,
+    CompositeCondition,
+    CustomCondition,
+    InteractionCondition,
+    NodeStateCondition,
     NodeStyleVariant,
+    NodeTypeCondition,
+    OverlayConfig,
     PartialNodeStyle,
     ResolvedNodeStyle,
     ResolvedOverlay,
-    OverlayConfig,
-    NodeTypeCondition,
-    NodeStateCondition,
-    InteractionCondition,
-    CompositeCondition,
-    CustomCondition
+    StyleCondition,
+    StyleContext,
+    StyleTheme
 } from './types';
 import { OverlayPosition } from './types';
-import { NodeType } from '$lib/types/graph';
 
 /**
  * Style engine class - resolves styles for nodes based on rules and context

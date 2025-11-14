@@ -8,6 +8,8 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
+import { ToastType } from '$lib/stores/notification.svelte';
+import { AnimationType, EasingType } from '$lib/types/animations';
 import type { LogicConnection } from '$lib/types/graph';
 
 /**
@@ -23,13 +25,13 @@ export interface DeleteConnectionPayload {
  */
 export interface DeleteConnectionResult {
     /** The deleted connection (for undo) */
-    deleted_connection: LogicConnection;
+    deleted_connection: Required<LogicConnection>;
 }
 
 /**
  * Command to delete a connection.
  */
-export const delete_connection_command: Command<DeleteConnectionPayload, DeleteConnectionResult> = {
+export const delete_connection_command = {
     id: 'graph.connection.delete',
 
     metadata: {
@@ -66,7 +68,10 @@ export const delete_connection_command: Command<DeleteConnectionPayload, DeleteC
     ): Promise<CommandResult<DeleteConnectionResult>> {
         try {
             // Get connection before deletion
-            const connection = graph_store.connections.find((c) => c.id === payload.connection_id);
+            const connection = graph_store.connections.find(
+                (connection): connection is Required<LogicConnection> =>
+                    !!connection?.id && connection.id === payload.connection_id
+            );
             if (!connection) {
                 return {
                     success: false,
@@ -87,15 +92,18 @@ export const delete_connection_command: Command<DeleteConnectionPayload, DeleteC
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Connection deleted successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'fade_out',
+                            type: AnimationType.FADE_OUT,
                             target: payload.connection_id,
-                            duration: 200
+                            config: {
+                                duration: 200,
+                                easing: EasingType.EASE_IN
+                            }
                         }
                     }
                 ]
@@ -128,15 +136,18 @@ export const delete_connection_command: Command<DeleteConnectionPayload, DeleteC
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Connection deletion undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
-                            type: 'draw_line',
+                            type: AnimationType.FADE_IN,
                             target: deleted_connection.id,
-                            duration: 300
+                            config: {
+                                duration: 300,
+                                easing: EasingType.EASE_OUT
+                            }
                         }
                     }
                 ]
@@ -148,4 +159,4 @@ export const delete_connection_command: Command<DeleteConnectionPayload, DeleteC
             };
         }
     }
-};
+} as const satisfies Command<DeleteConnectionPayload, DeleteConnectionResult>;

@@ -1,9 +1,11 @@
 <script lang="ts">
-    import { Plus, ChevronDown, ChevronRight } from '@lucide/svelte';
-    import AddConnectionForm from './AddConnectionForm.svelte';
-    import ConnectionListItem from './ConnectionListItem.svelte';
+    import { ChevronDown, ChevronRight, Plus } from '@lucide/svelte';
+
     import type { LogicNode } from '$lib/types/graph';
     import type { NodeConnectionRelation } from '$lib/utils/node-connections';
+
+    import AddConnectionForm from './AddConnectionForm.svelte';
+    import ConnectionListItem from './ConnectionListItem.svelte';
 
     interface Props {
         title: string;

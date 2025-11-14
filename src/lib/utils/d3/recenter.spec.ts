@@ -3,12 +3,14 @@
  */
 
 import { describe, expect, it } from 'vitest';
+
 import type { LogicNode } from '$lib/types/graph';
 import { NodeType } from '$lib/types/graph';
+
 import {
     calculate_bounding_box,
-    calculate_recenter_transform,
     calculate_focus_transform,
+    calculate_recenter_transform,
     DEFAULT_RECENTER_CONFIG
 } from './recenter';
 

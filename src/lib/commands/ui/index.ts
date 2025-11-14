@@ -6,13 +6,13 @@
 
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory } from '$lib/commands/types';
-import { ui_store } from '$lib/stores/ui.svelte';
 import { graph_store } from '$lib/stores/graph.svelte';
+import { ui_store } from '$lib/stores/ui.svelte';
 
 /**
  * Command to toggle left panel.
  */
-export const toggle_left_panel_command: Command<void, void> = {
+export const toggle_left_panel_command = {
     id: 'ui.panel.left.toggle',
 
     metadata: {
@@ -38,12 +38,12 @@ export const toggle_left_panel_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to open left panel.
  */
-export const open_left_panel_command: Command<void, void> = {
+export const open_left_panel_command = {
     id: 'ui.panel.left.open',
 
     metadata: {
@@ -69,12 +69,12 @@ export const open_left_panel_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to close left panel.
  */
-export const close_left_panel_command: Command<void, void> = {
+export const close_left_panel_command = {
     id: 'ui.panel.left.close',
 
     metadata: {
@@ -100,12 +100,12 @@ export const close_left_panel_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to close right panel.
  */
-export const close_right_panel_command: Command<void, void> = {
+export const close_right_panel_command = {
     id: 'ui.panel.right.close',
 
     metadata: {
@@ -131,12 +131,12 @@ export const close_right_panel_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to open create node form.
  */
-export const open_create_node_form_command: Command<void, void> = {
+export const open_create_node_form_command = {
     id: 'ui.form.create_node.open',
 
     metadata: {
@@ -162,12 +162,12 @@ export const open_create_node_form_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to open create question form.
  */
-export const open_create_question_form_command: Command<void, void> = {
+export const open_create_question_form_command = {
     id: 'ui.form.create_question.open',
 
     metadata: {
@@ -194,12 +194,12 @@ export const open_create_question_form_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Command to open create connection form.
  */
-export const open_create_connection_form_command: Command<void, void> = {
+export const open_create_connection_form_command = {
     id: 'ui.form.create_connection.open',
 
     metadata: {
@@ -226,7 +226,7 @@ export const open_create_connection_form_command: Command<void, void> = {
             };
         }
     }
-};
+} as const satisfies Command<void, void>;
 
 /**
  * Payload for opening edit node form.
@@ -239,7 +239,7 @@ export interface OpenEditNodeFormPayload {
 /**
  * Command to open edit node form.
  */
-export const open_edit_node_form_command: Command<OpenEditNodeFormPayload, void> = {
+export const open_edit_node_form_command = {
     id: 'ui.form.edit_node.open',
 
     metadata: {
@@ -295,7 +295,7 @@ export const open_edit_node_form_command: Command<OpenEditNodeFormPayload, void>
             };
         }
     }
-};
+} as const satisfies Command<OpenEditNodeFormPayload, void>;
 
 /**
  * Payload for opening edit connection form.
@@ -308,7 +308,7 @@ export interface OpenEditConnectionFormPayload {
 /**
  * Command to open edit connection form.
  */
-export const open_edit_connection_form_command: Command<OpenEditConnectionFormPayload, void> = {
+export const open_edit_connection_form_command = {
     id: 'ui.form.edit_connection.open',
 
     metadata: {
@@ -351,4 +351,4 @@ export const open_edit_connection_form_command: Command<OpenEditConnectionFormPa
             };
         }
     }
-};
+} as const satisfies Command<OpenEditConnectionFormPayload, void>;

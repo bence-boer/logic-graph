@@ -4,15 +4,16 @@
  * Routes user events to commands based on interaction definitions.
  */
 
+import { command_executor } from '$lib/commands/executor';
+
 import type {
-    InteractionDefinition,
+    ActiveInteractionContext,
     EventMatcher,
     EventMatcherType,
-    ActiveInteractionContext
+    InteractionDefinition
 } from './types';
-import { InteractionContext, EventMatcherType as MatcherType, KeyModifier } from './types';
-import { command_executor } from '$lib/commands/executor';
-import type { CommandPayload } from '$lib/commands/types'; /**
+import { EventMatcherType as MatcherType, InteractionContext, KeyModifier } from './types';
+/**
  * Interaction router handles event listening and command dispatching.
  */
 export class InteractionRouter {
@@ -384,9 +385,7 @@ export class InteractionRouter {
         }
 
         // Build payload
-        const payload: CommandPayload = interaction.payload_mapper
-            ? interaction.payload_mapper(event)
-            : {};
+        const payload = interaction.payload_mapper ? interaction.payload_mapper(event) : {};
 
         // Execute command
         try {

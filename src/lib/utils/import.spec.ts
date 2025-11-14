@@ -2,9 +2,11 @@
  * Tests for JSON import functionality
  */
 
-import { describe, it, expect } from 'vitest';
-import { import_graph_from_json } from './import';
+import { describe, expect, it } from 'vitest';
+
 import { NodeType, StatementState } from '$lib/types/graph';
+
+import { import_graph_from_json } from './import';
 
 describe('import_graph_from_json', () => {
     it('should import minimal graph with only required fields', () => {

@@ -7,9 +7,10 @@
  * - Selection highlights
  */
 
+import * as d3 from 'd3';
+
 import type { ResolvedOverlay } from '../types';
 import { OverlayType } from '../types';
-import * as d3 from 'd3';
 
 /**
  * Render all overlays for a node

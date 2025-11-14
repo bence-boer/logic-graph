@@ -1,8 +1,9 @@
 <script lang="ts">
-    import type { LogicNode, LogicConnection } from '$lib/types/graph';
-    import NodeSearchResult from './NodeSearchResult.svelte';
+    import type { LogicConnection, LogicNode } from '$lib/types/graph';
+
     import ConnectionSearchResult from './ConnectionSearchResult.svelte';
     import EmptySearchState from './EmptySearchState.svelte';
+    import NodeSearchResult from './NodeSearchResult.svelte';
 
     interface Props {
         nodes: LogicNode[];

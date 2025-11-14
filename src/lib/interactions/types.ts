@@ -4,8 +4,6 @@
  * Defines the types for mapping user interactions (events) to commands.
  */
 
-import type { CommandPayload } from '$lib/commands/types';
-
 /**
  * Context where an interaction can occur.
  */
@@ -144,7 +142,7 @@ export interface InteractionPrecondition<ContextData = unknown> {
  *
  * Extracts command payload from interaction event.
  */
-export type PayloadMapper<EventData = Event> = (event: EventData) => CommandPayload;
+export type PayloadMapper<EventData = Event, Payload = unknown> = (event: EventData) => Payload;
 
 /**
  * Interaction definition.

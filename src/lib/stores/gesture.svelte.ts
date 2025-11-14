@@ -5,15 +5,15 @@
  * touch and pointer event handling.
  */
 
-import type { GestureType } from '$lib/interactions/types';
 import {
-    tap_recognizer,
     long_press_recognizer,
-    swipe_recognizer,
-    pinch_recognizer,
     pan_recognizer,
-    rotate_recognizer
+    pinch_recognizer,
+    rotate_recognizer,
+    swipe_recognizer,
+    tap_recognizer
 } from '$lib/interactions/recognizers';
+import type { GestureType } from '$lib/interactions/types';
 
 /**
  * Point with x/y coordinates.

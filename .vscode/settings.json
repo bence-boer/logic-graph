@@ -37,5 +37,26 @@
         {
             "text": "Follow conventional commit format for the title: type(scope): description."
         }
-    ]
+    ],
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnSave": false,
+    "eslint.format.enable": true,
+    "editor.codeActionsOnSave": {},
+    // Disable TypeScript's organize imports to prevent conflicts with ESLint's simple-import-sort
+    "typescript.preferences.organizeImportsOnSave": false,
+    "javascript.preferences.organizeImportsOnSave": false,
+    "[svelte]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/node_modules": true,
+        "**/build": true
+    }
 }

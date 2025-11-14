@@ -21,3 +21,25 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Build / generated output
+/dist
+/coverage
+/.cache
+.parcel-cache
+.turbo
+.vite
+
+# ESLint / tool caches
+.eslintcache
+
+# IDEs and editors
+.idea/
+# keep workspace settings in repo, but ignore local editor state
+.vscode/*.code-workspace
+
+# Log files
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*

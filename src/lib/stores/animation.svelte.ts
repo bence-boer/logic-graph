@@ -8,11 +8,11 @@
  */
 
 import type {
-    AnimationType,
     AnimationConfig,
-    AnimationState,
+    AnimationQueueEntry,
     AnimationResult,
-    AnimationQueueEntry
+    AnimationState,
+    AnimationType
 } from '$lib/types/animations';
 
 /**

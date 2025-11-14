@@ -4,11 +4,12 @@
  * Uses HTML foreignObject elements with CSS for flexible text wrapping and dynamic sizing.
  * Provides drag behavior, selection handling, and visual feedback.
  */
+import * as d3 from 'd3';
+
 import { selection_store } from '$lib/stores/selection.svelte';
-import { DEFAULT_THEME, StyleEngine, build_style_context, render_overlays } from '$lib/styles';
+import { build_style_context, DEFAULT_THEME, render_overlays, StyleEngine } from '$lib/styles';
 import type { DragTrackingNode } from '$lib/types/d3-extensions';
 import type { LogicConnection, LogicNode } from '$lib/types/graph';
-import * as d3 from 'd3';
 
 // Create style engine instance with default theme
 const style_engine = new StyleEngine(DEFAULT_THEME);

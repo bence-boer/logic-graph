@@ -8,9 +8,10 @@
 import type { Command, CommandResult, ValidationResult } from '$lib/commands/types';
 import { CommandCategory, CommandEffectType } from '$lib/commands/types';
 import { graph_store } from '$lib/stores/graph.svelte';
+import { ToastType } from '$lib/stores/notification.svelte';
+import { AnimationType, EasingType } from '$lib/types/animations';
 import type { LogicNode } from '$lib/types/graph';
 import { NodeType, StatementState } from '$lib/types/graph';
-import { AnimationType, EasingType } from '$lib/types/animations';
 
 /**
  * Payload for updating a node.
@@ -41,7 +42,7 @@ export interface UpdateNodeResult {
 /**
  * Command to update an existing node.
  */
-export const update_node_command: Command<UpdateNodePayload, UpdateNodeResult> = {
+export const update_node_command = {
     id: 'graph.node.update',
 
     metadata: {
@@ -161,14 +162,14 @@ export const update_node_command: Command<UpdateNodePayload, UpdateNodeResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Node updated successfully',
-                            type: 'success'
+                            type: ToastType.SUCCESS
                         }
                     },
                     {
                         type: CommandEffectType.ANIMATION,
                         payload: {
                             target: `#node-${payload.node_id}`,
-                            animation_type: AnimationType.PULSE,
+                            type: AnimationType.PULSE,
                             config: {
                                 duration: 600,
                                 easing: EasingType.EASE_IN_OUT
@@ -204,7 +205,7 @@ export const update_node_command: Command<UpdateNodePayload, UpdateNodeResult> =
                         type: CommandEffectType.TOAST,
                         payload: {
                             message: 'Node update undone',
-                            type: 'info'
+                            type: ToastType.INFO
                         }
                     }
                 ]
@@ -216,4 +217,4 @@ export const update_node_command: Command<UpdateNodePayload, UpdateNodeResult> =
             };
         }
     }
-};
+} as const satisfies Command<UpdateNodePayload, UpdateNodeResult>;

@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { SearchFilterType, CONNECTION_TYPE_FILTER_VALUE } from '$lib/stores/search.svelte';
+    import { ArrowLeftRight, ArrowRight, CircleDot, Link2, ListFilter } from '@lucide/svelte';
+
+    import { CONNECTION_TYPE_FILTER_VALUE, SearchFilterType } from '$lib/stores/search.svelte';
     import { ConnectionType } from '$lib/types/graph';
-    import { ListFilter, CircleDot, Link2, ArrowRight, ArrowLeftRight } from '@lucide/svelte';
 
     interface Props {
         filter_type: SearchFilterType;

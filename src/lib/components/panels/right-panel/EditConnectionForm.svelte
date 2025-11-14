@@ -1,15 +1,16 @@
 <script lang="ts">
+    import { Trash2, X } from '@lucide/svelte';
+
+    import Button from '$lib/components/ui/Button.svelte';
     import FormField from '$lib/components/ui/FormField.svelte';
     import MultiSelect from '$lib/components/ui/MultiSelect.svelte';
     import Select from '$lib/components/ui/Select.svelte';
-    import Button from '$lib/components/ui/Button.svelte';
     import { graph_store } from '$lib/stores/graph.svelte';
-    import { selection_store } from '$lib/stores/selection.svelte';
     import { notification_store } from '$lib/stores/notification.svelte';
+    import { selection_store } from '$lib/stores/selection.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
     import { ConnectionType } from '$lib/types/graph';
     import { get_available_nodes_by_type } from '$lib/utils/node-connections';
-    import { Trash2, X } from '@lucide/svelte';
 
     interface Props {
         connection_id: string;
@@ -120,7 +121,7 @@
     <div class="flex h-full flex-col">
         <div class="flex items-center justify-between border-b border-(--border-default) p-3">
             <h3 class="m-0 text-lg font-semibold text-(--text-primary)">Edit Connection</h3>
-            <Button size="sm" icon onclick={close_panel}>
+            <Button size="sm" icon on_click={close_panel}>
                 <X size={14} />
             </Button>
         </div>
@@ -174,7 +175,7 @@
             <div class="my-(--spacing-sm) h-px bg-(--border-default)"></div>
 
             <div class="flex gap-1">
-                <Button variant="danger" size="sm" onclick={handle_delete}>
+                <Button variant="danger" size="sm" on_click={handle_delete}>
                     <Trash2 size={14} />
                 </Button>
             </div>

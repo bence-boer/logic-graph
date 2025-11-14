@@ -4,6 +4,7 @@
     import { selection_store } from '$lib/stores/selection.svelte';
     import { ui_store } from '$lib/stores/ui.svelte';
     import { toggle_node_pin } from '$lib/utils/edit-node-actions';
+
     import QuickActionsBar from '../EditNodeForm/QuickActionsBar.svelte';
     import AnswerSection from './AnswerSection.svelte';
     import BasicQuestionFields from './BasicQuestionFields.svelte';

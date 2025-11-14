@@ -3,11 +3,12 @@
      * Dynamic form component that renders forms from FormDefinition.
      * Handles form state, validation, and submission.
      */
-    import type { FormDefinition, FormContext } from '$lib/forms/types';
-    import { create_form, type FormData } from '$lib/forms';
-    import { FormActionVariant } from '$lib/forms/types';
-    import DynamicFormField from './DynamicFormField.svelte';
     import Button from '$lib/components/ui/Button.svelte';
+    import { create_form, type FormData } from '$lib/forms';
+    import type { FormContext, FormDefinition } from '$lib/forms/types';
+    import { FormActionVariant } from '$lib/forms/types';
+
+    import DynamicFormField from './DynamicFormField.svelte';
 
     interface Props {
         /** Form definition to render */
@@ -148,7 +149,7 @@
                     variant={get_button_variant(action)}
                     size="sm"
                     disabled={is_action_disabled(action) || form.state.submitting}
-                    onclick={() => handle_action(action)}
+                    on_click={() => handle_action(action)}
                 >
                     {action.label}
                 </Button>
